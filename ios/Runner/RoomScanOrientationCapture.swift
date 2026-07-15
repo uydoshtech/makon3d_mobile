@@ -120,7 +120,9 @@ final class RoomScanHeadingReader: NSObject, CLLocationManagerDelegate {
     if Thread.isMainThread {
       apply()
     } else {
-      DispatchQueue.main.async(execute: apply)
+      // Must be synchronous: async stop races ARSession teardown and can
+      // still crash CoreMotion.MotionThread.
+      DispatchQueue.main.sync(execute: apply)
     }
   }
 

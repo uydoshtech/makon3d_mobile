@@ -563,4 +563,20 @@ post_install do |installer|
       File.write(room_capture_file, src)
     end
   end
+
+  # Makon 3D: disable CLLocation heading entirely during RoomPlan.
+  # Even with early stop(), CoreMotion.MotionThread EXC_BAD_ACCESS still
+  # fires on some devices when heading overlaps ARKit teardown. True-north
+  # on the floor plan is optional for v1 — scan-relative north is enough.
+  if File.exist?(room_capture_file)
+    src = File.read(room_capture_file)
+    marker = '/* makon3d: disable heading capture */'
+    unless src.include?(marker)
+      src = src.sub(
+        "    private func uydoshStartHeadingUpdates() {\n        uydoshHeadingReader.start()\n    }",
+        "    private func uydoshStartHeadingUpdates() {\n        #{marker}\n        // no-op: avoid CoreMotion race with RoomPlan teardown\n    }"
+      )
+      File.write(room_capture_file, src)
+    end
+  end
 end
