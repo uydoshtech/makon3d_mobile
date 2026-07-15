@@ -17,10 +17,15 @@ import "package:makon3d_mobile/services/scan_upload_service.dart";
 import "package:makon3d_mobile/services/scans_refresh_notifier.dart";
 import "package:makon3d_mobile/widgets/toasts.dart";
 
-/// The single screen of Makon 3D: RoomPlan (LiDAR) capture → upload USDZ to
-/// the backend → present the native 3D viewer with the fresh scan.
+/// RoomPlan (LiDAR) capture → upload USDZ to the backend.
+///
+/// On success, [onScanUploaded] is invoked so the shell can switch to the
+/// Scans list (where the user can open the 3D/2D viewer).
 class ScanScreen extends StatefulWidget {
-  const ScanScreen({super.key});
+  const ScanScreen({super.key, this.onScanUploaded});
+
+  /// Called after a successful upload (before UI settles on the list tab).
+  final VoidCallback? onScanUploaded;
 
   @override
   State<ScanScreen> createState() => _ScanScreenState();
@@ -121,7 +126,8 @@ class _ScanScreenState extends State<ScanScreen>
         _uploading = false;
       });
       Toasts.showSuccess(context, L10n.get("room_scan_success"));
-      await _presentViewer(path, uploadedMetrics?.worldPlusXBearingDeg);
+      // Hand off to the Scans list — user opens the model from there.
+      widget.onScanUploaded?.call();
     } catch (e) {
       if (!mounted) return;
       setState(() => _uploading = false);
@@ -179,12 +185,12 @@ class _ScanScreenState extends State<ScanScreen>
       if (!mounted) return;
 
       await _roomplanChannel.invokeMethod<void>("startScan", <String, dynamic>{
-        "enableMultiRoom": true,
+        // Single-room only: hide the post-scan "Scan Other Rooms" button.
+        "enableMultiRoom": false,
         "strings": <String, String>{
           "cancel": L10n.get("cancel"),
           "done": L10n.get("done"),
           "finish": L10n.get("room_scan_finish"),
-          "scanOtherRooms": L10n.get("room_scan_scan_other_rooms"),
         },
       });
     } on MissingPluginException {

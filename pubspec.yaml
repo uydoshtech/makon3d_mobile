@@ -28,3 +28,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/branding/makon3d_logo.png
+    - assets/branding/makon3d_logo.svg

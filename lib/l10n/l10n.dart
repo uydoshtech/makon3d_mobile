@@ -78,7 +78,7 @@ class L10n {
       "scans_no_metrics": "No dimensions yet",
       "room_scan_title": "3D room scan",
       "room_scan_instructions":
-          "Before starting the 3D scan\n\n• Turn on good lighting\n• Move slowly, avoid sudden movements\n• Hold your phone at chest level\n• Scan walls, corners, windows, and doors in each room\n• Tap Scan Other Rooms to capture additional rooms (iOS 17+)\n• Tap Finish when all rooms are scanned\n\nTotal area is the sum of all scanned room floors",
+          "Before starting the 3D scan\n\n• Turn on good lighting\n• Move slowly, avoid sudden movements\n• Hold your phone at chest level\n• Scan walls, corners, windows, and doors\n• Tap Done when finished, then Finish to save",
       "room_scan_start": "Start scan",
       "room_scan_finish": "Finish",
       "room_scan_scan_other_rooms": "Scan Other Rooms",
@@ -185,7 +185,7 @@ class L10n {
       "scans_no_metrics": "Размеры пока нет",
       "room_scan_title": "3D-скан комнаты",
       "room_scan_instructions":
-          "Перед началом 3D-сканирования\n\n• Включите хорошее освещение\n• Двигайтесь медленно, без резких движений\n• Держите телефон на уровне груди\n• Сканируйте стены, углы, окна и двери в каждой комнате\n• Нажмите «Сканировать другие комнаты», чтобы добавить комнаты (iOS 17+)\n• Нажмите «Завершить», когда все комнаты отсканированы\n\nОбщая площадь — сумма полов всех отсканированных комнат",
+          "Перед началом 3D-сканирования\n\n• Включите хорошее освещение\n• Двигайтесь медленно, без резких движений\n• Держите телефон на уровне груди\n• Сканируйте стены, углы, окна и двери\n• Нажмите «Готово», затем «Завершить», чтобы сохранить",
       "room_scan_start": "Начать сканирование",
       "room_scan_finish": "Завершить",
       "room_scan_scan_other_rooms": "Сканировать другие комнаты",
@@ -293,7 +293,7 @@ class L10n {
       "scans_no_metrics": "O'lchamlar hali yo'q",
       "room_scan_title": "3D xona skani",
       "room_scan_instructions":
-          "3D skanlashni boshlashdan oldin\n\n• Yaxshi yoritishni yoqing\n• Sekin harakat qiling, keskin harakatlarsiz\n• Telefonni ko‘krak balandligida ushlang\n• Har bir xonada devorlar, burchaklar, derazalar va eshiklarni skanerlang\n• Qo'shimcha xonalar uchun «Boshqa xonalarni skanerlash»ni bosing (iOS 17+)\n• Barcha xonalar skanerlangach «Yakunlash»ni bosing\n\nUmumiy maydon — barcha skanerlangan xona pollarining yig'indisi",
+          "3D skanlashni boshlashdan oldin\n\n• Yaxshi yoritishni yoqing\n• Sekin harakat qiling, keskin harakatlarsiz\n• Telefonni ko‘krak balandligida ushlang\n• Devorlar, burchaklar, derazalar va eshiklarni skanerlang\n• Tugagach «Tayyor», keyin «Yakunlash»ni bosing",
       "room_scan_start": "Skanlashni boshlash",
       "room_scan_finish": "Yakunlash",
       "room_scan_scan_other_rooms": "Boshqa xonalarni skanerlash",

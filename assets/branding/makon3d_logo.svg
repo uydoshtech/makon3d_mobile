@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Makon3D logo</title>
+  <desc id="desc">A geometric 3D cube icon in cyan and orange next to the Makon3D wordmark.</desc>
+
+  <defs>
+    <linearGradient id="cyanTop" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#BDF9F5"/>
+      <stop offset="100%" stop-color="#55D7DE"/>
+    </linearGradient>
+
+    <linearGradient id="cyanLeft" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#18B9CD"/>
+      <stop offset="100%" stop-color="#05617C"/>
+    </linearGradient>
+
+    <linearGradient id="cyanInner" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2BD4E4"/>
+      <stop offset="100%" stop-color="#08718A"/>
+    </linearGradient>
+
+    <linearGradient id="orangeRight" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF7A1A"/>
+      <stop offset="55%" stop-color="#FF9C15"/>
+      <stop offset="100%" stop-color="#FFD21A"/>
+    </linearGradient>
+
+    <linearGradient id="orangeInner" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF6B16"/>
+      <stop offset="100%" stop-color="#FFB51A"/>
+    </linearGradient>
+
+    <linearGradient id="orangeText" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#FF8A17"/>
+      <stop offset="100%" stop-color="#FFD21A"/>
+    </linearGradient>
+
+    <filter id="softGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="22" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="smallGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- transparent background -->
+
+  <!-- subtle glow -->
+  <g opacity="0.42" filter="url(#softGlow)">
+    <ellipse cx="475" cy="450" rx="145" ry="165" fill="#18CDE0"/>
+    <ellipse cx="640" cy="450" rx="145" ry="165" fill="#FFB514"/>
+    <ellipse cx="1120" cy="450" rx="180" ry="90" fill="#FFB514"/>
+  </g>
+
+  <!-- icon -->
+  <g transform="translate(260 245)">
+    <!-- top -->
+    <polygon points="180,0 360,100 180,200 0,100"
+             fill="url(#cyanTop)" stroke="#0B3852" stroke-width="2"/>
+
+    <!-- left outer face -->
+    <polygon points="0,100 180,200 180,420 0,320"
+             fill="url(#cyanLeft)" stroke="#0B3852" stroke-width="3"/>
+
+    <!-- right outer face -->
+    <polygon points="360,100 180,200 180,420 360,320"
+             fill="url(#orangeRight)" stroke="#8A4A00" stroke-width="2"/>
+
+    <!-- left inner facet -->
+    <polygon points="28,132 158,204 158,360 28,288"
+             fill="url(#cyanInner)" opacity="0.98"/>
+
+    <!-- right inner facet -->
+    <polygon points="332,132 202,204 202,360 332,288"
+             fill="url(#orangeInner)" opacity="0.98"/>
+
+    <!-- central depth -->
+    <polygon points="158,204 180,216 202,204 202,360 180,372 158,360"
+             fill="#12384C" opacity="0.34"/>
+
+    <!-- highlights -->
+    <polyline points="3,100 180,200 357,100" fill="none" stroke="#E7FFFF" stroke-opacity="0.55" stroke-width="2"/>
+    <line x1="180" y1="200" x2="180" y2="420" stroke="#102F43" stroke-opacity="0.45" stroke-width="2"/>
+  </g>
+
+  <!-- wordmark -->
+  <g transform="translate(680 0)">
+    <text x="0" y="505"
+          font-family="Avenir Next, Montserrat, Helvetica Neue, Arial, sans-serif"
+          font-size="154"
+          font-weight="600"
+          letter-spacing="-7"
+          fill="#102A40"
+          stroke="#071925"
+          stroke-width="1.4"
+          paint-order="stroke">
+      Makon
+    </text>
+
+    <text x="480" y="505"
+          font-family="Avenir Next, Montserrat, Helvetica Neue, Arial, sans-serif"
+          font-size="154"
+          font-weight="700"
+          letter-spacing="-6"
+          fill="url(#orangeText)"
+          stroke="#B85B00"
+          stroke-width="1"
+          paint-order="stroke"
+          filter="url(#smallGlow)">
+      3D
+    </text>
+  </g>
+</svg>

@@ -19,6 +19,16 @@ class _MainShellState extends State<MainShell> {
       GlobalKey<CurvedNavigationBarState>();
   int _index = 0;
 
+  static const int _scansListTab = 1;
+
+  void _goToTab(int index) {
+    if (index == _index) return;
+    HapticFeedback.selectionClick();
+    // Keep the curved bar animation in sync when switching programmatically.
+    _navKey.currentState?.setPage(index);
+    setState(() => _index = index);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,17 +37,16 @@ class _MainShellState extends State<MainShell> {
       body: IndexedStack(
         index: _index,
         children: [
-          const ScanScreen(),
-          ScansListScreen(isActive: _index == 1),
+          ScanScreen(
+            onScanUploaded: () => _goToTab(_scansListTab),
+          ),
+          ScansListScreen(isActive: _index == _scansListTab),
         ],
       ),
       bottomNavigationBar: MakonCurvedNavBar(
         currentIndex: _index,
         navigationKey: _navKey,
-        onTap: (index) {
-          HapticFeedback.selectionClick();
-          setState(() => _index = index);
-        },
+        onTap: _goToTab,
       ),
     );
   }
