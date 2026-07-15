@@ -2,7 +2,7 @@ import "package:flutter/material.dart";
 import "package:flutter_localizations/flutter_localizations.dart";
 
 import "package:makon3d_mobile/l10n/l10n.dart";
-import "package:makon3d_mobile/screens/scan_screen.dart";
+import "package:makon3d_mobile/screens/main_shell.dart";
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,7 +32,7 @@ class Makon3DApp extends StatelessWidget {
             useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4B3A2F)),
           ),
-          home: const ScanScreen(),
+          home: const MainShell(),
         );
       },
     );

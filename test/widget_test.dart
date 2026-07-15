@@ -5,7 +5,7 @@ import "package:makon3d_mobile/l10n/l10n.dart";
 import "package:makon3d_mobile/main.dart";
 
 void main() {
-  testWidgets("Scan screen renders start button", (tester) async {
+  testWidgets("Shell shows scan tab and curved nav", (tester) async {
     SharedPreferences.setMockInitialValues(<String, Object>{
       "selected_language": "en",
     });
@@ -14,5 +14,6 @@ void main() {
     await tester.pump();
 
     expect(find.text("3D room scan"), findsOneWidget);
+    expect(find.text("Scans"), findsOneWidget);
   });
 }

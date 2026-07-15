@@ -14,6 +14,7 @@ import "package:makon3d_mobile/services/room_plan_capability.dart";
 import "package:makon3d_mobile/services/room_scan_bounds_service.dart";
 import "package:makon3d_mobile/services/room_usdz_viewer_service.dart";
 import "package:makon3d_mobile/services/scan_upload_service.dart";
+import "package:makon3d_mobile/services/scans_refresh_notifier.dart";
 import "package:makon3d_mobile/widgets/toasts.dart";
 
 /// The single screen of Makon 3D: RoomPlan (LiDAR) capture → upload USDZ to
@@ -112,6 +113,7 @@ class _ScanScreenState extends State<ScanScreen>
       metrics ??= await RoomScanBoundsService.computeFromUsdPath(path);
       uploadedMetrics ??= metrics;
       debugPrint("Scan uploaded: id=${result.id} glb=${result.glbUrl}");
+      ScansRefreshNotifier.instance.notifyScansChanged();
       if (!mounted) return;
       setState(() {
         _lastScanPath = path;
@@ -259,7 +261,8 @@ class _ScanScreenState extends State<ScanScreen>
     final loading = _uploading || _starting;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      // Extra bottom inset so the Start button clears the curved nav bar.
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 100),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

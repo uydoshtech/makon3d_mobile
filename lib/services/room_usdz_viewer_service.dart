@@ -1,7 +1,12 @@
+import "dart:io";
+
+import "package:dio/dio.dart";
 import "package:flutter/services.dart";
+import "package:path_provider/path_provider.dart";
 
 import "package:makon3d_mobile/base/ios_device.dart";
 import "package:makon3d_mobile/l10n/l10n.dart";
+import "package:makon3d_mobile/services/scan_upload_service.dart";
 
 /// Presents the native SceneKit USDZ viewer (RoomUsdzViewerViewController)
 /// for a local scan file. Channel and string keys are shared with UyDosh so
@@ -14,6 +19,35 @@ class RoomUsdzViewerService {
 
   /// Matches UyDosh's `AppColors.floorObject3dTint` (0xFF795548).
   static const String _floorObjectTintHex = "795548";
+
+  /// Downloads a remote USDZ (relative or absolute URL) then presents it.
+  static Future<bool> downloadAndPresent(
+    String pathOrUrl, {
+    required int scanId,
+    required String languageCode,
+    double? worldPlusXBearingDeg,
+  }) async {
+    if (!isIOSDevice) return false;
+    final absolute = ScanUploadService.hostedUrl(pathOrUrl);
+    final temp = await getTemporaryDirectory();
+    final file = File("${temp.path}/makon3d_scan_$scanId.usdz");
+    final dio = Dio(
+      BaseOptions(
+        connectTimeout: const Duration(seconds: 45),
+        receiveTimeout: const Duration(minutes: 2),
+        responseType: ResponseType.bytes,
+      ),
+    );
+    await dio.download(absolute, file.path);
+    if (!file.existsSync() || file.lengthSync() == 0) {
+      throw StateError("Downloaded USDZ is missing or empty");
+    }
+    return presentLocalFile(
+      file.path,
+      languageCode: languageCode,
+      worldPlusXBearingDeg: worldPlusXBearingDeg,
+    );
+  }
 
   /// Returns true if the native viewer was presented.
   static Future<bool> presentLocalFile(
