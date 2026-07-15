@@ -9,13 +9,11 @@ class MakonCurvedNavBar extends StatelessWidget {
   const MakonCurvedNavBar({
     required this.currentIndex,
     required this.onTap,
-    required this.navigationKey,
     super.key,
   });
 
   final int currentIndex;
   final ValueChanged<int> onTap;
-  final GlobalKey<CurvedNavigationBarState> navigationKey;
 
   static const Color _barColor = Color(0xFF4B3A2F);
   static const Color _orbColor = Color(0xFF6D5647);
@@ -40,7 +38,6 @@ class MakonCurvedNavBar extends StatelessWidget {
     return SizedBox(
       height: 70,
       child: CurvedNavigationBar(
-        key: navigationKey,
         index: currentIndex.clamp(0, items.length - 1),
         height: 70,
         color: _barColor,

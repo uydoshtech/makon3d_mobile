@@ -1,4 +1,3 @@
-import "package:curved_navigation_bar/curved_navigation_bar.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 
@@ -15,8 +14,6 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
-  final GlobalKey<CurvedNavigationBarState> _navKey =
-      GlobalKey<CurvedNavigationBarState>();
   int _index = 0;
 
   static const int _scansListTab = 1;
@@ -24,8 +21,9 @@ class _MainShellState extends State<MainShell> {
   void _goToTab(int index) {
     if (index == _index) return;
     HapticFeedback.selectionClick();
-    // Keep the curved bar animation in sync when switching programmatically.
-    _navKey.currentState?.setPage(index);
+    // Only update our index — do not call CurvedNavigationBar.setPage from
+    // onTap (that re-enters _buttonTap and breaks subsequent taps). The bar
+    // syncs via its `index:` prop / didUpdateWidget when we rebuild.
     setState(() => _index = index);
   }
 
@@ -45,7 +43,6 @@ class _MainShellState extends State<MainShell> {
       ),
       bottomNavigationBar: MakonCurvedNavBar(
         currentIndex: _index,
-        navigationKey: _navKey,
         onTap: _goToTab,
       ),
     );
