@@ -1,0 +1,66 @@
+name: Release iOS (TestFlight)
+
+# Mirrors local: bash tool/release_ios_tag.sh --bump build --commit
+# 1. Bump version in pubspec.yaml, commit, and push
+# 2. Create and push ios-<version> tag
+# 3. Tag push starts release-testflight.yml
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Version bump type"
+        required: true
+        type: choice
+        default: build
+        options:
+          - build
+          - patch
+          - minor
+          - major
+
+concurrency:
+  group: release-ios
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  tag-and-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - name: Configure git
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump version, commit, and push iOS tag
+        env:
+          BUMP: ${{ inputs.bump }}
+        run: |
+          set -euo pipefail
+          bash tool/release_ios_tag.sh --bump "${BUMP}" --commit
+
+      - name: Summary
+        run: |
+          set -euo pipefail
+          VERSION_RAW="$(grep -m1 -E '^version:[[:space:]]+' pubspec.yaml | sed -E 's/^version:[[:space:]]+//; s/[[:space:]]*#.*//; s/[[:space:]]+$//')"
+          TAG_SUFFIX="${VERSION_RAW//+/-}"
+          {
+            echo "### Makon 3D iOS release triggered"
+            echo ""
+            echo "- **Version:** \`${VERSION_RAW}\`"
+            echo "- **iOS tag:** \`ios-${TAG_SUFFIX}\` → [release-testflight workflow](${{ github.server_url }}/${{ github.repository }}/actions/workflows/release-testflight.yml)"
+            echo ""
+            echo "The TestFlight build starts automatically from the tag push."
+          } >> "${GITHUB_STEP_SUMMARY}"

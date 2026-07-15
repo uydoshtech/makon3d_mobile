@@ -1,0 +1,49 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build an IPA with Flutter (App Store export)"
+  lane :build_ipa do |options|
+    export_options_plist = options[:export_options_plist] || "ios/ExportOptions.plist"
+
+    # Fastlane executes with cwd=`fastlane/` in many setups; make paths stable.
+    project_root = File.expand_path("..", __dir__)
+    export_options_plist = File.expand_path(export_options_plist, project_root)
+
+    sh("cd \"#{project_root}\" && flutter pub get")
+
+    build_name = options[:build_name]
+    build_number = options[:build_number]
+
+    cmd = ["cd", project_root, "&&", "flutter", "build", "ipa", "--release", "--export-options-plist=#{export_options_plist}"]
+    cmd << "--build-name=#{build_name}" if build_name && !build_name.to_s.strip.empty?
+    cmd << "--build-number=#{build_number}" if build_number && !build_number.to_s.strip.empty?
+    sh(cmd.join(" "))
+  end
+
+  desc "Upload an IPA to TestFlight (App Store Connect API key recommended)"
+  lane :upload_testflight do |options|
+    ipa_path = options[:ipa_path]
+    project_root = File.expand_path("..", __dir__)
+    ipa_path ||= Dir[File.join(project_root, "build/ios/ipa/*.ipa")].sort.last
+
+    UI.user_error!("No IPA found at build/ios/ipa/*.ipa; run ios build_ipa first") if ipa_path.nil?
+
+    key_id = options[:asc_key_id] || ENV["ASC_KEY_ID"]
+    issuer_id = options[:asc_issuer_id] || ENV["ASC_ISSUER_ID"]
+    key_content = options[:asc_key_content] || ENV["ASC_KEY_P8_BASE64"]
+
+    if key_id && issuer_id && key_content
+      app_store_connect_api_key(
+        key_id: key_id,
+        issuer_id: issuer_id,
+        key_content: key_content,
+        is_key_content_base64: true,
+      )
+    end
+
+    pilot(
+      ipa: ipa_path,
+      skip_waiting_for_build_processing: true,
+    )
+  end
+end

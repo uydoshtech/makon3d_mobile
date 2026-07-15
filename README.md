@@ -48,3 +48,15 @@ flutter analyze && flutter test
 If you change the Xcode file set, re-run `ruby tool/configure_xcodeproj.rb`
 (one-shot script that registered the copied Swift sources, localized strings,
 bundle id, and iOS 17.0 deployment target).
+
+## TestFlight / CI
+
+Push an `ios-*` tag to build and upload to TestFlight via GitHub Actions:
+
+```bash
+bash tool/release_ios_tag.sh --bump build --commit
+```
+
+Or: GitHub → **Actions** → **Release iOS (TestFlight)** → **Run workflow**.
+
+Secrets and first-time profile setup: [`tool/TESTFLIGHT_CI.md`](tool/TESTFLIGHT_CI.md).

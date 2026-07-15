@@ -72,7 +72,6 @@ enum RoomPlanToEditableModelMapper {
     attachOpeningsToWalls(openings: &openings, walls: &walls)
     markObjectsOutsideBounds(&objects, vertices: footprintVertices)
 
-    let bounds = EditableFloorPlanBoundsCalculator.bounds(for: vertices)
     let now = Date()
     var model = EditableFloorPlanModel(
       id: UUID(),
@@ -87,7 +86,9 @@ enum RoomPlanToEditableModelMapper {
       wallHeight: wallHeight,
       wallThickness: wallThickness,
       floorY: floorY,
-      bounds: bounds,
+      // Wall endpoints only — footprint OBB corners stay on `vertices` for the floor polygon but
+      // must not inflate the plan rectangle used by overall dims / resize.
+      bounds: EditableFloorPlanBoundsCalculator.bounds(for: wallVertices),
       scanFootprintBounds: scanFootprintBounds,
       footprintLongM: metrics.floorLongM,
       footprintShortM: metrics.floorShortM,
@@ -330,7 +331,7 @@ enum RoomPlanToEditableModelMapper {
       return w
     }
     updated.walls.removeAll { $0.computedLength < 1e-3 }
-    updated.bounds = EditableFloorPlanBoundsCalculator.bounds(for: updated.vertices)
+    updated.bounds = EditableFloorPlanBoundsCalculator.wallBounds(for: updated)
     return updated
   }
 

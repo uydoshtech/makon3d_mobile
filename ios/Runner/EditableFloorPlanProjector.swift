@@ -57,7 +57,8 @@ enum EditableFloorPlanProjector {
       )
     }
 
-    // Overall + per-wall dimensions (Telegram blueprint always shows both).
+    // Overall dims sit on the drawn wall rectangle (see DimensionLineService); wall
+    // segments remain available alongside them.
     let overallDimensions = DimensionLineService.renderLines(
       from: model.dimensionAnnotations.filter {
         $0.type == .overallWidth || $0.type == .overallLength

@@ -224,7 +224,7 @@ final class FloorPlanCanvas: UIView {
         highlightedDimensionId: highlightedDimensionId
       )
     case .wallSegments:
-      // Match Telegram: wall chips + overall W/H together when dims are on.
+      // Wall chips + overall W/H on the drawn rectangle when dims are on.
       labelHitRegions = DimensionLineRenderer.draw(
         lines: model.wallSegmentDimensions,
         in: ctx,
