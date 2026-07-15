@@ -71,9 +71,14 @@ enum RoomScanOrientationCapture {
 }
 
 /// Lightweight heading reader for RoomPlan capture (best-effort true north).
+///
+/// Must be stopped *before* the RoomPlan/ARKit session tears down — leaving
+/// CoreMotion heading updates alive across `ARSession` stop has been observed
+/// to crash on `com.apple.CoreMotion.MotionThread` (`EXC_BAD_ACCESS`).
 final class RoomScanHeadingReader: NSObject, CLLocationManagerDelegate {
   private let manager = CLLocationManager()
   private(set) var trueHeadingDegrees: Double?
+  private var isRunning = false
 
   override init() {
     super.init()
@@ -81,15 +86,42 @@ final class RoomScanHeadingReader: NSObject, CLLocationManagerDelegate {
     manager.headingFilter = 1
   }
 
+  deinit {
+    // Defensive: never leave CoreMotion callbacks aimed at a freed object.
+    manager.stopUpdatingHeading()
+    manager.delegate = nil
+  }
+
   func start() {
-    manager.requestWhenInUseAuthorization()
-    if CLLocationManager.headingAvailable() {
-      manager.startUpdatingHeading()
+    let apply = { [weak self] in
+      guard let self else { return }
+      self.manager.requestWhenInUseAuthorization()
+      guard CLLocationManager.headingAvailable() else { return }
+      self.manager.delegate = self
+      self.manager.startUpdatingHeading()
+      self.isRunning = true
+    }
+    if Thread.isMainThread {
+      apply()
+    } else {
+      DispatchQueue.main.async(execute: apply)
     }
   }
 
   func stop() {
-    manager.stopUpdatingHeading()
+    let apply = { [weak self] in
+      guard let self, self.isRunning || self.manager.delegate != nil else { return }
+      self.manager.stopUpdatingHeading()
+      // Clearing the delegate stops MotionThread from delivering into this
+      // object (or a half-deallocated one) during ARKit teardown.
+      self.manager.delegate = nil
+      self.isRunning = false
+    }
+    if Thread.isMainThread {
+      apply()
+    } else {
+      DispatchQueue.main.async(execute: apply)
+    }
   }
 
   func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {

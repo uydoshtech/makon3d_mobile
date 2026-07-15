@@ -72,7 +72,7 @@ class L10n {
       "room_scan_start": "Start scan",
       "room_scan_finish": "Finish",
       "room_scan_scan_other_rooms": "Scan Other Rooms",
-      "room_scan_uploading": "Uploading…",
+      "room_scan_uploading": "Uploading & converting…\nThis can take a few minutes.",
       "room_scan_success": "3D scan saved",
       "room_scan_cancelled": "No scan was captured. Tap Start to try again.",
       "room_scan_error": "Could not save scan. Try again.",
@@ -169,7 +169,7 @@ class L10n {
       "room_scan_start": "Начать сканирование",
       "room_scan_finish": "Завершить",
       "room_scan_scan_other_rooms": "Сканировать другие комнаты",
-      "room_scan_uploading": "Загрузка…",
+      "room_scan_uploading": "Загрузка и конвертация…\nЭто может занять несколько минут.",
       "room_scan_success": "3D-скан сохранён",
       "room_scan_cancelled":
           "Скан не был сделан. Нажмите «Начать», чтобы попробовать снова.",
@@ -267,7 +267,7 @@ class L10n {
       "room_scan_start": "Skanlashni boshlash",
       "room_scan_finish": "Yakunlash",
       "room_scan_scan_other_rooms": "Boshqa xonalarni skanerlash",
-      "room_scan_uploading": "Yuklanmoqda…",
+      "room_scan_uploading": "Yuklash va konvertatsiya…\nBu bir necha daqiqa olishi mumkin.",
       "room_scan_success": "3D skan saqlandi",
       "room_scan_cancelled":
           "Skan qilinmadi. Qayta urinish uchun «Boshlash»ni bosing.",

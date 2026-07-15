@@ -542,4 +542,25 @@ post_install do |installer|
       File.write(room_capture_file, src)
     end
   end
+
+  # Stop CoreMotion heading as soon as we have the snapshot (and on every
+  # Flutter-notify / dismiss path). Leaving heading updates running while
+  # RoomPlan tears down the ARSession races MotionThread → EXC_BAD_ACCESS.
+  if File.exist?(room_capture_file)
+    src = File.read(room_capture_file)
+    marker = '/* uydosh: stop heading before ar teardown */'
+    unless src.include?(marker)
+      src = src.sub(
+        "    @objc private func doneScanning() {\n        uydoshCaptureScanOrientation()\n        if isScanning {",
+        "    @objc private func doneScanning() {\n        uydoshCaptureScanOrientation()\n        #{marker}\n        uydoshHeadingReader.stop()\n        if isScanning {"
+      )
+      # Cancel / empty-finish / successful-finish all notify Flutter first —
+      # stop heading there so every exit path is covered.
+      src = src.sub(
+        '    private func uydoshNotifyRoomCaptureFinishedToFlutter() {',
+        "    private func uydoshNotifyRoomCaptureFinishedToFlutter() {\n        #{marker}\n        uydoshHeadingReader.stop()"
+      )
+      File.write(room_capture_file, src)
+    end
+  end
 end
