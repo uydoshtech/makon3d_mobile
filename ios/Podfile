@@ -1,0 +1,545 @@
+# Makon 3D — iOS Podfile.
+#
+# The post_install section patches the flutter_roomplan pod the same way the
+# UyDosh app does (markers kept as "uydosh:" so the patches stay byte-identical
+# and easy to diff against the original):
+#   - scene-safe view-controller lookups (UIScene apps)
+#   - notify Flutter on cancel / empty finish
+#   - localized + Flutter-provided button titles, nicer styling
+#   - compass orientation sidecar written next to the exported USDZ
+#   - keep the screen awake during capture
+platform :ios, '17.0'
+
+# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
+
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Generated.xcconfig, then run flutter pub get"
+end
+
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+flutter_ios_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '17.0'
+
+      # permission_handler: opt in to the permission types we actually use.
+      # The pod ships every permission's Swift code, gated behind these
+      # preprocessor macros. Without them, Permission.camera returns .denied
+      # with no system prompt. Location is used by the scan-time heading
+      # reader (true-north compass on the floor plan).
+      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
+      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] += [
+        'PERMISSION_CAMERA=1',
+        'PERMISSION_LOCATION=1',
+      ]
+    end
+  end
+
+  # Patch flutter_roomplan iOS plugin to work with iOS multi-scene apps.
+  # The upstream plugin uses `UIApplication.shared.delegate?.window??.rootViewController`,
+  # which is often nil on iOS 13+ (UIScene) and causes "Start scan" to no-op and
+  # USDZ path lookups to fail.
+  plugin_file = File.expand_path(File.join(__dir__, '.symlinks', 'plugins', 'flutter_roomplan', 'ios', 'Classes', 'FlutterRoomplanPlugin.swift'))
+  if File.exist?(plugin_file)
+    src = File.read(plugin_file)
+    marker = '/* uydosh: scene-safe VC lookup */'
+    unless src.include?(marker)
+      # Replace fragile rootVC lookup.
+      src = src.gsub(
+        'let rootVC = UIApplication.shared.delegate?.window??.rootViewController',
+        'let rootVC = FlutterRoomplanPlugin.uydoshTopViewController()'
+      )
+      # Replace scan VC lookup used by getUsdzFilePath/getJsonFilePath.
+      src = src.gsub(
+        'if let roomVC = UIApplication.shared.delegate?.window??.rootViewController?.presentedViewController as? RoomCaptureViewController',
+        'if let roomVC = FlutterRoomplanPlugin.uydoshCurrentRoomCaptureViewController()'
+      )
+
+      # Inject helpers before the final closing brace of the class.
+      injection = <<~SWIFT
+
+        #{marker}
+        private static func uydoshTopViewController() -> UIViewController? {
+          for scene in UIApplication.shared.connectedScenes {
+            guard let windowScene = scene as? UIWindowScene else { continue }
+            let windows = windowScene.windows
+            let root = windows.first(where: { $0.isKeyWindow })?.rootViewController
+              ?? windows.first?.rootViewController
+            if let root = root {
+              return uydoshFindTop(from: root)
+            }
+          }
+          return nil
+        }
+
+        private static func uydoshFindTop(from vc: UIViewController) -> UIViewController {
+          if let presented = vc.presentedViewController {
+            return uydoshFindTop(from: presented)
+          }
+          if let nav = vc as? UINavigationController, let visible = nav.visibleViewController {
+            return uydoshFindTop(from: visible)
+          }
+          if let tab = vc as? UITabBarController, let selected = tab.selectedViewController {
+            return uydoshFindTop(from: selected)
+          }
+          return vc
+        }
+
+        private static func uydoshCurrentRoomCaptureViewController() -> RoomCaptureViewController? {
+          guard let top = uydoshTopViewController() else { return nil }
+          // Walk presented chain from the current top VC.
+          var vc: UIViewController? = top
+          while let current = vc {
+            if let room = current as? RoomCaptureViewController { return room }
+            vc = current.presentedViewController
+          }
+          return nil
+        }
+      SWIFT
+
+      # Insert right before the last "}" (end of class).
+      idx = src.rindex("}")
+      if idx
+        src = src.dup.insert(idx, injection)
+        File.write(plugin_file, src)
+      end
+    end
+  end
+
+  # Same UIScene issue as above: finishAndReturnResult() notifies Flutter via
+  # `UIApplication.shared.delegate?.window??.rootViewController`, which is nil
+  # on scene-based apps — so `onRoomCaptureFinished` never reaches Dart, the
+  # USDZ upload never runs, and the user stays on the scan screen after scan.
+  room_capture_file = File.expand_path(File.join(__dir__, '.symlinks', 'plugins', 'flutter_roomplan', 'ios', 'Classes', 'RoomCaptureViewController.swift'))
+  if File.exist?(room_capture_file)
+    src = File.read(room_capture_file)
+    marker = '/* uydosh: room capture finished → Flutter (UIScene-safe) */'
+    unless src.include?(marker)
+      src = src.gsub(
+        "                        if let controller = UIApplication.shared.delegate?.window??.rootViewController as? FlutterViewController {\n                            let channel = FlutterMethodChannel(name: \"rkg/flutter_roomplan\", binaryMessenger: controller.binaryMessenger)\n                            channel.invokeMethod(\"onRoomCaptureFinished\", arguments: nil)\n                        }",
+        '                        self.uydoshNotifyRoomCaptureFinishedToFlutter()'
+      )
+
+      # Use explicit lines (not <<~SWIFT) so Ruby does not strip Swift indentation.
+      injection = [
+        '',
+        "    #{marker}",
+        '    private func uydoshNotifyRoomCaptureFinishedToFlutter() {',
+        '        var vc: UIViewController? = self.presentingViewController',
+        '        while let current = vc {',
+        '            if let flutter = current as? FlutterViewController {',
+        '                let channel = FlutterMethodChannel(name: "rkg/flutter_roomplan", binaryMessenger: flutter.binaryMessenger)',
+        '                channel.invokeMethod("onRoomCaptureFinished", arguments: nil)',
+        '                return',
+        '            }',
+        '            if let nav = current as? UINavigationController {',
+        '                for sub in nav.viewControllers {',
+        '                    if let flutter = sub as? FlutterViewController {',
+        '                        let channel = FlutterMethodChannel(name: "rkg/flutter_roomplan", binaryMessenger: flutter.binaryMessenger)',
+        '                        channel.invokeMethod("onRoomCaptureFinished", arguments: nil)',
+        '                        return',
+        '                    }',
+        '                }',
+        '                if let flutter = nav.visibleViewController as? FlutterViewController {',
+        '                    let channel = FlutterMethodChannel(name: "rkg/flutter_roomplan", binaryMessenger: flutter.binaryMessenger)',
+        '                    channel.invokeMethod("onRoomCaptureFinished", arguments: nil)',
+        '                    return',
+        '                }',
+        '            }',
+        '            if let tab = current as? UITabBarController {',
+        '                vc = tab.selectedViewController',
+        '                continue',
+        '            }',
+        '            vc = current.presentingViewController',
+        '        }',
+        '        for scene in UIApplication.shared.connectedScenes {',
+        '            guard let windowScene = scene as? UIWindowScene else { continue }',
+        '            let root = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController',
+        '                ?? windowScene.windows.first?.rootViewController',
+        '            guard let root = root else { continue }',
+        '            if let flutter = Self.uydoshFindFlutterViewController(in: root) {',
+        '                let channel = FlutterMethodChannel(name: "rkg/flutter_roomplan", binaryMessenger: flutter.binaryMessenger)',
+        '                channel.invokeMethod("onRoomCaptureFinished", arguments: nil)',
+        '                return',
+        '            }',
+        '        }',
+        '    }',
+        '',
+        '    private static func uydoshFindFlutterViewController(in vc: UIViewController) -> FlutterViewController? {',
+        '        if let f = vc as? FlutterViewController { return f }',
+        '        if let nav = vc as? UINavigationController {',
+        '            for child in nav.viewControllers {',
+        '                if let found = uydoshFindFlutterViewController(in: child) { return found }',
+        '            }',
+        '        }',
+        '        if let tab = vc as? UITabBarController, let selected = tab.selectedViewController {',
+        '            return uydoshFindFlutterViewController(in: selected)',
+        '        }',
+        '        for child in vc.children {',
+        '            if let found = uydoshFindFlutterViewController(in: child) { return found }',
+        '        }',
+        '        return nil',
+        '    }',
+      ].join("\n")
+
+      src = src.sub(
+        '    private func resetScanningSession() {',
+        "#{injection}\n    private func resetScanningSession() {"
+      )
+      File.write(room_capture_file, src)
+    end
+  end
+
+  # Notify Flutter when the user dismisses the native RoomCaptureViewController
+  # without exporting a USDZ — i.e. tapped "Cancel", or tapped "Done" → "Finish"
+  # before any room was captured. Upstream just calls `self.dismiss(animated:)`
+  # in those paths and never sends `onRoomCaptureFinished`, so Dart's listener
+  # never fires and our screen is stuck on "Start scan" with no feedback.
+  if File.exist?(room_capture_file)
+    src = File.read(room_capture_file)
+    marker = '/* uydosh: notify flutter on cancel/empty-finish */'
+    unless src.include?(marker)
+      src = src.sub(
+        "    @objc private func cancelScanning() {\n        self.dismiss(animated: true)\n    }",
+        "    @objc private func cancelScanning() {\n        #{marker}\n        self.uydoshNotifyRoomCaptureFinishedToFlutter()\n        self.dismiss(animated: true)\n    }"
+      )
+      # finishAndReturnResult's "no captured room" early-out also dismisses
+      # silently — make it behave the same as cancel.
+      src = src.sub(
+        "    @objc private func finishAndReturnResult() {\n        guard let currentCapturedRoom = currentCapturedRoom else {\n            self.dismiss(animated: true)\n            return\n        }",
+        "    @objc private func finishAndReturnResult() {\n        guard let currentCapturedRoom = currentCapturedRoom else {\n            #{marker}\n            self.uydoshNotifyRoomCaptureFinishedToFlutter()\n            self.dismiss(animated: true)\n            return\n        }"
+      )
+      File.write(room_capture_file, src)
+    end
+  end
+
+  # Localize hardcoded UI strings in flutter_roomplan's RoomCaptureViewController.
+  # Upstream uses hardcoded English titles for top buttons.
+  if File.exist?(room_capture_file)
+    src = File.read(room_capture_file)
+    marker = '/* uydosh: localize roomplan buttons */'
+    unless src.include?(marker)
+      # Inject helper + swap hardcoded titles.
+      # Keep the code simple: strings resolved from Runner's Localizable.strings.
+      helper = [
+        '',
+        "    #{marker}",
+        '    private func uydoshL(_ key: String, _ fallback: String) -> String {',
+        '        NSLocalizedString(key, tableName: nil, bundle: Bundle.main, value: fallback, comment: "")',
+        '    }',
+      ].join("\n")
+
+      src = src.sub(
+        '    private func setupUI() {',
+        "#{helper}\n    private func setupUI() {"
+      )
+      File.write(room_capture_file, src)
+    end
+  end
+
+  # Always ensure RoomCaptureViewController can accept Flutter-provided button titles
+  # (even if the localization patch above already ran in a previous install).
+  if File.exist?(room_capture_file)
+    src = File.read(room_capture_file)
+    marker = '/* uydosh: roomplan button overrides */'
+    unless src.include?(marker)
+      # Add override properties right after jsonFilePath.
+      unless src.include?('public var uydoshCancelTitle')
+        src = src.sub(
+          '    public  var jsonFilePath: String?',
+          "    public  var jsonFilePath: String?\n\n    #{marker}\n    public var uydoshCancelTitle: String?\n    public var uydoshDoneTitle: String?\n    public var uydoshFinishTitle: String?\n    public var uydoshScanOtherRoomsTitle: String?"
+        )
+      end
+
+      # Replace the setTitle calls with "override if provided" versions (idempotent-ish).
+      src = src.gsub(
+        'finishButton.setTitle(uydoshL("roomplan_finish", "Finish"), for: .normal)',
+        'finishButton.setTitle((uydoshFinishTitle?.isEmpty == false ? uydoshFinishTitle! : uydoshL("roomplan_finish", "Finish")), for: .normal)'
+      )
+      src = src.gsub(
+        'scanOtherRoomsButton.setTitle(uydoshL("roomplan_scan_other_rooms", "Scan Other Rooms"), for: .normal)',
+        'scanOtherRoomsButton.setTitle((uydoshScanOtherRoomsTitle?.isEmpty == false ? uydoshScanOtherRoomsTitle! : uydoshL("roomplan_scan_other_rooms", "Scan Other Rooms")), for: .normal)'
+      )
+      src = src.gsub(
+        'cancelButton.setTitle(uydoshL("roomplan_cancel", "Cancel"), for: .normal)',
+        'cancelButton.setTitle((uydoshCancelTitle?.isEmpty == false ? uydoshCancelTitle! : uydoshL("roomplan_cancel", "Cancel")), for: .normal)'
+      )
+      src = src.gsub(
+        'doneButton.setTitle(uydoshL("roomplan_done", "Done"), for: .normal)',
+        'doneButton.setTitle((uydoshDoneTitle?.isEmpty == false ? uydoshDoneTitle! : uydoshL("roomplan_done", "Done")), for: .normal)'
+      )
+
+      File.write(room_capture_file, src)
+    end
+  end
+
+  # Restyle the "Finish" / "Scan Other Rooms" buttons to look like a matched pair of
+  # pill-shaped buttons instead of the upstream mismatched rectangle sizes (120x44 vs
+  # 160x44).
+  if File.exist?(room_capture_file)
+    src = File.read(room_capture_file)
+    marker = '/* uydosh: nicer roomplan button styling */'
+    unless src.include?(marker)
+      src = src.sub(
+        "        // Configure Finish Button - Filled style\n" \
+        "        finishButton.setTitle((uydoshFinishTitle?.isEmpty == false ? uydoshFinishTitle! : uydoshL(\"roomplan_finish\", \"Finish\")), for: .normal)",
+        "        // Configure Finish Button - Filled style\n" \
+        "        #{marker}\n" \
+        "        finishButton.setTitle((uydoshFinishTitle?.isEmpty == false ? uydoshFinishTitle! : uydoshL(\"roomplan_finish\", \"Finish\")), for: .normal)"
+      )
+
+      src = src.sub(
+        "        finishButton.layer.cornerRadius = 12\n" \
+        "        finishButton.addTarget(self, action: #selector(finishAndReturnResult), for: .touchUpInside)",
+        "        finishButton.layer.cornerRadius = 24\n" \
+        "        finishButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .semibold)\n" \
+        "        finishButton.layer.shadowColor = UIColor.black.cgColor\n" \
+        "        finishButton.layer.shadowOpacity = 0.25\n" \
+        "        finishButton.layer.shadowRadius = 6\n" \
+        "        finishButton.layer.shadowOffset = CGSize(width: 0, height: 3)\n" \
+        "        finishButton.addTarget(self, action: #selector(finishAndReturnResult), for: .touchUpInside)"
+      )
+
+      src = src.sub(
+        "        scanOtherRoomsButton.backgroundColor = UIColor.clear\n" \
+        "        scanOtherRoomsButton.setTitleColor(UIColor(red: 75/255.0, green: 58/255.0, blue: 47/255.0, alpha: 1.0), for: .normal)\n" \
+        "        scanOtherRoomsButton.layer.cornerRadius = 12\n" \
+        "        scanOtherRoomsButton.layer.borderWidth = 2.0\n" \
+        "        scanOtherRoomsButton.layer.borderColor = UIColor(red: 75/255.0, green: 58/255.0, blue: 47/255.0, alpha: 1.0).cgColor",
+        "        scanOtherRoomsButton.backgroundColor = UIColor(red: 75/255.0, green: 58/255.0, blue: 47/255.0, alpha: 0.08)\n" \
+        "        scanOtherRoomsButton.setTitleColor(UIColor(red: 75/255.0, green: 58/255.0, blue: 47/255.0, alpha: 1.0), for: .normal)\n" \
+        "        scanOtherRoomsButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .semibold)\n" \
+        "        scanOtherRoomsButton.layer.cornerRadius = 24\n" \
+        "        scanOtherRoomsButton.layer.borderWidth = 1.5\n" \
+        "        scanOtherRoomsButton.layer.borderColor = UIColor(red: 75/255.0, green: 58/255.0, blue: 47/255.0, alpha: 1.0).cgColor"
+      )
+
+      # Make the two buttons an equal-width pair (was 120x44 / 160x44 — lopsided).
+      src = src.sub(
+        "                finishButton.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: -10),\n" \
+        "                finishButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40),\n" \
+        "                finishButton.widthAnchor.constraint(equalToConstant: 120),\n" \
+        "                finishButton.heightAnchor.constraint(equalToConstant: 44),\n" \
+        "\n" \
+        "                scanOtherRoomsButton.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: 10),\n" \
+        "                scanOtherRoomsButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40),\n" \
+        "                scanOtherRoomsButton.widthAnchor.constraint(equalToConstant: 160),\n" \
+        "                scanOtherRoomsButton.heightAnchor.constraint(equalToConstant: 44),",
+        "                finishButton.trailingAnchor.constraint(equalTo: view.centerXAnchor, constant: -8),\n" \
+        "                finishButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40),\n" \
+        "                finishButton.widthAnchor.constraint(equalToConstant: 140),\n" \
+        "                finishButton.heightAnchor.constraint(equalToConstant: 48),\n" \
+        "\n" \
+        "                scanOtherRoomsButton.leadingAnchor.constraint(equalTo: view.centerXAnchor, constant: 8),\n" \
+        "                scanOtherRoomsButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40),\n" \
+        "                scanOtherRoomsButton.widthAnchor.constraint(equalToConstant: 140),\n" \
+        "                scanOtherRoomsButton.heightAnchor.constraint(equalToConstant: 48),"
+      )
+
+      File.write(room_capture_file, src)
+    end
+  end
+
+  # Allow passing button titles from Flutter to the RoomCaptureViewController instance.
+  flutter_roomplan_plugin_file = File.expand_path(File.join(__dir__, '.symlinks', 'plugins', 'flutter_roomplan', 'ios', 'Classes', 'FlutterRoomplanPlugin.swift'))
+  if File.exist?(flutter_roomplan_plugin_file)
+    src = File.read(flutter_roomplan_plugin_file)
+    marker = '/* uydosh: pass strings into RoomCaptureViewController */'
+    unless src.include?(marker)
+      # Inject right after roomVC is created.
+      src = src.gsub(
+        '        let roomVC = RoomCaptureViewController()',
+        "        let roomVC = RoomCaptureViewController()\n        #{marker}\n        if let stringsDict = arguments?[\"strings\"] as? [String: Any] {\n            roomVC.uydoshCancelTitle = stringsDict[\"cancel\"] as? String\n            roomVC.uydoshDoneTitle = stringsDict[\"done\"] as? String\n            roomVC.uydoshFinishTitle = stringsDict[\"finish\"] as? String\n            roomVC.uydoshScanOtherRoomsTitle = stringsDict[\"scanOtherRooms\"] as? String\n        }"
+      )
+      File.write(flutter_roomplan_plugin_file, src)
+    end
+  end
+
+  # Re-apply button titles when the capture UI appears so Flutter-provided labels
+  # are always shown even if view setup order changes across iOS versions.
+  if File.exist?(room_capture_file)
+    src = File.read(room_capture_file)
+    marker = '/* uydosh: re-apply button titles on appear */'
+    unless src.include?(marker)
+      helper = [
+        '',
+        "    #{marker}",
+        '    private func uydoshApplyButtonTitles() {',
+        '        finishButton.setTitle((uydoshFinishTitle?.isEmpty == false ? uydoshFinishTitle! : uydoshL("roomplan_finish", "Finish")), for: .normal)',
+        '        scanOtherRoomsButton.setTitle((uydoshScanOtherRoomsTitle?.isEmpty == false ? uydoshScanOtherRoomsTitle! : uydoshL("roomplan_scan_other_rooms", "Scan Other Rooms")), for: .normal)',
+        '        cancelButton.setTitle((uydoshCancelTitle?.isEmpty == false ? uydoshCancelTitle! : uydoshL("roomplan_cancel", "Cancel")), for: .normal)',
+        '        doneButton.setTitle((uydoshDoneTitle?.isEmpty == false ? uydoshDoneTitle! : uydoshL("roomplan_done", "Done")), for: .normal)',
+        '    }',
+      ].join("\n")
+
+      src = src.sub(
+        '    public override func viewDidAppear(_ animated: Bool) {',
+        "#{helper}\n    public override func viewDidAppear(_ animated: Bool) {"
+      )
+      src = src.sub(
+        "    public override func viewDidAppear(_ animated: Bool) {\n        super.viewDidAppear(animated)\n        startSession()",
+        "    public override func viewDidAppear(_ animated: Bool) {\n        super.viewDidAppear(animated)\n        uydoshApplyButtonTitles()\n        startSession()"
+      )
+      File.write(room_capture_file, src)
+    end
+  end
+
+  # Capture device compass + AR world axes when RoomPlan scan finishes so the floor
+  # plan overlay can show true geographic north (not just scan-relative axes).
+  if File.exist?(room_capture_file)
+    orientation_src = File.expand_path('Runner/RoomScanOrientationCapture.swift', __dir__)
+    orientation_dst = File.join(File.dirname(room_capture_file), 'RoomScanOrientationCapture.swift')
+    FileUtils.cp(orientation_src, orientation_dst) if File.exist?(orientation_src)
+
+    src = File.read(room_capture_file)
+    marker = '/* uydosh: scan orientation capture */'
+    unless src.include?(marker)
+      src = src.sub('import ARKit', "import ARKit\nimport CoreLocation") unless src.include?('import CoreLocation')
+      src = src.sub(
+        '    public var uydoshScanOtherRoomsTitle: String?',
+        "    public var uydoshScanOtherRoomsTitle: String?\n\n    #{marker}\n    private var uydoshHeadingReader = RoomScanHeadingReader()\n    private var uydoshPendingOrientation: RoomScanOrientationCapture.Snapshot?"
+      )
+
+      unless src.include?("uydoshApplyButtonTitles()\n        uydoshStartHeadingUpdates()") ||
+             src.include?("super.viewDidAppear(animated)\n        uydoshStartHeadingUpdates()")
+        if src.include?("uydoshApplyButtonTitles()\n        startSession()")
+          src = src.sub(
+            "uydoshApplyButtonTitles()\n        startSession()",
+            "uydoshApplyButtonTitles()\n        uydoshStartHeadingUpdates()\n        startSession()"
+          )
+        else
+          src = src.sub(
+            "        super.viewDidAppear(animated)\n        startSession()",
+            "        super.viewDidAppear(animated)\n        uydoshStartHeadingUpdates()\n        startSession()"
+          )
+        end
+      end
+
+      helper = [
+        '',
+        "    #{marker}",
+        '    private func uydoshStartHeadingUpdates() {',
+        '        uydoshHeadingReader.start()',
+        '    }',
+        '',
+        '    private func uydoshCaptureScanOrientation() {',
+        '        guard let heading = uydoshHeadingReader.trueHeadingDegrees else { return }',
+        '        uydoshPendingOrientation = RoomScanOrientationCapture.snapshot(',
+        '            from: roomCaptureView.captureSession.arSession,',
+        '            trueHeadingDegrees: heading',
+        '        )',
+        '    }',
+        '',
+        '    private func uydoshWriteOrientationSidecarIfNeeded() {',
+        '        guard let snapshot = uydoshPendingOrientation,',
+        '            let path = usdzFilePath else { return }',
+        '        RoomScanOrientationCapture.writeSidecar(snapshot, forUsdzPath: path)',
+        '    }',
+      ].join("\n")
+
+      src = src.sub(
+        '    private func resetScanningSession() {',
+        "#{helper}\n    private func resetScanningSession() {"
+      )
+
+      src = src.sub(
+        "    public override func viewWillDisappear(_ animated: Bool) {\n        super.viewWillDisappear(animated)\n        stopSession()\n    }",
+        "    public override func viewWillDisappear(_ animated: Bool) {\n        super.viewWillDisappear(animated)\n        uydoshHeadingReader.stop()\n        stopSession()\n    }"
+      )
+
+      src = src.sub(
+        "    @objc private func doneScanning() {\n        if isScanning {",
+        "    @objc private func doneScanning() {\n        uydoshCaptureScanOrientation()\n        if isScanning {"
+      )
+
+      src = src.gsub(
+        "                self.usdzFilePath = fileURL.path\n                \n                print(\"Successfully exported USDZ file to:",
+        "                self.usdzFilePath = fileURL.path\n                self.uydoshWriteOrientationSidecarIfNeeded()\n                \n                print(\"Successfully exported USDZ file to:"
+      )
+
+      File.write(room_capture_file, src)
+    end
+  end
+
+  # Long RoomPlan scans exceed the system auto-lock; keep the screen on while capture UI is visible.
+  if File.exist?(room_capture_file)
+    src = File.read(room_capture_file)
+    marker = '/* uydosh: keep screen awake during scan */'
+    unless src.include?(marker)
+      helper = [
+        '',
+        "    #{marker}",
+        '    private var uydoshWasIdleTimerDisabled = false',
+        '',
+        '    private func uydoshKeepScreenAwakeDuringScan() {',
+        '        uydoshWasIdleTimerDisabled = UIApplication.shared.isIdleTimerDisabled',
+        '        UIApplication.shared.isIdleTimerDisabled = true',
+        '    }',
+        '',
+        '    private func uydoshRestoreScreenIdleTimer() {',
+        '        UIApplication.shared.isIdleTimerDisabled = uydoshWasIdleTimerDisabled',
+        '    }',
+      ].join("\n")
+
+      src = src.sub(
+        '    public override func viewDidAppear(_ animated: Bool) {',
+        "#{helper}\n    public override func viewDidAppear(_ animated: Bool) {"
+      )
+
+      if src.include?("super.viewDidAppear(animated)\n        uydoshApplyButtonTitles()")
+        src = src.sub(
+          "super.viewDidAppear(animated)\n        uydoshApplyButtonTitles()",
+          "super.viewDidAppear(animated)\n        uydoshKeepScreenAwakeDuringScan()\n        uydoshApplyButtonTitles()"
+        )
+      else
+        src = src.sub(
+          "super.viewDidAppear(animated)\n        startSession()",
+          "super.viewDidAppear(animated)\n        uydoshKeepScreenAwakeDuringScan()\n        startSession()"
+        )
+      end
+
+      if src.include?("super.viewWillDisappear(animated)\n        uydoshHeadingReader.stop()")
+        src = src.sub(
+          "super.viewWillDisappear(animated)\n        uydoshHeadingReader.stop()",
+          "super.viewWillDisappear(animated)\n        uydoshRestoreScreenIdleTimer()\n        uydoshHeadingReader.stop()"
+        )
+      else
+        src = src.sub(
+          "super.viewWillDisappear(animated)\n        stopSession()",
+          "super.viewWillDisappear(animated)\n        uydoshRestoreScreenIdleTimer()\n        stopSession()"
+        )
+      end
+
+      File.write(room_capture_file, src)
+    end
+  end
+end
