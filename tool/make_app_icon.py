@@ -13,9 +13,10 @@ from pathlib import Path
 from PIL import Image
 
 SRC = Path(sys.argv[1])
-ICONSET = Path(__file__).resolve().parent.parent / (
-    "ios/Runner/Assets.xcassets/AppIcon.appiconset"
-)
+ROOT = Path(__file__).resolve().parent.parent
+ICONSET = ROOT / "ios/Runner/Assets.xcassets/AppIcon.appiconset"
+LAUNCHSET = ROOT / "ios/Runner/Assets.xcassets/LaunchImage.imageset"
+BRANDING = ROOT / "assets/branding"
 
 # (filename, pixel size)
 SIZES = [
@@ -94,3 +95,32 @@ for name, size in SIZES:
     out = master if size == 1024 else master.resize((size, size), Image.LANCZOS)
     out.save(ICONSET / name, "PNG")
     print(f"wrote {name} ({size}x{size})")
+
+# Transparent icon (same crop) for the launch and splash screens. The source
+# is fully opaque on white, so turn near-white into transparency.
+rgba = img.crop((bbox[0], icon_band[0] + bbox[1], bbox[2], icon_band[0] + bbox[3]))
+datas = []
+for r, g, b, a in rgba.getdata():
+    if r >= 250 and g >= 250 and b >= 250:
+        datas.append((255, 255, 255, 0))
+    else:
+        datas.append((r, g, b, a))
+transparent = Image.new("RGBA", rgba.size)
+transparent.putdata(datas)
+
+# Launch image: @3x tallest at 480px, keep aspect.
+h3 = 480
+w3 = round(transparent.width * h3 / transparent.height)
+launch3 = transparent.resize((w3, h3), Image.LANCZOS)
+for scale, name in ((3, "LaunchImage@3x.png"), (2, "LaunchImage@2x.png"), (1, "LaunchImage.png")):
+    size = (round(w3 * scale / 3), round(h3 * scale / 3))
+    launch3.resize(size, Image.LANCZOS).save(LAUNCHSET / name, "PNG")
+    print(f"wrote {name} {size}")
+
+# In-app branding asset used by the Flutter splash screen.
+brand_h = 1024
+brand_w = round(transparent.width * brand_h / transparent.height)
+transparent.resize((brand_w, brand_h), Image.LANCZOS).save(
+    BRANDING / "makon3d_logo.png", "PNG"
+)
+print(f"wrote assets/branding/makon3d_logo.png ({brand_w}x{brand_h})")

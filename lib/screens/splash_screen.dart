@@ -65,7 +65,9 @@ class _SplashScreenState extends State<SplashScreen>
             child: Image.asset(
               "assets/branding/makon3d_logo.png",
               fit: BoxFit.contain,
-              width: MediaQuery.sizeOf(context).width * 0.78,
+              // Same logical size as the native launch screen's intrinsic
+              // LaunchImage (137x160 pt) so the handoff is seamless.
+              width: 137,
             ),
           ),
         ),
