@@ -25,17 +25,15 @@ No login: uploads are keyed by an install-scoped random `device_id`
 ## Architecture
 
 - `lib/screens/scan_screen.dart` — the single screen (capture → upload → viewer).
-- `lib/services/` — RoomPlan capability check, USDZ bounds/metrics
-  (method channel), anonymous upload, native viewer presentation, native
-  language sync.
+- `lib/services/` — RoomPlan capability check, anonymous upload, and thin
+  wrappers around [`room_scan_kit`](https://github.com/uydoshtech/room_scan_kit)
+  (viewer, bounds, native language).
 - `lib/l10n/l10n.dart` — map-based en/ru/uz strings + persisted language state.
-- `ios/Runner/*.swift` — native stack copied from UyDosh: `RoomScanBoundsPlugin`
-  (USDZ footprint metrics), `RoomUsdzViewerViewController` + floor-plan /
-  compass / sun-simulation files. Method-channel names keep the `uydosh/`
-  prefix so these files stay byte-identical with the UyDosh originals.
+- Native SceneKit viewer / editable floor plan live in **`room_scan_kit`**
+  (private Flutter plugin), not in `ios/Runner`.
 - `ios/Podfile` — patches the `flutter_roomplan` pod (UIScene-safe lookups,
   cancel notifications, localized buttons, compass orientation sidecar,
-  keep-screen-awake). Same patches as UyDosh; markers kept as `uydosh:`.
+  keep-screen-awake). Markers kept as `uydosh:`.
 
 ## Development
 
@@ -45,9 +43,13 @@ flutter run            # requires a physical LiDAR device for actual scanning
 flutter analyze && flutter test
 ```
 
-If you change the Xcode file set, re-run `ruby tool/configure_xcodeproj.rb`
-(one-shot script that registered the copied Swift sources, localized strings,
-bundle id, and iOS 17.0 deployment target).
+`room_scan_kit` is a private git dependency (`ref: v0.1.0`). Local `pub get`
+needs GitHub auth that can read `uydoshtech/room_scan_kit`. CI uses the
+`ROOM_SCAN_KIT_GITHUB_TOKEN` repo secret (classic PAT or fine-grained token
+with Contents: Read on that repo).
+
+`ruby tool/configure_xcodeproj.rb` only maintains Localizable/InfoPlist strings
+and bundle id / iOS 17 deployment target — not the viewer Swift sources.
 
 ## TestFlight / CI
 

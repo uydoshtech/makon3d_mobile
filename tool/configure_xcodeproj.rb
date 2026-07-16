@@ -1,6 +1,8 @@
-# One-shot project configuration: registers the Swift files copied from the
-# UyDosh Runner (3D viewer / floor plan / scan bounds stack), the localized
-# .strings files, and sets bundle id + deployment target.
+# One-shot project configuration: registers localized .strings files and sets
+# bundle id + deployment target.
+#
+# Room-scan / floor-plan / sun-simulation Swift sources now come from the
+# room_scan_kit CocoaPod — do not re-register them in the Runner target.
 #
 # Run from the repo root:  ruby tool/configure_xcodeproj.rb
 require 'xcodeproj'
@@ -11,47 +13,6 @@ project = Xcodeproj::Project.open(project_path)
 runner_target = project.targets.find { |t| t.name == 'Runner' }
 tests_target = project.targets.find { |t| t.name == 'RunnerTests' }
 runner_group = project.main_group['Runner']
-
-swift_files = %w[
-  CompassOrientationAdjustPanel
-  CompassOrientationEditController
-  CompassScreenProjection
-  DimensionEditController
-  DimensionLineService
-  EditableFloorPlanAlignService
-  EditableFloorPlanModel
-  EditableFloorPlanProjector
-  FloorPlanAlignmentService
-  FloorPlanCanvas
-  FloorPlanModel
-  FloorPlanNorthOrientation
-  FloorPlanProjectionService
-  FloorPlanRenderers
-  FloorPlanResizeService
-  FloorPlanStateManager
-  FloorPlanTab
-  RoomPlanToEditableModelMapper
-  RoomScanBoundsPlugin
-  RoomScanMetricsComputer
-  RoomScanOrientationCapture
-  RoomUsdzViewerViewController
-  ScanCeilingService
-  Scene3DRegenerationService
-  SolarPosition
-  SunClockOverlayView
-  SunCompassOverlayView
-  SunPositionMath
-  SunSimulationController
-  SunSimulationPanel
-].map { |n| "#{n}.swift" }
-
-existing = runner_group.files.map(&:display_name)
-swift_files.each do |name|
-  next if existing.include?(name)
-  ref = runner_group.new_reference(name)
-  runner_target.source_build_phase.add_file_reference(ref, true)
-  puts "added source #{name}"
-end
 
 # Localized InfoPlist.strings / Localizable.strings variant groups.
 %w[InfoPlist.strings Localizable.strings].each do |strings_name|
