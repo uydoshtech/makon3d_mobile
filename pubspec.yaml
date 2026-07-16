@@ -31,6 +31,10 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
 flutter:
+  # Match UyDosh: stay on CocoaPods. SPM fails on room_scan_kit because its
+  # Package.swift has localized Resources but no defaultLocalization.
+  config:
+    enable-swift-package-manager: false
   uses-material-design: true
   assets:
     - assets/branding/makon3d_logo.png
