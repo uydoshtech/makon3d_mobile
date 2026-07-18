@@ -32,9 +32,10 @@ class _ScanModeSelectionScreenState extends State<ScanModeSelectionScreen> {
     final modes = ScanModePolicy.availableModes(
       forProduct: kMakonScanEntry.product,
     );
+    // Default to entire housing; user can still pick room-by-room.
     _selected = widget.initialMode ??
-        (modes.contains(ScanMode.roomByRoom)
-            ? ScanMode.roomByRoom
+        (modes.contains(ScanMode.entireHousing)
+            ? ScanMode.entireHousing
             : modes.first);
     MakonAnalytics.scanModeScreenViewed(
       projectId: widget.projectId,

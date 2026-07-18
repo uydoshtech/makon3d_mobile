@@ -102,7 +102,9 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
           children: [
             TextField(
               controller: _nameController,
+              autofocus: true,
               textCapitalization: TextCapitalization.sentences,
+              textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 labelText: L10n.get('project_name_label'),
                 border: const OutlineInputBorder(),
@@ -112,8 +114,10 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
             TextField(
               controller: _addressController,
               textCapitalization: TextCapitalization.sentences,
+              textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 labelText: L10n.get('project_address_label'),
+                helperText: L10n.get('project_address_optional_hint'),
                 border: const OutlineInputBorder(),
               ),
             ),
@@ -124,6 +128,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
               maxLines: 3,
               decoration: InputDecoration(
                 labelText: L10n.get('project_notes_label'),
+                helperText: L10n.get('project_notes_optional_hint'),
                 border: const OutlineInputBorder(),
               ),
             ),

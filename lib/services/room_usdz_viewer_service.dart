@@ -15,17 +15,19 @@ class RoomUsdzViewerService {
   /// Matches UyDosh's `AppColors.floorObject3dTint` (0xFF795548).
   static const String _floorObjectTintHex = "795548";
 
-  /// Downloads a remote USDZ (relative or absolute URL) then presents it.
-  static Future<bool> downloadAndPresent(
+  /// Downloads USDZ to the per-scan temp cache (for mini preview or fullscreen).
+  /// Returns null on non-iOS. [pathOrUrl] may be relative or absolute.
+  static Future<File?> downloadUsdToCache(
     String pathOrUrl, {
     required int scanId,
-    required String languageCode,
-    double? worldPlusXBearingDeg,
   }) async {
-    if (!isIOSDevice) return false;
+    if (!isIOSDevice) return null;
     final absolute = ScanUploadService.hostedUrl(pathOrUrl);
     final temp = await getTemporaryDirectory();
     final file = File("${temp.path}/makon3d_scan_$scanId.usdz");
+    if (file.existsSync() && file.lengthSync() > 0) {
+      return file;
+    }
     final dio = Dio(
       BaseOptions(
         connectTimeout: const Duration(seconds: 45),
@@ -37,6 +39,18 @@ class RoomUsdzViewerService {
     if (!file.existsSync() || file.lengthSync() == 0) {
       throw StateError("Downloaded USDZ is missing or empty");
     }
+    return file;
+  }
+
+  /// Downloads a remote USDZ (relative or absolute URL) then presents it.
+  static Future<bool> downloadAndPresent(
+    String pathOrUrl, {
+    required int scanId,
+    required String languageCode,
+    double? worldPlusXBearingDeg,
+  }) async {
+    final file = await downloadUsdToCache(pathOrUrl, scanId: scanId);
+    if (file == null) return false;
     return presentLocalFile(
       file.path,
       languageCode: languageCode,

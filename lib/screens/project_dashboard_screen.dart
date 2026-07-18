@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:room_scan_kit/scan_flow/scan_flow.dart';
 
 import 'package:makon3d_mobile/l10n/l10n.dart';
+import 'package:makon3d_mobile/models/housing_scan.dart';
 import 'package:makon3d_mobile/models/makon_project.dart';
 import 'package:makon3d_mobile/models/project_room.dart';
 import 'package:makon3d_mobile/scan_flow/makon_entire_housing_coordinator.dart';
 import 'package:makon3d_mobile/scan_flow/makon_room_by_room_coordinator.dart';
+import 'package:makon3d_mobile/screens/scan_detail_screen.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
 import 'package:makon3d_mobile/services/room_usdz_viewer_service.dart';
+import 'package:makon3d_mobile/widgets/scan_mini_preview.dart';
 import 'package:makon3d_mobile/widgets/toasts.dart';
 
 /// Mode-aware project home. Does not re-ask for scan mode.
@@ -23,6 +26,8 @@ class ProjectDashboardScreen extends StatefulWidget {
 }
 
 class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
+  bool _openingFullscreen = false;
+
   @override
   void initState() {
     super.initState();
@@ -74,46 +79,27 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
   Future<void> _openHousingModel() async {
     final scan = _project?.entireHousingScan;
     if (scan == null) return;
-    await _openScan(
-      scan.localUsdzPath,
-      scan.usdzUrl,
-      scan.worldPlusXBearingDeg,
-      remoteScanId: scan.remoteScanId,
-    );
+    await _openScan(scan);
   }
 
-  Future<void> _openRoomModel(ProjectRoom room) async {
-    final scan = room.scan;
-    if (scan == null) return;
-    await _openScan(
-      scan.localUsdzPath,
-      scan.usdzUrl,
-      scan.worldPlusXBearingDeg,
-      remoteScanId: scan.remoteScanId,
-    );
-  }
-
-  Future<void> _openScan(
-    String? localPath,
-    String? usdzUrl,
-    double? bearing, {
-    int? remoteScanId,
-  }) async {
+  Future<void> _openScan(HousingScan scan) async {
+    if (_openingFullscreen) return;
+    setState(() => _openingFullscreen = true);
     try {
-      if (localPath != null && localPath.isNotEmpty) {
+      if (scan.localUsdzPath != null && scan.localUsdzPath!.isNotEmpty) {
         await RoomUsdzViewerService.presentLocalFile(
-          localPath,
+          scan.localUsdzPath!,
           languageCode: LanguageState().currentLanguage,
-          worldPlusXBearingDeg: bearing,
+          worldPlusXBearingDeg: scan.worldPlusXBearingDeg,
         );
         return;
       }
-      if (usdzUrl != null && usdzUrl.isNotEmpty) {
+      if (scan.usdzUrl != null && scan.usdzUrl!.isNotEmpty) {
         await RoomUsdzViewerService.downloadAndPresent(
-          usdzUrl,
-          scanId: remoteScanId ?? usdzUrl.hashCode,
+          scan.usdzUrl!,
+          scanId: scan.remoteScanId ?? scan.id.hashCode,
           languageCode: LanguageState().currentLanguage,
-          worldPlusXBearingDeg: bearing,
+          worldPlusXBearingDeg: scan.worldPlusXBearingDeg,
         );
         return;
       }
@@ -122,7 +108,29 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
     } catch (_) {
       if (!mounted) return;
       Toasts.showError(context, L10n.get('scans_open_error'));
+    } finally {
+      if (mounted) setState(() => _openingFullscreen = false);
     }
+  }
+
+  Future<void> _openRoomDetail(ProjectRoom room) async {
+    final scan = room.scan;
+    if (scan == null) return;
+    final title = room.name?.isNotEmpty == true
+        ? room.name!
+        : L10n.get(room.roomType.titleKey);
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => ScanDetailScreen(
+          title: title,
+          scan: scan,
+          onRescan: () {
+            Navigator.of(context).pop();
+            unawaited(_rescanRoom(room));
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -142,13 +150,14 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
       body: project.scanMode == ScanMode.entireHousing
           ? _EntireHousingBody(
               project: project,
+              openingFullscreen: _openingFullscreen,
               onStartScan: _startEntireHousingScan,
-              onOpenModel: _openHousingModel,
+              onOpenModel: () => unawaited(_openHousingModel()),
             )
           : _RoomByRoomBody(
               project: project,
               onAddRoom: _addRoom,
-              onOpenRoom: _openRoomModel,
+              onOpenRoom: (room) => unawaited(_openRoomDetail(room)),
               onRescanRoom: _rescanRoom,
             ),
     );
@@ -158,11 +167,13 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
 class _EntireHousingBody extends StatelessWidget {
   const _EntireHousingBody({
     required this.project,
+    required this.openingFullscreen,
     required this.onStartScan,
     required this.onOpenModel,
   });
 
   final MakonProject project;
+  final bool openingFullscreen;
   final VoidCallback onStartScan;
   final VoidCallback onOpenModel;
 
@@ -170,6 +181,7 @@ class _EntireHousingBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final hasModel = project.hasEntireHousingModel;
+    final scan = project.entireHousingScan;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
@@ -186,12 +198,20 @@ class _EntireHousingBody extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        if (hasModel) ...[
+        if (hasModel && scan != null) ...[
+          ScanMiniPreview(
+            scanId: scan.remoteScanId ?? scan.id.hashCode,
+            localUsdzPath: scan.localUsdzPath,
+            usdzUrl: scan.usdzUrl,
+            isLoadingFullscreen: openingFullscreen,
+            onOpenFullscreen: onOpenModel,
+          ),
+          const SizedBox(height: 16),
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.view_in_ar),
             title: Text(L10n.get('project_action_3d_model')),
-            trailing: const Icon(Icons.chevron_right),
+            trailing: const Icon(Icons.fullscreen),
             onTap: onOpenModel,
           ),
           ListTile(
