@@ -3,9 +3,10 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: tool/bump_version.sh [{build|patch|minor|major}] [--commit] [--push]
+Usage: tool/bump_version.sh [{build|patch|minor|major}] [--commit] [--push] [--skip-ios]
 
-Bumps version in pubspec.yaml (format: x.y.z+build).
+Bumps version in pubspec.yaml (format: x.y.z+build) and regenerates
+ios/Flutter/Generated.xcconfig so Xcode Archive picks up the new build number.
 
 Bump types:
   build   Increment build number only (default)
@@ -17,6 +18,7 @@ Options:
   --bump <type>   Bump type (alternative to positional argument)
   --commit        Git commit the version bump
   --push          Push after commit (requires --commit)
+  --skip-ios      Skip regenerating Generated.xcconfig (pubspec only)
 EOF
 }
 
@@ -31,6 +33,7 @@ cd "${REPO_ROOT}"
 BUMPTYPE="build"
 DO_COMMIT="false"
 DO_PUSH="false"
+SYNC_IOS="true"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -48,6 +51,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --push)
       DO_PUSH="true"
+      shift
+      ;;
+    --skip-ios)
+      SYNC_IOS="false"
       shift
       ;;
     -h|--help)
@@ -119,6 +126,30 @@ if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
   echo -e "Updated pubspec.yaml to version: \033[33m${MAJOR}.${MINOR}.${PATCH}\033[0m\033[32m+${BUILD}\033[0m"
 else
   echo "Updated pubspec.yaml to version: ${NEW_VERSION}"
+fi
+
+if [[ "${SYNC_IOS}" == "true" ]]; then
+  if ! command -v flutter >/dev/null 2>&1; then
+    echo "Error: flutter not found on PATH; cannot sync iOS build number."
+    exit 1
+  fi
+  echo "Syncing iOS Generated.xcconfig (FLUTTER_BUILD_NAME/NUMBER)..."
+  # Xcode Archive reads ios/Flutter/Generated.xcconfig — not pubspec.yaml.
+  # --config-only refreshes those values without a full device build.
+  flutter build ios --config-only --no-codesign
+
+  XCCONFIG="${REPO_ROOT}/ios/Flutter/Generated.xcconfig"
+  if [[ ! -f "${XCCONFIG}" ]]; then
+    echo "Error: ${XCCONFIG} was not generated."
+    exit 1
+  fi
+  SYNCED_NAME="$(grep -m1 -E '^FLUTTER_BUILD_NAME=' "${XCCONFIG}" | cut -d= -f2-)"
+  SYNCED_NUMBER="$(grep -m1 -E '^FLUTTER_BUILD_NUMBER=' "${XCCONFIG}" | cut -d= -f2-)"
+  if [[ "${SYNCED_NAME}" != "${MAJOR}.${MINOR}.${PATCH}" || "${SYNCED_NUMBER}" != "${BUILD}" ]]; then
+    echo "Error: Generated.xcconfig out of sync (got ${SYNCED_NAME}+${SYNCED_NUMBER}, expected ${NEW_VERSION})."
+    exit 1
+  fi
+  echo "iOS build number synced: ${SYNCED_NAME} (${SYNCED_NUMBER})"
 fi
 
 if [[ "${DO_COMMIT}" == "true" ]]; then
