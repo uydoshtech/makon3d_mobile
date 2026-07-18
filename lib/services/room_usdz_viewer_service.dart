@@ -167,6 +167,14 @@ class RoomUsdzViewerService {
           l("room_3d_floor_plan_furniture_variant_accessibility"),
       "floorPlanFurnitureColorTitle":
           l("room_3d_floor_plan_furniture_color_title"),
+      "floorPlanFurnitureColorPartTitle":
+          l("room_3d_floor_plan_furniture_color_part_title"),
+      "floorPlanFurnitureColorRoleFrame":
+          l("room_3d_floor_plan_furniture_color_role_frame"),
+      "floorPlanFurnitureColorRoleFabric":
+          l("room_3d_floor_plan_furniture_color_role_fabric"),
+      "floorPlanFurnitureColorRoleLinen":
+          l("room_3d_floor_plan_furniture_color_role_linen"),
       "floorPlanFurnitureColorDefault":
           l("room_3d_floor_plan_furniture_color_default"),
       "floorPlanFurnitureColorAccessibility":
