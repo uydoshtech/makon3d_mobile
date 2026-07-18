@@ -1,0 +1,23 @@
+{
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/FloorPlanProjectionService.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/x86_64/FloorPlanProjectionService.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/x86_64/FloorPlanProjectionService.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/x86_64/FloorPlanProjectionService.dia",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/x86_64/FloorPlanProjectionService.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/x86_64/FloorPlanProjectionService.swiftdeps"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/FloorPlanRenderers.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/x86_64/FloorPlanRenderers.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/x86_64/FloorPlanRenderers.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/x86_64/FloorPlanRenderers.dia",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/x86_64/FloorPlanRenderers.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/x86_64/FloorPlanRenderers.swiftdeps"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/FloorPlanResizeService.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/x86_64/FloorPlanResizeService.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/x86_64/FloorPlanResizeService.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/x86_64/FloorPlanResizeService.dia",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/x86_64/FloorPlanResizeService.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/x86_64/FloorPlanResizeService.swiftdeps"
+  }
+}

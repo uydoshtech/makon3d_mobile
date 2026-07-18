@@ -1,0 +1,379 @@
+{
+  "" : {
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/room_scan_kit-primary.dia",
+    "emit-module-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/room_scan_kit-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/room_scan_kit-primary-emit-module.dia",
+    "pch" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/room_scan_kit-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/room_scan_kit-primary.swiftdeps"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/CompassOrientationAdjustPanel.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationAdjustPanel.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationAdjustPanel.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationAdjustPanel.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationAdjustPanel.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationAdjustPanel.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationAdjustPanel.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationAdjustPanel.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationAdjustPanel~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/CompassOrientationEditController.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationEditController.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationEditController.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationEditController.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationEditController.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationEditController.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationEditController.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationEditController.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationEditController~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/CompassScreenProjection.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassScreenProjection.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassScreenProjection.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassScreenProjection.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassScreenProjection.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassScreenProjection.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassScreenProjection.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassScreenProjection.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassScreenProjection~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/DimensionEditController.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/DimensionEditController.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/DimensionEditController.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/DimensionEditController.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/DimensionEditController.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/DimensionEditController.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/DimensionEditController.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/DimensionEditController.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/DimensionEditController~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/DimensionLineService.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/DimensionLineService.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/DimensionLineService.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/DimensionLineService.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/DimensionLineService.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/DimensionLineService.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/DimensionLineService.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/DimensionLineService.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/DimensionLineService~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/EditableFloorPlanAlignService.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanAlignService.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanAlignService.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanAlignService.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanAlignService.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanAlignService.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanAlignService.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanAlignService.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanAlignService~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/EditableFloorPlanModel.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanModel.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanModel.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanModel.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanModel.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanModel.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanModel.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanModel.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanModel~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/EditableFloorPlanProjector.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanProjector.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanProjector.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanProjector.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanProjector.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanProjector.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanProjector.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanProjector.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/EditableFloorPlanProjector~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/FloorPlanAlignmentService.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanAlignmentService.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanAlignmentService.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanAlignmentService.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanAlignmentService.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanAlignmentService.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanAlignmentService.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanAlignmentService.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanAlignmentService~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/FloorPlanCanvas.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanCanvas.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanCanvas.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanCanvas.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanCanvas.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanCanvas.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanCanvas.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanCanvas.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanCanvas~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/FloorPlanModel.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanModel.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanModel.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanModel.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanModel.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanModel.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanModel.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanModel.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanModel~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/FloorPlanNorthOrientation.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanNorthOrientation.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanNorthOrientation.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanNorthOrientation.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanNorthOrientation.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanNorthOrientation.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanNorthOrientation.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanNorthOrientation.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanNorthOrientation~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/FloorPlanProjectionService.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanProjectionService.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanProjectionService.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanProjectionService.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanProjectionService.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanProjectionService.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanProjectionService.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanProjectionService.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanProjectionService~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/FloorPlanRenderers.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanRenderers.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanRenderers.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanRenderers.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanRenderers.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanRenderers.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanRenderers.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanRenderers.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanRenderers~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/FloorPlanResizeService.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanResizeService.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanResizeService.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanResizeService.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanResizeService.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanResizeService.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanResizeService.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanResizeService.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanResizeService~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/FloorPlanStateManager.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanStateManager.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanStateManager.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanStateManager.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanStateManager.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanStateManager.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanStateManager.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanStateManager.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanStateManager~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/FloorPlanTab.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanTab.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanTab.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanTab.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanTab.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanTab.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanTab.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanTab.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FloorPlanTab~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/FurnitureEdits.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureEdits.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureEdits.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureEdits.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureEdits.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureEdits.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureEdits.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureEdits.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureEdits~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/FurnitureModelCatalog.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureModelCatalog.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureModelCatalog.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureModelCatalog.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureModelCatalog.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureModelCatalog.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureModelCatalog.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureModelCatalog.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureModelCatalog~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/FurnitureRotationPanel.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureRotationPanel.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureRotationPanel.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureRotationPanel.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureRotationPanel.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureRotationPanel.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureRotationPanel.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureRotationPanel.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/FurnitureRotationPanel~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/NativeLanguagePlugin.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/NativeLanguagePlugin.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/NativeLanguagePlugin.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/NativeLanguagePlugin.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/NativeLanguagePlugin.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/NativeLanguagePlugin.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/NativeLanguagePlugin.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/NativeLanguagePlugin.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/NativeLanguagePlugin~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/RoomPlanToEditableModelMapper.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomPlanToEditableModelMapper.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomPlanToEditableModelMapper.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomPlanToEditableModelMapper.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomPlanToEditableModelMapper.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomPlanToEditableModelMapper.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomPlanToEditableModelMapper.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomPlanToEditableModelMapper.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomPlanToEditableModelMapper~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/RoomScanBoundsPlugin.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanBoundsPlugin.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanBoundsPlugin.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanBoundsPlugin.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanBoundsPlugin.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanBoundsPlugin.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanBoundsPlugin.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanBoundsPlugin.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanBoundsPlugin~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/RoomScanKitPlugin.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanKitPlugin.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanKitPlugin.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanKitPlugin.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanKitPlugin.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanKitPlugin.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanKitPlugin.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanKitPlugin.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanKitPlugin~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/RoomScanLiveDetectionOverlay.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanLiveDetectionOverlay.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanLiveDetectionOverlay.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanLiveDetectionOverlay.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanLiveDetectionOverlay.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanLiveDetectionOverlay.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanLiveDetectionOverlay.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanLiveDetectionOverlay.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanLiveDetectionOverlay~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/RoomScanMetricsComputer.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanMetricsComputer.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanMetricsComputer.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanMetricsComputer.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanMetricsComputer.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanMetricsComputer.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanMetricsComputer.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanMetricsComputer.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanMetricsComputer~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/RoomScanOrientationCapture.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanOrientationCapture.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanOrientationCapture.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanOrientationCapture.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanOrientationCapture.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanOrientationCapture.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanOrientationCapture.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanOrientationCapture.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomScanOrientationCapture~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/RoomUsdzViewerPlugin.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomUsdzViewerPlugin.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomUsdzViewerPlugin.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomUsdzViewerPlugin.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomUsdzViewerPlugin.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomUsdzViewerPlugin.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomUsdzViewerPlugin.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomUsdzViewerPlugin.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomUsdzViewerPlugin~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/RoomUsdzViewerViewController.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomUsdzViewerViewController.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomUsdzViewerViewController.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomUsdzViewerViewController.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomUsdzViewerViewController.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomUsdzViewerViewController.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomUsdzViewerViewController.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomUsdzViewerViewController.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/RoomUsdzViewerViewController~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/ScanCeilingService.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/ScanCeilingService.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/ScanCeilingService.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/ScanCeilingService.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/ScanCeilingService.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/ScanCeilingService.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/ScanCeilingService.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/ScanCeilingService.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/ScanCeilingService~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/Scene3DRegenerationService.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/Scene3DRegenerationService.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/Scene3DRegenerationService.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/Scene3DRegenerationService.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/Scene3DRegenerationService.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/Scene3DRegenerationService.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/Scene3DRegenerationService.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/Scene3DRegenerationService.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/Scene3DRegenerationService~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/SolarPosition.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SolarPosition.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SolarPosition.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SolarPosition.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SolarPosition.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SolarPosition.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SolarPosition.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SolarPosition.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SolarPosition~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/SunClockOverlayView.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunClockOverlayView.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunClockOverlayView.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunClockOverlayView.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunClockOverlayView.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunClockOverlayView.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunClockOverlayView.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunClockOverlayView.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunClockOverlayView~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/SunCompassOverlayView.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunCompassOverlayView.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunCompassOverlayView.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunCompassOverlayView.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunCompassOverlayView.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunCompassOverlayView.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunCompassOverlayView.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunCompassOverlayView.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunCompassOverlayView~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/SunPositionMath.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunPositionMath.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunPositionMath.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunPositionMath.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunPositionMath.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunPositionMath.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunPositionMath.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunPositionMath.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunPositionMath~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/SunSimulationController.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunSimulationController.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunSimulationController.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunSimulationController.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunSimulationController.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunSimulationController.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunSimulationController.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunSimulationController.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunSimulationController~partial.swiftmodule"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/SunSimulationPanel.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunSimulationPanel.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunSimulationPanel.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunSimulationPanel.dia",
+    "index-unit-output-path" : "/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunSimulationPanel.o",
+    "llvm-bc" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunSimulationPanel.bc",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunSimulationPanel.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunSimulationPanel.swiftdeps",
+    "swiftmodule" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/SunSimulationPanel~partial.swiftmodule"
+  }
+}

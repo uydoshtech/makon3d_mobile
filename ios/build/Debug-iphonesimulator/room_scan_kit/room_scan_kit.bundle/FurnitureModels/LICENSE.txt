@@ -1,0 +1,29 @@
+Kenney Furniture Kit (selected models)
+Source: https://kenney.nl/assets/furniture-kit
+Also distributed via OpenGameArt: https://opengameart.org/content/furniture-kit
+License: Creative Commons Zero (CC0) — https://creativecommons.org/publicdomain/zero/1.0/
+Credit (optional): Kenney (www.kenney.nl)
+
+Models used (OBJ + MTL, renamed):
+bedDouble → bed, bedSingle → bed2, bedBunk → bed3,
+chairCushion → chair, chairRounded → chair2, chair → chair3,
+chairDesk → chair4, chairModernCushion → chair5, loungeDesignChair → chair6,
+table → table, tableRound → table2, tableCross → table3,
+desk → table4, tableCoffee → table5, sideTable → table6,
+loungeSofa → sofa, loungeSofaLong → sofa2, benchCushion → sofa3,
+loungeDesignSofa → sofa4,
+bookcaseClosed → storage, bookcaseOpen → storage2, bookcaseClosedWide → storage3,
+bookcaseClosedDoors → storage4, bookcaseOpenLow → storage5,
+kitchenCabinet → cabinet, kitchenCabinetDrawer → cabinet2,
+cabinetBed → cabinet3, bathroomCabinet → cabinet4,
+kitchenSink → sink, bathroomSink → sink2,
+toilet → toilet, toiletSquare → toilet2,
+bathtub → bathtub,
+kitchenFridge → fridge, kitchenFridgeLarge → fridge2,
+kitchenStove → stove, kitchenStoveElectric → stove2,
+washer → washer, dryer → washer2,
+televisionModern → television, televisionVintage → television2,
+televisionAntenna → television3,
+stairs → stairs, doorwayOpen → doorway.
+
+Windows are built procedurally in FurnitureModelCatalog (no Kenney source).

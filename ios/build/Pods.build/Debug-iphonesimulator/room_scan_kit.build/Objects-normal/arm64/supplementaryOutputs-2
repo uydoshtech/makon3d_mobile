@@ -1,0 +1,23 @@
+{
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/CompassOrientationAdjustPanel.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationAdjustPanel.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationAdjustPanel.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationAdjustPanel.dia",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationAdjustPanel.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationAdjustPanel.swiftdeps"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/CompassOrientationEditController.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationEditController.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationEditController.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationEditController.dia",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationEditController.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassOrientationEditController.swiftdeps"
+  },
+  "/Users/arturmusin/Documents/repositories/room_scan_kit/ios/room_scan_kit/Sources/room_scan_kit/CompassScreenProjection.swift" : {
+    "const-values" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassScreenProjection.swiftconstvalues",
+    "dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassScreenProjection.d",
+    "diagnostics" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassScreenProjection.dia",
+    "object" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassScreenProjection.o",
+    "swift-dependencies" : "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/Objects-normal/arm64/CompassScreenProjection.swiftdeps"
+  }
+}

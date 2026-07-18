@@ -1,0 +1,23 @@
+{
+  "version": 0,
+  "use-external-names": false,
+  "case-sensitive": false,
+  "roots": [{
+    "type": "directory",
+    "name": "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Debug-iphonesimulator/room_scan_kit/room_scan_kit.framework/Modules",
+    "contents": [{
+      "type": "file",
+      "name": "module.modulemap",
+      "external-contents": "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/unextended-module.modulemap",
+    }]
+    },
+    {
+    "type": "directory",
+    "name": "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Debug-iphonesimulator/room_scan_kit/room_scan_kit.framework/Headers",
+    "contents": [{
+      "type": "file",
+      "name": "room_scan_kit-Swift.h",
+      "external-contents": "/Users/arturmusin/Documents/repositories/makon3d_mobile/ios/build/Pods.build/Debug-iphonesimulator/room_scan_kit.build/unextended-interface-header.h",
+    }]
+  }]
+}

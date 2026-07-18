@@ -1,0 +1,5 @@
+
+module room_scan_kit.Swift {
+  header "room_scan_kit-Swift.h"
+  requires objc
+}

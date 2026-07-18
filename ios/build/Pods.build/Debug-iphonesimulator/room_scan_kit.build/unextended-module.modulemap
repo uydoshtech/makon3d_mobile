@@ -1,0 +1,10 @@
+framework module room_scan_kit {
+  umbrella header "room_scan_kit-umbrella.h"
+
+  export *
+  module * { export * }
+}
+
+module room_scan_kit.__Swift {
+  exclude header "room_scan_kit-Swift.h"
+}

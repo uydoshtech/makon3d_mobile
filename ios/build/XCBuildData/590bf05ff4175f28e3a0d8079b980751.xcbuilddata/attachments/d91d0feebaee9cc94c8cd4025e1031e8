@@ -1,0 +1,4 @@
+
+module room_scan_kit.__Swift {
+  exclude header "room_scan_kit-Swift.h"
+}

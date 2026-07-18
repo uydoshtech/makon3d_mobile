@@ -1,0 +1,22 @@
+# Exported using Kenney Suite 1.2
+# Duvet/pillows kept linen-white; blanket uses the Kenney red fabric color.
+
+newmtl carpetWhite
+Ka 0.000000 0.000000 0.000000 
+Kd 0.945098 0.937255 0.921569 
+Ks 0.220000 0.220000 0.220000 
+
+newmtl wood
+Ka 0.000000 0.000000 0.000000 
+Kd 0.8313726 0.654902 0.4235294 
+Ks 0.330000 0.330000 0.330000 
+
+newmtl metal
+Ka 0.000000 0.000000 0.000000 
+Kd 0.6588235 0.827451 0.827451 
+Ks 0.330000 0.330000 0.330000 
+
+newmtl carpet
+Ka 0.000000 0.000000 0.000000 
+Kd 0.909804 0.482353 0.301961 
+Ks 0.180000 0.180000 0.180000 

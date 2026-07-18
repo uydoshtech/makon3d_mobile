@@ -1,0 +1,6 @@
+Target dependency graph (3 targets)
+Target 'room_scan_kit' in project 'Pods'
+➜ Explicit dependency on target 'Flutter' in project 'Pods'
+➜ Explicit dependency on target 'room_scan_kit-room_scan_kit' in project 'Pods'
+Target 'room_scan_kit-room_scan_kit' in project 'Pods' (no dependencies)
+Target 'Flutter' in project 'Pods' (no dependencies)
