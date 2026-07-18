@@ -1,0 +1,93 @@
+/// A single whole-property (or single-room) scan artifact attached to a project.
+class HousingScan {
+  const HousingScan({
+    required this.id,
+    this.localUsdzPath,
+    this.remoteScanId,
+    this.usdzUrl,
+    this.glbUrl,
+    this.floorLongM,
+    this.floorShortM,
+    this.heightM,
+    this.floorAreaM2,
+    this.worldPlusXBearingDeg,
+    this.capturedAt,
+  });
+
+  final String id;
+  final String? localUsdzPath;
+  final int? remoteScanId;
+  final String? usdzUrl;
+  final String? glbUrl;
+  final double? floorLongM;
+  final double? floorShortM;
+  final double? heightM;
+  final double? floorAreaM2;
+  final double? worldPlusXBearingDeg;
+  final DateTime? capturedAt;
+
+  bool get hasModel =>
+      (localUsdzPath != null && localUsdzPath!.isNotEmpty) ||
+      (usdzUrl != null && usdzUrl!.isNotEmpty) ||
+      (glbUrl != null && glbUrl!.isNotEmpty);
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'id': id,
+        'localUsdzPath': localUsdzPath,
+        'remoteScanId': remoteScanId,
+        'usdzUrl': usdzUrl,
+        'glbUrl': glbUrl,
+        'floorLongM': floorLongM,
+        'floorShortM': floorShortM,
+        'heightM': heightM,
+        'floorAreaM2': floorAreaM2,
+        'worldPlusXBearingDeg': worldPlusXBearingDeg,
+        'capturedAt': capturedAt?.toIso8601String(),
+      };
+
+  factory HousingScan.fromJson(Map<String, dynamic> json) {
+    return HousingScan(
+      id: json['id'] as String? ?? '',
+      localUsdzPath: json['localUsdzPath'] as String?,
+      remoteScanId: (json['remoteScanId'] as num?)?.toInt(),
+      usdzUrl: json['usdzUrl'] as String?,
+      glbUrl: json['glbUrl'] as String?,
+      floorLongM: (json['floorLongM'] as num?)?.toDouble(),
+      floorShortM: (json['floorShortM'] as num?)?.toDouble(),
+      heightM: (json['heightM'] as num?)?.toDouble(),
+      floorAreaM2: (json['floorAreaM2'] as num?)?.toDouble(),
+      worldPlusXBearingDeg: (json['worldPlusXBearingDeg'] as num?)?.toDouble(),
+      capturedAt: json['capturedAt'] != null
+          ? DateTime.tryParse(json['capturedAt'].toString())
+          : null,
+    );
+  }
+
+  HousingScan copyWith({
+    String? localUsdzPath,
+    int? remoteScanId,
+    String? usdzUrl,
+    String? glbUrl,
+    double? floorLongM,
+    double? floorShortM,
+    double? heightM,
+    double? floorAreaM2,
+    double? worldPlusXBearingDeg,
+    DateTime? capturedAt,
+  }) {
+    return HousingScan(
+      id: id,
+      localUsdzPath: localUsdzPath ?? this.localUsdzPath,
+      remoteScanId: remoteScanId ?? this.remoteScanId,
+      usdzUrl: usdzUrl ?? this.usdzUrl,
+      glbUrl: glbUrl ?? this.glbUrl,
+      floorLongM: floorLongM ?? this.floorLongM,
+      floorShortM: floorShortM ?? this.floorShortM,
+      heightM: heightM ?? this.heightM,
+      floorAreaM2: floorAreaM2 ?? this.floorAreaM2,
+      worldPlusXBearingDeg:
+          worldPlusXBearingDeg ?? this.worldPlusXBearingDeg,
+      capturedAt: capturedAt ?? this.capturedAt,
+    );
+  }
+}

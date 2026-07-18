@@ -3,7 +3,7 @@ import "package:flutter/material.dart";
 
 import "package:makon3d_mobile/l10n/l10n.dart";
 
-/// Slim 2-tab curved bottom bar (Scan / Scans), matching UyDosh's look via
+/// Slim 2-tab curved bottom bar (Projects / Scans), matching UyDosh's look via
 /// [curved_navigation_bar] + a neumorphic active orb — without auth/gig coupling.
 class MakonCurvedNavBar extends StatelessWidget {
   const MakonCurvedNavBar({
@@ -24,8 +24,8 @@ class MakonCurvedNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = <Widget>[
       _navItem(
-        icon: Icons.view_in_ar,
-        labelKey: "nav_scan",
+        icon: Icons.folder_outlined,
+        labelKey: "nav_projects",
         selected: currentIndex == 0,
       ),
       _navItem(

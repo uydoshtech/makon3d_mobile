@@ -1,6 +1,8 @@
 import "package:flutter/material.dart";
 
 import "package:makon3d_mobile/screens/main_shell.dart";
+import "package:makon3d_mobile/services/makon_project_migration.dart";
+import "package:makon3d_mobile/services/makon_project_store.dart";
 
 /// Brief branded splash before the main tab shell.
 ///
@@ -34,7 +36,11 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _run() async {
     await _fadeController.forward();
-    await Future<void>.delayed(const Duration(milliseconds: _holdMs));
+    await Future.wait<void>([
+      Future<void>.delayed(const Duration(milliseconds: _holdMs)),
+      MakonProjectStore.instance.ensureLoaded(),
+      MakonProjectMigration.runIfNeeded(),
+    ]);
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
