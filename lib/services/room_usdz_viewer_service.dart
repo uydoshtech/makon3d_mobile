@@ -92,6 +92,29 @@ class RoomUsdzViewerService {
       "floorPlanAdjustNorthUpdated": l("room_3d_floor_plan_adjust_north_updated"),
       "floorPlanAdjustNorthDegreesFormat":
           l("room_3d_floor_plan_adjust_north_degrees_format"),
+      "floorPlanRotateFurnitureTitle":
+          l("room_3d_floor_plan_rotate_furniture_title"),
+      "floorPlanRotateFurnitureMessage":
+          l("room_3d_floor_plan_rotate_furniture_message"),
+      "floorPlanRotateFurnitureUpdated":
+          l("room_3d_floor_plan_rotate_furniture_updated"),
+      "floorPlanRotateFurnitureDegreesFormat":
+          l("room_3d_floor_plan_rotate_furniture_degrees_format"),
+      "floorPlanMoveFurnitureUp": l("room_3d_floor_plan_move_furniture_up"),
+      "floorPlanMoveFurnitureDown": l("room_3d_floor_plan_move_furniture_down"),
+      "floorPlanMoveFurnitureLeft": l("room_3d_floor_plan_move_furniture_left"),
+      "floorPlanMoveFurnitureRight": l("room_3d_floor_plan_move_furniture_right"),
+      "floorPlanFurnitureVariantTitle":
+          l("room_3d_floor_plan_furniture_variant_title"),
+      "floorPlanFurnitureVariantAccessibility":
+          l("room_3d_floor_plan_furniture_variant_accessibility"),
+      "floorPlanDeleteFurniture": l("room_3d_floor_plan_delete_furniture"),
+      "floorPlanDeleteFurnitureConfirmTitle":
+          l("room_3d_floor_plan_delete_furniture_confirm_title"),
+      "floorPlanDeleteFurnitureConfirmMessage":
+          l("room_3d_floor_plan_delete_furniture_confirm_message"),
+      "floorPlanDeleteFurnitureUpdated":
+          l("room_3d_floor_plan_delete_furniture_updated"),
       "floorPlanEditDimensionTitle": l("room_3d_floor_plan_edit_dimension_title"),
       "floorPlanEditDimensionCurrent":
           l("room_3d_floor_plan_edit_dimension_current"),
