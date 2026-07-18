@@ -1,3 +1,4 @@
+import 'package:makon3d_mobile/models/floor_tile_prefs.dart';
 import 'package:makon3d_mobile/models/housing_scan.dart';
 import 'package:makon3d_mobile/models/room_type.dart';
 
@@ -9,6 +10,10 @@ class ProjectRoom {
     required this.createdAt,
     this.name,
     this.scan,
+    this.layoutOffsetXM,
+    this.layoutOffsetZM,
+    this.layoutYawDeg,
+    this.floorTilePrefs,
   });
 
   final String id;
@@ -17,7 +22,19 @@ class ProjectRoom {
   final String? name;
   final HousingScan? scan;
 
+  /// Placement in the combined housing layout (meters / degrees).
+  /// Null = use native auto-pack along +X when assembling.
+  final double? layoutOffsetXM;
+  final double? layoutOffsetZM;
+  final double? layoutYawDeg;
+
+  /// Last floor-tile estimate settings for this room (local only).
+  final FloorTilePrefs? floorTilePrefs;
+
   bool get isScanned => scan?.hasModel == true;
+
+  bool get hasExplicitLayout =>
+      layoutOffsetXM != null && layoutOffsetZM != null;
 
   Map<String, dynamic> toJson() => <String, dynamic>{
         'id': id,
@@ -25,6 +42,10 @@ class ProjectRoom {
         'createdAt': createdAt.toIso8601String(),
         'name': name,
         'scan': scan?.toJson(),
+        'layoutOffsetXM': layoutOffsetXM,
+        'layoutOffsetZM': layoutOffsetZM,
+        'layoutYawDeg': layoutYawDeg,
+        'floorTilePrefs': floorTilePrefs?.toJson(),
       };
 
   factory ProjectRoom.fromJson(Map<String, dynamic> json) {
@@ -38,6 +59,18 @@ class ProjectRoom {
       scan: json['scan'] is Map<String, dynamic>
           ? HousingScan.fromJson(json['scan'] as Map<String, dynamic>)
           : null,
+      layoutOffsetXM: (json['layoutOffsetXM'] as num?)?.toDouble(),
+      layoutOffsetZM: (json['layoutOffsetZM'] as num?)?.toDouble(),
+      layoutYawDeg: (json['layoutYawDeg'] as num?)?.toDouble(),
+      floorTilePrefs: json['floorTilePrefs'] is Map<String, dynamic>
+          ? FloorTilePrefs.fromJson(
+              json['floorTilePrefs'] as Map<String, dynamic>,
+            )
+          : json['floorTilePrefs'] is Map
+              ? FloorTilePrefs.fromJson(
+                  Map<String, dynamic>.from(json['floorTilePrefs'] as Map),
+                )
+              : null,
     );
   }
 
@@ -45,6 +78,11 @@ class ProjectRoom {
     RoomType? roomType,
     String? name,
     HousingScan? scan,
+    double? layoutOffsetXM,
+    double? layoutOffsetZM,
+    double? layoutYawDeg,
+    FloorTilePrefs? floorTilePrefs,
+    bool clearLayout = false,
   }) {
     return ProjectRoom(
       id: id,
@@ -52,6 +90,12 @@ class ProjectRoom {
       createdAt: createdAt,
       name: name ?? this.name,
       scan: scan ?? this.scan,
+      layoutOffsetXM:
+          clearLayout ? null : (layoutOffsetXM ?? this.layoutOffsetXM),
+      layoutOffsetZM:
+          clearLayout ? null : (layoutOffsetZM ?? this.layoutOffsetZM),
+      layoutYawDeg: clearLayout ? null : (layoutYawDeg ?? this.layoutYawDeg),
+      floorTilePrefs: floorTilePrefs ?? this.floorTilePrefs,
     );
   }
 }

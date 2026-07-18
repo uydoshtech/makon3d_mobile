@@ -122,6 +122,12 @@ class RoomUsdzViewerService {
           l("room_3d_floor_plan_furniture_variant_title"),
       "floorPlanFurnitureVariantAccessibility":
           l("room_3d_floor_plan_furniture_variant_accessibility"),
+      "floorPlanFurnitureColorTitle":
+          l("room_3d_floor_plan_furniture_color_title"),
+      "floorPlanFurnitureColorDefault":
+          l("room_3d_floor_plan_furniture_color_default"),
+      "floorPlanFurnitureColorAccessibility":
+          l("room_3d_floor_plan_furniture_color_accessibility"),
       "floorPlanDeleteFurniture": l("room_3d_floor_plan_delete_furniture"),
       "floorPlanDeleteFurnitureConfirmTitle":
           l("room_3d_floor_plan_delete_furniture_confirm_title"),

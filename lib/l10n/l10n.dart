@@ -87,8 +87,28 @@ class L10n {
       "project_action_measurements": "Measurements",
       "project_action_materials": "Material Estimates",
       "project_materials_coming_soon":
-          "Material estimates will use this scan as one measured space.",
+          "Open a room to estimate floor tiles for that room.",
       "project_rescan": "Rescan property",
+      "materials_floor_title": "Floor tiles",
+      "materials_floor_surface": "Floor",
+      "materials_floor_area_template": "Measured area: ~{area} m²",
+      "materials_floor_area_approx":
+          "Using room length × width (approximate).",
+      "materials_floor_no_area":
+          "No floor area yet. Scan this room to estimate tiles.",
+      "materials_tile_shape": "Tile shape",
+      "materials_tile_square": "Square",
+      "materials_tile_rect": "Rectangle",
+      "materials_tile_size_cm": "Tile size (cm)",
+      "materials_tile_width_cm": "Width",
+      "materials_tile_height_cm": "Length",
+      "materials_waste_label": "Waste: {percent}%",
+      "materials_result_heading": "To buy",
+      "materials_result_tiles_template": "{count} tiles",
+      "materials_result_buy_area_template": "~{area} m² of tiles",
+      "materials_result_detail_template":
+          "Tile {tileArea} m² · with waste ~{effectiveArea} m²",
+      "room_action_materials": "Material estimates",
       "project_rooms_heading": "Rooms",
       "project_rooms_empty": "No rooms yet. Add a room to start scanning.",
       "project_room_scanned": "Scanned",
@@ -97,6 +117,13 @@ class L10n {
       "project_generate_combined": "Generate Combined 3D View",
       "project_combined_view_coming_soon":
           "Combined apartment view will be available in a later update.",
+      "project_combined_assembling": "Assembling rooms…",
+      "project_combined_success": "Combined 3D view ready",
+      "project_combined_failed":
+          "Could not assemble rooms. Individual room scans are unchanged.",
+      "project_combined_need_two_rooms":
+          "Scan at least two rooms before generating a combined view.",
+      "project_open_combined": "Open Combined 3D View",
       "scan_mode_choose_title": "Choose how to scan",
       "scan_mode_choose_subtitle": "How would you like to scan?",
       "scan_mode_continue": "Continue",
@@ -261,6 +288,9 @@ class L10n {
       "room_3d_floor_plan_move_furniture_right": "Move right",
       "room_3d_floor_plan_furniture_variant_title": "Style",
       "room_3d_floor_plan_furniture_variant_accessibility": "Style %d",
+      "room_3d_floor_plan_furniture_color_title": "Color",
+      "room_3d_floor_plan_furniture_color_default": "Default color",
+      "room_3d_floor_plan_furniture_color_accessibility": "Color %d",
       "room_3d_floor_plan_delete_furniture": "Delete",
       "room_3d_floor_plan_delete_furniture_confirm_title": "Remove furniture?",
       "room_3d_floor_plan_delete_furniture_confirm_message":
@@ -303,8 +333,28 @@ class L10n {
       "project_action_measurements": "Размеры",
       "project_action_materials": "Расчёт материалов",
       "project_materials_coming_soon":
-          "Расчёт материалов пока использует весь скан как одно пространство.",
+          "Откройте комнату, чтобы рассчитать плитку для пола.",
       "project_rescan": "Пересканировать объект",
+      "materials_floor_title": "Плитка на пол",
+      "materials_floor_surface": "Пол",
+      "materials_floor_area_template": "Площадь: ~{area} m²",
+      "materials_floor_area_approx":
+          "Используется длина × ширина комнаты (приблизительно).",
+      "materials_floor_no_area":
+          "Площадь пола пока неизвестна. Отсканируйте комнату.",
+      "materials_tile_shape": "Форма плитки",
+      "materials_tile_square": "Квадрат",
+      "materials_tile_rect": "Прямоугольник",
+      "materials_tile_size_cm": "Размер плитки (см)",
+      "materials_tile_width_cm": "Ширина",
+      "materials_tile_height_cm": "Длина",
+      "materials_waste_label": "Запас: {percent}%",
+      "materials_result_heading": "К покупке",
+      "materials_result_tiles_template": "{count} плиток",
+      "materials_result_buy_area_template": "~{area} m² плитки",
+      "materials_result_detail_template":
+          "Плитка {tileArea} m² · с запасом ~{effectiveArea} m²",
+      "room_action_materials": "Расчёт материалов",
       "project_rooms_heading": "Комнаты",
       "project_rooms_empty":
           "Комнат пока нет. Добавьте комнату, чтобы начать сканирование.",
@@ -314,6 +364,13 @@ class L10n {
       "project_generate_combined": "Собрать общий 3D-вид",
       "project_combined_view_coming_soon":
           "Общий вид квартиры появится в следующем обновлении.",
+      "project_combined_assembling": "Сборка комнат…",
+      "project_combined_success": "Общий 3D-вид готов",
+      "project_combined_failed":
+          "Не удалось собрать комнаты. Отдельные сканы не изменены.",
+      "project_combined_need_two_rooms":
+          "Отсканируйте минимум две комнаты, чтобы собрать общий вид.",
+      "project_open_combined": "Открыть общий 3D-вид",
       "scan_mode_choose_title": "Выберите способ сканирования",
       "scan_mode_choose_subtitle": "Как вы хотите сканировать?",
       "scan_mode_continue": "Продолжить",
@@ -479,6 +536,9 @@ class L10n {
       "room_3d_floor_plan_move_furniture_right": "Вправо",
       "room_3d_floor_plan_furniture_variant_title": "Стиль",
       "room_3d_floor_plan_furniture_variant_accessibility": "Стиль %d",
+      "room_3d_floor_plan_furniture_color_title": "Цвет",
+      "room_3d_floor_plan_furniture_color_default": "Цвет по умолчанию",
+      "room_3d_floor_plan_furniture_color_accessibility": "Цвет %d",
       "room_3d_floor_plan_delete_furniture": "Удалить",
       "room_3d_floor_plan_delete_furniture_confirm_title": "Убрать мебель?",
       "room_3d_floor_plan_delete_furniture_confirm_message":
@@ -521,8 +581,28 @@ class L10n {
       "project_action_measurements": "O'lchamlar",
       "project_action_materials": "Material hisobi",
       "project_materials_coming_soon":
-          "Material hisobi hozircha butun skanni bitta maydon sifatida ishlatadi.",
+          "Pol plitkasi hisobi uchun xonani oching.",
       "project_rescan": "Ob'ektni qayta skanerlash",
+      "materials_floor_title": "Pol plitkasi",
+      "materials_floor_surface": "Pol",
+      "materials_floor_area_template": "Maydon: ~{area} m²",
+      "materials_floor_area_approx":
+          "Xona uzunligi × kengligi ishlatiladi (taxminiy).",
+      "materials_floor_no_area":
+          "Pol maydoni hali yo'q. Hisoblash uchun xonani skanerlang.",
+      "materials_tile_shape": "Plitka shakli",
+      "materials_tile_square": "Kvadrat",
+      "materials_tile_rect": "To'rtburchak",
+      "materials_tile_size_cm": "Plitka o'lchami (sm)",
+      "materials_tile_width_cm": "Kenglik",
+      "materials_tile_height_cm": "Uzunlik",
+      "materials_waste_label": "Zaxira: {percent}%",
+      "materials_result_heading": "Sotib olish",
+      "materials_result_tiles_template": "{count} plitka",
+      "materials_result_buy_area_template": "~{area} m² plitka",
+      "materials_result_detail_template":
+          "Plitka {tileArea} m² · zaxira bilan ~{effectiveArea} m²",
+      "room_action_materials": "Material hisobi",
       "project_rooms_heading": "Xonalar",
       "project_rooms_empty":
           "Hali xona yo'q. Skanlashni boshlash uchun xona qo'shing.",
@@ -532,6 +612,13 @@ class L10n {
       "project_generate_combined": "Umumiy 3D ko'rinishni yaratish",
       "project_combined_view_coming_soon":
           "Umumiy kvartira ko'rinishi keyingi yangilanishda paydo bo'ladi.",
+      "project_combined_assembling": "Xonalar yig‘ilmoqda…",
+      "project_combined_success": "Umumiy 3D ko'rinish tayyor",
+      "project_combined_failed":
+          "Xonalarni yig‘ib bo‘lmadi. Alohida skanlar o‘zgarmagan.",
+      "project_combined_need_two_rooms":
+          "Umumiy ko'rinish uchun kamida ikkita xonani skanerlang.",
+      "project_open_combined": "Umumiy 3D ko'rinishni ochish",
       "scan_mode_choose_title": "Qanday skanerlashni tanlang",
       "scan_mode_choose_subtitle": "Qanday skanerlashni xohlaysiz?",
       "scan_mode_continue": "Davom etish",
@@ -697,6 +784,9 @@ class L10n {
       "room_3d_floor_plan_move_furniture_right": "O'ngga",
       "room_3d_floor_plan_furniture_variant_title": "Uslub",
       "room_3d_floor_plan_furniture_variant_accessibility": "Uslub %d",
+      "room_3d_floor_plan_furniture_color_title": "Rang",
+      "room_3d_floor_plan_furniture_color_default": "Standart rang",
+      "room_3d_floor_plan_furniture_color_accessibility": "Rang %d",
       "room_3d_floor_plan_delete_furniture": "O'chirish",
       "room_3d_floor_plan_delete_furniture_confirm_title": "Mebelni olib tashlash?",
       "room_3d_floor_plan_delete_furniture_confirm_message":

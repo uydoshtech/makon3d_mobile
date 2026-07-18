@@ -1,5 +1,6 @@
 import 'package:room_scan_kit/scan_flow/scan_flow.dart';
 
+import 'package:makon3d_mobile/models/floor_tile_prefs.dart';
 import 'package:makon3d_mobile/models/housing_scan.dart';
 import 'package:makon3d_mobile/models/project_room.dart';
 
@@ -15,6 +16,7 @@ class MakonProject {
     this.entireHousingScan,
     this.rooms = const [],
     this.mergedStructureLocalPath,
+    this.entireHousingFloorTilePrefs,
   });
 
   final String id;
@@ -28,6 +30,9 @@ class MakonProject {
 
   /// Optional path to a combined USDZ generated from room scans (future).
   final String? mergedStructureLocalPath;
+
+  /// Floor-tile settings when [scanMode] is entire housing (one space).
+  final FloorTilePrefs? entireHousingFloorTilePrefs;
 
   bool get hasEntireHousingModel => entireHousingScan?.hasModel == true;
 
@@ -43,6 +48,7 @@ class MakonProject {
         'entireHousingScan': entireHousingScan?.toJson(),
         'rooms': rooms.map((r) => r.toJson()).toList(),
         'mergedStructureLocalPath': mergedStructureLocalPath,
+        'entireHousingFloorTilePrefs': entireHousingFloorTilePrefs?.toJson(),
       };
 
   factory MakonProject.fromJson(Map<String, dynamic> json) {
@@ -83,6 +89,18 @@ class MakonProject {
       entireHousingScan: entire,
       rooms: rooms,
       mergedStructureLocalPath: json['mergedStructureLocalPath'] as String?,
+      entireHousingFloorTilePrefs:
+          json['entireHousingFloorTilePrefs'] is Map<String, dynamic>
+              ? FloorTilePrefs.fromJson(
+                  json['entireHousingFloorTilePrefs'] as Map<String, dynamic>,
+                )
+              : json['entireHousingFloorTilePrefs'] is Map
+                  ? FloorTilePrefs.fromJson(
+                      Map<String, dynamic>.from(
+                        json['entireHousingFloorTilePrefs'] as Map,
+                      ),
+                    )
+                  : null,
     );
   }
 
@@ -111,6 +129,7 @@ class MakonProject {
     HousingScan? entireHousingScan,
     List<ProjectRoom>? rooms,
     String? mergedStructureLocalPath,
+    FloorTilePrefs? entireHousingFloorTilePrefs,
     bool clearEntireHousingScan = false,
   }) {
     return MakonProject(
@@ -126,6 +145,8 @@ class MakonProject {
       rooms: rooms ?? this.rooms,
       mergedStructureLocalPath:
           mergedStructureLocalPath ?? this.mergedStructureLocalPath,
+      entireHousingFloorTilePrefs:
+          entireHousingFloorTilePrefs ?? this.entireHousingFloorTilePrefs,
     );
   }
 }
