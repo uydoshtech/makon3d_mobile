@@ -9,6 +9,7 @@ import 'package:makon3d_mobile/screens/project_dashboard_screen.dart';
 import 'package:makon3d_mobile/screens/scan_mode_selection_screen.dart';
 import 'package:makon3d_mobile/services/makon_analytics.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
+import 'package:makon3d_mobile/widgets/keyboard_dismiss_scope.dart';
 import 'package:makon3d_mobile/widgets/toasts.dart';
 
 String _newProjectId() {
@@ -97,56 +98,64 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
         title: Text(L10n.get('project_new_title')),
       ),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-          children: [
-            TextField(
-              controller: _nameController,
-              autofocus: true,
-              textCapitalization: TextCapitalization.sentences,
-              textInputAction: TextInputAction.next,
-              decoration: InputDecoration(
-                labelText: L10n.get('project_name_label'),
-                border: const OutlineInputBorder(),
+        child: KeyboardDismissScope(
+          child: ListView(
+            keyboardDismissBehavior: KeyboardDismissScope.scrollBehavior,
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+            children: [
+              TextField(
+                controller: _nameController,
+                autofocus: true,
+                textCapitalization: TextCapitalization.sentences,
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(
+                  labelText: L10n.get('project_name_label'),
+                  border: const OutlineInputBorder(),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _addressController,
-              textCapitalization: TextCapitalization.sentences,
-              textInputAction: TextInputAction.next,
-              decoration: InputDecoration(
-                labelText: L10n.get('project_address_label'),
-                helperText: L10n.get('project_address_optional_hint'),
-                border: const OutlineInputBorder(),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _addressController,
+                textCapitalization: TextCapitalization.sentences,
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(
+                  labelText: L10n.get('project_address_label'),
+                  helperText: L10n.get('project_address_optional_hint'),
+                  border: const OutlineInputBorder(),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _notesController,
-              textCapitalization: TextCapitalization.sentences,
-              maxLines: 3,
-              decoration: InputDecoration(
-                labelText: L10n.get('project_notes_label'),
-                helperText: L10n.get('project_notes_optional_hint'),
-                border: const OutlineInputBorder(),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _notesController,
+                textCapitalization: TextCapitalization.sentences,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  labelText: L10n.get('project_notes_label'),
+                  helperText: L10n.get('project_notes_optional_hint'),
+                  border: const OutlineInputBorder(),
+                ),
               ),
-            ),
-            const SizedBox(height: 28),
-            FilledButton(
-              onPressed: _saving ? null : _continueToMode,
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+              const SizedBox(height: 28),
+              FilledButton(
+                onPressed: _saving
+                    ? null
+                    : () {
+                        KeyboardDismissScope.dismiss();
+                        _continueToMode();
+                      },
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: _saving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(L10n.get('project_continue_to_mode')),
               ),
-              child: _saving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(L10n.get('project_continue_to_mode')),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

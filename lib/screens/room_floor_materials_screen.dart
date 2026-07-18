@@ -10,6 +10,7 @@ import 'package:makon3d_mobile/models/makon_project.dart';
 import 'package:makon3d_mobile/models/project_room.dart';
 import 'package:makon3d_mobile/services/floor_tile_estimate.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
+import 'package:makon3d_mobile/widgets/keyboard_dismiss_scope.dart';
 
 /// Per-room (or entire-housing) floor tile quantity estimate.
 class RoomFloorMaterialsScreen extends StatefulWidget {
@@ -127,6 +128,7 @@ class _RoomFloorMaterialsScreenState extends State<RoomFloorMaterialsScreen> {
   }
 
   void _applyPreset(_Preset preset) {
+    KeyboardDismissScope.dismiss();
     setState(() {
       _widthCm = preset.widthCm;
       _heightCm = preset.heightCm;
@@ -138,6 +140,7 @@ class _RoomFloorMaterialsScreenState extends State<RoomFloorMaterialsScreen> {
   }
 
   void _setSquare(bool square) {
+    KeyboardDismissScope.dismiss();
     setState(() {
       _isSquare = square;
       if (square) {
@@ -172,6 +175,7 @@ class _RoomFloorMaterialsScreenState extends State<RoomFloorMaterialsScreen> {
   }
 
   void _setWaste(double value) {
+    KeyboardDismissScope.dismiss();
     setState(() => _wastePercent = value);
     _schedulePersist();
   }
@@ -242,9 +246,11 @@ class _RoomFloorMaterialsScreenState extends State<RoomFloorMaterialsScreen> {
       appBar: AppBar(
         title: Text(L10n.get('materials_floor_title')),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
-        children: [
+      body: KeyboardDismissScope(
+        child: ListView(
+          keyboardDismissBehavior: KeyboardDismissScope.scrollBehavior,
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
+          children: [
           Text(
             _title,
             style: theme.textTheme.titleMedium?.copyWith(
@@ -452,6 +458,7 @@ class _RoomFloorMaterialsScreenState extends State<RoomFloorMaterialsScreen> {
             ),
           ),
         ],
+        ),
       ),
     );
   }

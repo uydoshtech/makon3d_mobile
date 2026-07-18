@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:room_scan_kit/scan_flow/scan_flow.dart';
@@ -89,25 +90,16 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
     if (_openingFullscreen) return;
     setState(() => _openingFullscreen = true);
     try {
-      if (scan.localUsdzPath != null && scan.localUsdzPath!.isNotEmpty) {
-        await RoomUsdzViewerService.presentLocalFile(
-          scan.localUsdzPath!,
-          languageCode: LanguageState().currentLanguage,
-          worldPlusXBearingDeg: scan.worldPlusXBearingDeg,
-        );
-        return;
+      final ok = await RoomUsdzViewerService.openUsdz(
+        localUsdzPath: scan.localUsdzPath,
+        usdzUrl: scan.usdzUrl,
+        scanId: scan.remoteScanId ?? scan.id.hashCode,
+        languageCode: LanguageState().currentLanguage,
+        worldPlusXBearingDeg: scan.worldPlusXBearingDeg,
+      );
+      if (!ok && mounted) {
+        Toasts.showError(context, L10n.get('scans_open_error'));
       }
-      if (scan.usdzUrl != null && scan.usdzUrl!.isNotEmpty) {
-        await RoomUsdzViewerService.downloadAndPresent(
-          scan.usdzUrl!,
-          scanId: scan.remoteScanId ?? scan.id.hashCode,
-          languageCode: LanguageState().currentLanguage,
-          worldPlusXBearingDeg: scan.worldPlusXBearingDeg,
-        );
-        return;
-      }
-      if (!mounted) return;
-      Toasts.showError(context, L10n.get('scans_open_error'));
     } catch (_) {
       if (!mounted) return;
       Toasts.showError(context, L10n.get('scans_open_error'));
@@ -154,6 +146,12 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
     if (_openingFullscreen) return;
     setState(() => _openingFullscreen = true);
     try {
+      final file = File(path);
+      if (!file.existsSync() || file.lengthSync() == 0) {
+        if (!mounted) return;
+        Toasts.showError(context, L10n.get('scans_open_error'));
+        return;
+      }
       await RoomUsdzViewerService.presentLocalFile(
         path,
         languageCode: LanguageState().currentLanguage,

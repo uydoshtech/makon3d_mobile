@@ -42,27 +42,16 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
     if (_openingFullscreen) return;
     setState(() => _openingFullscreen = true);
     try {
-      final local = widget.scan.localUsdzPath;
-      if (local != null && local.isNotEmpty) {
-        await RoomUsdzViewerService.presentLocalFile(
-          local,
-          languageCode: LanguageState().currentLanguage,
-          worldPlusXBearingDeg: widget.scan.worldPlusXBearingDeg,
-        );
-        return;
+      final ok = await RoomUsdzViewerService.openUsdz(
+        localUsdzPath: widget.scan.localUsdzPath,
+        usdzUrl: widget.scan.usdzUrl,
+        scanId: _cacheScanId,
+        languageCode: LanguageState().currentLanguage,
+        worldPlusXBearingDeg: widget.scan.worldPlusXBearingDeg,
+      );
+      if (!ok && mounted) {
+        Toasts.showError(context, L10n.get('scans_open_error'));
       }
-      final url = widget.scan.usdzUrl;
-      if (url != null && url.isNotEmpty) {
-        await RoomUsdzViewerService.downloadAndPresent(
-          url,
-          scanId: _cacheScanId,
-          languageCode: LanguageState().currentLanguage,
-          worldPlusXBearingDeg: widget.scan.worldPlusXBearingDeg,
-        );
-        return;
-      }
-      if (!mounted) return;
-      Toasts.showError(context, L10n.get('scans_open_error'));
     } catch (_) {
       if (!mounted) return;
       Toasts.showError(context, L10n.get('scans_open_error'));

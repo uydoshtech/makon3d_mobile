@@ -58,6 +58,45 @@ class RoomUsdzViewerService {
     );
   }
 
+  /// Opens fullscreen viewer, matching mini-preview resolution order:
+  /// existing local file → download [usdzUrl] → fail.
+  ///
+  /// Important: a stale non-empty [localUsdzPath] must not block the URL
+  /// fallback (iOS temp/Documents paths often vanish after relaunch).
+  static Future<bool> openUsdz({
+    String? localUsdzPath,
+    String? usdzUrl,
+    required int scanId,
+    required String languageCode,
+    double? worldPlusXBearingDeg,
+  }) async {
+    if (!isIOSDevice) return false;
+
+    final local = localUsdzPath?.trim();
+    if (local != null && local.isNotEmpty) {
+      final file = File(local);
+      if (file.existsSync() && file.lengthSync() > 0) {
+        return presentLocalFile(
+          file.path,
+          languageCode: languageCode,
+          worldPlusXBearingDeg: worldPlusXBearingDeg,
+        );
+      }
+    }
+
+    final url = usdzUrl?.trim();
+    if (url != null && url.isNotEmpty) {
+      return downloadAndPresent(
+        url,
+        scanId: scanId,
+        languageCode: languageCode,
+        worldPlusXBearingDeg: worldPlusXBearingDeg,
+      );
+    }
+
+    return false;
+  }
+
   /// Returns true if the native viewer was presented.
   static Future<bool> presentLocalFile(
     String path, {
@@ -65,6 +104,10 @@ class RoomUsdzViewerService {
     double? worldPlusXBearingDeg,
   }) async {
     if (!isIOSDevice) return false;
+    final file = File(path);
+    if (!file.existsSync() || file.lengthSync() == 0) {
+      throw StateError("USDZ not found at $path");
+    }
     String l(String key) => L10n.getForLanguage(key, languageCode);
     final strings = <String, String>{
       "title": l("room_3d_viewer_title"),

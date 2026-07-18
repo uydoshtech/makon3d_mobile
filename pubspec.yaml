@@ -2,7 +2,7 @@ name: makon3d_mobile
 description: "Makon 3D — LiDAR 3D room scanning app."
 publish_to: 'none'
 
-version: 1.0.0+10
+version: 1.0.0+11
 
 environment:
   sdk: ^3.12.2
