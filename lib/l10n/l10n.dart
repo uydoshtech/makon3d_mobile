@@ -64,6 +64,7 @@ class L10n {
     "en": {
       "app_name": "Makon 3D",
       "cancel": "Cancel",
+      "back": "Back",
       "done": "Done",
       "ok": "OK",
       "nav_scan": "Scan",
@@ -342,6 +343,7 @@ class L10n {
     "ru": {
       "app_name": "Makon 3D",
       "cancel": "Отмена",
+      "back": "Назад",
       "done": "Готово",
       "ok": "ОК",
       "nav_scan": "Скан",
@@ -622,6 +624,7 @@ class L10n {
     "uz": {
       "app_name": "Makon 3D",
       "cancel": "Bekor qilish",
+      "back": "Orqaga",
       "done": "Tayyor",
       "ok": "OK",
       "nav_scan": "Skan",

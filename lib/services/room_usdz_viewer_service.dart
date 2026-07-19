@@ -120,6 +120,7 @@ class RoomUsdzViewerService {
       "structureWallAreaTemplate": l("room_3d_structure_wall_area_template"),
       "loadErrorTitle": l("room_3d_load_error_title"),
       "alertOk": l("ok"),
+      "back": l("back"),
       "floorOnlyButton": l("room_3d_floor_only_button"),
       "fullRoomButton": l("room_3d_full_room_button"),
       "floorOnlyUnavailable": l("room_3d_floor_only_unavailable"),
