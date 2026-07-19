@@ -511,11 +511,20 @@ post_install do |installer|
         '',
         "    #{marker}",
         '    private func uydoshStartHeadingUpdates() {',
+        '        /* uydosh: live compass heading feed */',
+        '        uydoshHeadingReader.onHeadingUpdate = { [weak self] heading, accuracy in',
+        '            self?.uydoshLiveDetectionOverlay?.updateHeading(',
+        '                degrees: heading,',
+        '                accuracyDegrees: accuracy',
+        '            )',
+        '        }',
         '        uydoshHeadingReader.start()',
         '    }',
         '',
         '    private func uydoshCaptureScanOrientation() {',
-        '        guard let heading = uydoshHeadingReader.trueHeadingDegrees else { return }',
+        '        /* uydosh: filtered heading for orientation */',
+        '        guard let heading = uydoshHeadingReader.bestTrueHeadingDegrees',
+        '            ?? uydoshHeadingReader.trueHeadingDegrees else { return }',
         '        uydoshPendingOrientation = RoomScanOrientationCapture.snapshot(',
         '            from: roomCaptureView.captureSession.arSession,',
         '            trueHeadingDegrees: heading',
@@ -631,16 +640,102 @@ post_install do |installer|
   # Even with early stop(), CoreMotion.MotionThread EXC_BAD_ACCESS still
   # fires on some devices when heading overlaps ARKit teardown. True-north
   # on the floor plan is optional for v1 — scan-relative north is enough.
+  # The live compass HUD still mounts; without heading updates it stays idle.
   if File.exist?(room_capture_file)
     src = File.read(room_capture_file)
     marker = '/* makon3d: disable heading capture */'
     unless src.include?(marker)
-      src = src.sub(
-        "    private func uydoshStartHeadingUpdates() {\n        uydoshHeadingReader.start()\n    }",
-        "    private func uydoshStartHeadingUpdates() {\n        #{marker}\n        // no-op: avoid CoreMotion race with RoomPlan teardown\n    }"
-      )
-      File.write(room_capture_file, src)
+      # Match both the legacy start() body and the live-compass-wired body.
+      [
+        [
+          "    private func uydoshStartHeadingUpdates() {\n        uydoshHeadingReader.start()\n    }",
+          "    private func uydoshStartHeadingUpdates() {\n        #{marker}\n        // no-op: avoid CoreMotion race with RoomPlan teardown\n    }",
+        ],
+        [
+          [
+            '    private func uydoshStartHeadingUpdates() {',
+            '        /* uydosh: live compass heading feed */',
+            '        uydoshHeadingReader.onHeadingUpdate = { [weak self] heading, accuracy in',
+            '            self?.uydoshLiveDetectionOverlay?.updateHeading(',
+            '                degrees: heading,',
+            '                accuracyDegrees: accuracy',
+            '            )',
+            '        }',
+            '        uydoshHeadingReader.start()',
+            '    }',
+          ].join("\n"),
+          "    private func uydoshStartHeadingUpdates() {\n        #{marker}\n        // no-op: avoid CoreMotion race with RoomPlan teardown\n    }",
+        ],
+      ].each do |old_body, new_body|
+        if src.include?(old_body)
+          src = src.sub(old_body, new_body)
+          break
+        end
+      end
+      File.write(room_capture_file, src) if src.include?(marker)
     end
+  end
+
+  # Feed live compass HUD + use filtered heading for the orientation sidecar
+  # (UyDosh and any Makon build that re-enables heading). Skip when Makon
+  # has replaced start() with the disable-heading no-op.
+  if File.exist?(room_capture_file)
+    src = File.read(room_capture_file)
+    upgraded = false
+
+    unless src.include?('/* uydosh: live compass heading feed */') ||
+           src.include?('/* makon3d: disable heading capture */')
+      old_start = [
+        '    private func uydoshStartHeadingUpdates() {',
+        '        uydoshHeadingReader.start()',
+        '    }',
+      ].join("\n")
+      new_start = [
+        '    private func uydoshStartHeadingUpdates() {',
+        '        /* uydosh: live compass heading feed */',
+        '        uydoshHeadingReader.onHeadingUpdate = { [weak self] heading, accuracy in',
+        '            self?.uydoshLiveDetectionOverlay?.updateHeading(',
+        '                degrees: heading,',
+        '                accuracyDegrees: accuracy',
+        '            )',
+        '        }',
+        '        uydoshHeadingReader.start()',
+        '    }',
+      ].join("\n")
+      if src.include?(old_start)
+        src = src.sub(old_start, new_start)
+        upgraded = true
+      end
+    end
+
+    unless src.include?('/* uydosh: filtered heading for orientation */')
+      old_capture = [
+        '    private func uydoshCaptureScanOrientation() {',
+        '        guard let heading = uydoshHeadingReader.trueHeadingDegrees else { return }',
+        '        uydoshPendingOrientation = RoomScanOrientationCapture.snapshot(',
+        '            from: roomCaptureView.captureSession.arSession,',
+        '            trueHeadingDegrees: heading',
+        '        )',
+        '    }',
+      ].join("\n")
+      new_capture = [
+        '    private func uydoshCaptureScanOrientation() {',
+        '        /* uydosh: filtered heading for orientation */',
+        '        guard let heading = uydoshHeadingReader.bestTrueHeadingDegrees',
+        '            ?? uydoshHeadingReader.trueHeadingDegrees else { return }',
+        '        uydoshPendingOrientation = RoomScanOrientationCapture.snapshot(',
+        '            from: roomCaptureView.captureSession.arSession,',
+        '            trueHeadingDegrees: heading',
+        '        )',
+        '    }',
+      ].join("\n")
+      if src.include?(old_capture)
+        src = src.sub(old_capture, new_capture)
+        upgraded = true
+      end
+    end
+
+    File.write(room_capture_file, src) if upgraded
   end
 
   # Live detection feed + stats HUD during RoomPlan capture.

@@ -161,10 +161,14 @@ class RoomUsdzViewerService {
       "floorPlanMoveFurnitureDown": l("room_3d_floor_plan_move_furniture_down"),
       "floorPlanMoveFurnitureLeft": l("room_3d_floor_plan_move_furniture_left"),
       "floorPlanMoveFurnitureRight": l("room_3d_floor_plan_move_furniture_right"),
+      "floorPlanRaiseFurniture": l("room_3d_floor_plan_raise_furniture"),
+      "floorPlanLowerFurniture": l("room_3d_floor_plan_lower_furniture"),
       "floorPlanFurnitureVariantTitle":
           l("room_3d_floor_plan_furniture_variant_title"),
       "floorPlanFurnitureVariantAccessibility":
           l("room_3d_floor_plan_furniture_variant_accessibility"),
+      "floorPlanFurnitureRotationTitle":
+          l("room_3d_floor_plan_furniture_rotation_title"),
       "floorPlanFurnitureColorTitle":
           l("room_3d_floor_plan_furniture_color_title"),
       "floorPlanFurnitureColorPartTitle":
