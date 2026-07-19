@@ -1,8 +1,10 @@
 import "package:flutter/material.dart";
+import "package:flutter_svg/flutter_svg.dart";
 
 import "package:makon3d_mobile/screens/main_shell.dart";
 import "package:makon3d_mobile/services/makon_project_migration.dart";
 import "package:makon3d_mobile/services/makon_project_store.dart";
+import "package:makon3d_mobile/theme/makon_colors.dart";
 
 /// Brief branded splash before the main tab shell.
 ///
@@ -17,7 +19,6 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
-  static const _background = Color(0xFFFFFFFF);
   static const _holdMs = 1200;
 
   late final AnimationController _fadeController;
@@ -62,18 +63,42 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _background,
+      backgroundColor: Colors.white,
       body: FadeTransition(
         opacity: _fade,
         child: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: Image.asset(
-              "assets/branding/makon3d_logo.png",
-              fit: BoxFit.contain,
-              // Same logical size as the native launch screen's intrinsic
-              // LaunchImage (143x160 pt) so the handoff is seamless.
-              width: 143,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SvgPicture.asset(
+                  "assets/branding/makon3d_mark.svg",
+                  fit: BoxFit.contain,
+                  width: 140,
+                ),
+                const SizedBox(height: 18),
+                Text.rich(
+                  TextSpan(
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.2,
+                      height: 1,
+                    ),
+                    children: const [
+                      TextSpan(
+                        text: "Makon",
+                        style: TextStyle(color: MakonColors.slateMuted),
+                      ),
+                      TextSpan(
+                        text: "3D",
+                        style: TextStyle(color: MakonColors.teal),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),

@@ -1,24 +1,31 @@
 #!/usr/bin/env python3
-"""Generate all Makon 3D brand images from the Makon logo image.
+"""Generate Makon 3D brand images from the SVG lockup / mark.
 
-Crops the wordmark under the icon and writes:
-  - every size referenced by AppIcon.appiconset/Contents.json (white bg),
-  - LaunchImage 1x/2x/3x (transparent),
-  - assets/branding/makon3d_logo.png (transparent, used by the splash screen).
+Requires `rsvg-convert` (librsvg) on PATH.
+
+Writes:
+  - every size in AppIcon.appiconset (white bg, cube mark),
+  - LaunchImage 1x/2x/3x (transparent full lockup),
+  - assets/branding/makon3d_logo.png (transparent full lockup).
 """
 
+from __future__ import annotations
+
+import shutil
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 from PIL import Image
 
-SRC = Path(sys.argv[1])
 ROOT = Path(__file__).resolve().parent.parent
 ICONSET = ROOT / "ios/Runner/Assets.xcassets/AppIcon.appiconset"
 LAUNCHSET = ROOT / "ios/Runner/Assets.xcassets/LaunchImage.imageset"
 BRANDING = ROOT / "assets/branding"
+MARK_SVG = BRANDING / "makon3d_mark.svg"
+LOGO_SVG = BRANDING / "makon3d_logo.svg"
 
-# (filename, pixel size)
 SIZES = [
     ("Icon-App-20x20@1x.png", 20),
     ("Icon-App-20x20@2x.png", 40),
@@ -37,90 +44,59 @@ SIZES = [
     ("Icon-App-1024x1024@1x.png", 1024),
 ]
 
-img = Image.open(SRC).convert("RGBA")
 
-# Flatten onto white (App Store icons must not have alpha).
-flat = Image.new("RGB", img.size, (255, 255, 255))
-flat.paste(img, mask=img.split()[3])
+def _require_rsvg() -> str:
+    path = shutil.which("rsvg-convert")
+    if not path:
+        sys.exit("rsvg-convert not found — install librsvg (e.g. brew install librsvg)")
+    return path
 
-# Row-wise content detection. A strict threshold plus a minimum pixel count
-# per row lets us ignore the faint drop shadow that bridges icon and text.
-px = flat.load()
-w, h = flat.size
-row_content = []
-for y in range(h):
-    count = 0
-    for x in range(0, w, 2):
-        r, g, b = px[x, y]
-        if r < 225 or g < 225 or b < 225:
-            count += 1
-    row_content.append(count)
 
-MIN_ROW = 3
-# Find content bands (consecutive rows with content) — the icon is the
-# tallest band, the wordmark is the band below the gap.
-bands = []
-start = None
-for y, c in enumerate(row_content):
-    if c >= MIN_ROW and start is None:
-        start = y
-    elif c < MIN_ROW and start is not None:
-        bands.append((start, y - 1))
-        start = None
-if start is not None:
-    bands.append((start, h - 1))
+def _rasterize(rsvg: str, svg: Path, out: Path, width: int, height: int | None = None) -> None:
+    cmd = [rsvg, "-w", str(width)]
+    if height is not None:
+        cmd += ["-h", str(height)]
+    cmd += [str(svg), "-o", str(out)]
+    subprocess.run(cmd, check=True)
 
-if not bands:
-    sys.exit("no content found in source image")
 
-icon_band = max(bands, key=lambda b: b[1] - b[0])
-print(f"content bands: {bands}, using icon band {icon_band}")
+def main() -> None:
+    rsvg = _require_rsvg()
+    if not MARK_SVG.is_file() or not LOGO_SVG.is_file():
+        sys.exit(f"missing brand SVGs under {BRANDING}")
 
-icon_region = flat.crop((0, icon_band[0], w, icon_band[1] + 1))
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+        mark_png = tmp_path / "mark.png"
+        logo_png = tmp_path / "logo.png"
+        _rasterize(rsvg, MARK_SVG, mark_png, 1024, 1024)
+        _rasterize(rsvg, LOGO_SVG, logo_png, 1024)
 
-# Trim horizontal whitespace.
-gray = icon_region.convert("L").point(lambda v: 0 if v >= 225 else 255)
-bbox = gray.getbbox()
-icon = icon_region.crop(bbox)
-print(f"icon trimmed to {icon.size}")
+        mark = Image.open(mark_png).convert("RGBA")
+        # App Store icons must not have alpha — flatten onto white.
+        icon_master = Image.new("RGB", (1024, 1024), (255, 255, 255))
+        icon_master.paste(mark, mask=mark.split()[3])
 
-# Center on a square canvas with ~8% margin on the larger dimension.
-side = round(max(icon.size) * 1.16)
-canvas = Image.new("RGB", (side, side), (255, 255, 255))
-canvas.paste(icon, ((side - icon.width) // 2, (side - icon.height) // 2))
+        for name, size in SIZES:
+            out = icon_master if size == 1024 else icon_master.resize((size, size), Image.LANCZOS)
+            out.save(ICONSET / name, "PNG")
+            print(f"wrote {name} ({size}x{size})")
 
-master = canvas.resize((1024, 1024), Image.LANCZOS)
+        logo = Image.open(logo_png).convert("RGBA")
+        # Launch image: @3x tallest around 520px, keep aspect.
+        h3 = 520
+        w3 = round(logo.width * h3 / logo.height)
+        launch3 = logo.resize((w3, h3), Image.LANCZOS)
+        for scale, name in ((3, "LaunchImage@3x.png"), (2, "LaunchImage@2x.png"), (1, "LaunchImage.png")):
+            size = (round(w3 * scale / 3), round(h3 * scale / 3))
+            launch3.resize(size, Image.LANCZOS).save(LAUNCHSET / name, "PNG")
+            print(f"wrote {name} {size}")
 
-for name, size in SIZES:
-    out = master if size == 1024 else master.resize((size, size), Image.LANCZOS)
-    out.save(ICONSET / name, "PNG")
-    print(f"wrote {name} ({size}x{size})")
+        brand_h = 1024
+        brand_w = round(logo.width * brand_h / logo.height)
+        logo.resize((brand_w, brand_h), Image.LANCZOS).save(BRANDING / "makon3d_logo.png", "PNG")
+        print(f"wrote assets/branding/makon3d_logo.png ({brand_w}x{brand_h})")
 
-# Transparent icon (same crop) for the launch and splash screens. The source
-# is fully opaque on white, so turn near-white into transparency.
-rgba = img.crop((bbox[0], icon_band[0] + bbox[1], bbox[2], icon_band[0] + bbox[3]))
-datas = []
-for r, g, b, a in rgba.getdata():
-    if r >= 250 and g >= 250 and b >= 250:
-        datas.append((255, 255, 255, 0))
-    else:
-        datas.append((r, g, b, a))
-transparent = Image.new("RGBA", rgba.size)
-transparent.putdata(datas)
 
-# Launch image: @3x tallest at 480px, keep aspect.
-h3 = 480
-w3 = round(transparent.width * h3 / transparent.height)
-launch3 = transparent.resize((w3, h3), Image.LANCZOS)
-for scale, name in ((3, "LaunchImage@3x.png"), (2, "LaunchImage@2x.png"), (1, "LaunchImage.png")):
-    size = (round(w3 * scale / 3), round(h3 * scale / 3))
-    launch3.resize(size, Image.LANCZOS).save(LAUNCHSET / name, "PNG")
-    print(f"wrote {name} {size}")
-
-# In-app branding asset used by the Flutter splash screen.
-brand_h = 1024
-brand_w = round(transparent.width * brand_h / transparent.height)
-transparent.resize((brand_w, brand_h), Image.LANCZOS).save(
-    BRANDING / "makon3d_logo.png", "PNG"
-)
-print(f"wrote assets/branding/makon3d_logo.png ({brand_w}x{brand_h})")
+if __name__ == "__main__":
+    main()

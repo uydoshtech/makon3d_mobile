@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150" role="img" aria-label="Makon3D">
-  <!-- Isometric cube brand mark -->
-  <polygon fill="#1E2F3D" points="13.00,45.50 74.50,83.00 74.50,148.00 13.00,112.50"/>
-  <polygon fill="#273C4A" points="136.00,45.50 136.00,112.50 74.50,148.00 74.50,83.00"/>
-  <polygon fill="#28A5AC" points="74.50,10.00 136.00,45.50 74.50,83.00 13.00,45.50"/>
-  <polygon fill="#34C8CC" points="13.00,45.50 74.50,83.00 74.50,91.00 13.00,53.50"/>
-  <polygon fill="#34C8CC" points="136.00,45.50 74.50,83.00 74.50,91.00 136.00,53.50"/>
-  <polygon fill="#34C8CC" points="39.50,64.25 48.00,64.25 48.00,86.25 39.50,86.25"/>
-  <polygon fill="#34C8CC" points="101.00,64.25 109.50,64.25 109.50,86.25 101.00,86.25"/>
-  <polygon fill="#34C8CC" points="72.90,84.20 76.10,84.20 76.10,148.00 72.90,148.00"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 220" role="img" aria-label="Makon3D">
+  <!-- Isometric cube brand mark + wordmark (logo lockup) -->
+  <g transform="translate(65, 0)">
+    <polygon fill="#1E2F3D" points="13.00,45.50 74.50,83.00 74.50,148.00 13.00,112.50"/>
+    <polygon fill="#273C4A" points="136.00,45.50 136.00,112.50 74.50,148.00 74.50,83.00"/>
+    <polygon fill="#28A5AC" points="74.50,10.00 136.00,45.50 74.50,83.00 13.00,45.50"/>
+    <!-- Structural accents (white, matching brand lockup) -->
+    <polygon fill="#FFFFFF" points="13.00,45.50 74.50,83.00 74.50,91.00 13.00,53.50"/>
+    <polygon fill="#FFFFFF" points="136.00,45.50 74.50,83.00 74.50,91.00 136.00,53.50"/>
+    <polygon fill="#FFFFFF" points="39.50,64.25 48.00,64.25 48.00,86.25 39.50,86.25"/>
+    <polygon fill="#FFFFFF" points="101.00,64.25 109.50,64.25 109.50,86.25 101.00,86.25"/>
+    <polygon fill="#FFFFFF" points="72.90,84.20 76.10,84.20 76.10,148.00 72.90,148.00"/>
+  </g>
+  <text x="140" y="200" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="36" font-weight="700">
+    <tspan fill="#2C3E50">Makon</tspan><tspan fill="#28A5AC">3D</tspan>
+  </text>
 </svg>

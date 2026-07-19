@@ -8,10 +8,10 @@ import 'package:makon3d_mobile/base/ios_device.dart';
 import 'package:makon3d_mobile/l10n/l10n.dart';
 import 'package:makon3d_mobile/services/room_usdz_viewer_service.dart';
 
-/// Matches UyDosh listing-detail / web mini-app sky gradient.
+/// Cool teal sky gradient aligned with Makon3D brand colors.
 const List<Color> _roomScanSkyGradient = [
-  Color(0xFFBCDCF7),
-  Color(0xFF6FA3E0),
+  Color(0xFFD2F1F2),
+  Color(0xFF28A5AC),
 ];
 
 /// Mini preview height — same as UyDosh / web `.roomscan-viewer-wrap`.

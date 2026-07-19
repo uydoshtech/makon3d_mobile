@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150" role="img" aria-label="Makon3D">
+  <polygon fill="#1E2F3D" points="13.00,45.50 74.50,83.00 74.50,148.00 13.00,112.50"/>
+  <polygon fill="#273C4A" points="136.00,45.50 136.00,112.50 74.50,148.00 74.50,83.00"/>
+  <polygon fill="#28A5AC" points="74.50,10.00 136.00,45.50 74.50,83.00 13.00,45.50"/>
+  <polygon fill="#FFFFFF" points="13.00,45.50 74.50,83.00 74.50,91.00 13.00,53.50"/>
+  <polygon fill="#FFFFFF" points="136.00,45.50 74.50,83.00 74.50,91.00 136.00,53.50"/>
+  <polygon fill="#FFFFFF" points="39.50,64.25 48.00,64.25 48.00,86.25 39.50,86.25"/>
+  <polygon fill="#FFFFFF" points="101.00,64.25 109.50,64.25 109.50,86.25 101.00,86.25"/>
+  <polygon fill="#FFFFFF" points="72.90,84.20 76.10,84.20 76.10,148.00 72.90,148.00"/>
+</svg>

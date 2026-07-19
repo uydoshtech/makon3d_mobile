@@ -12,8 +12,8 @@ import "package:makon3d_mobile/services/scan_upload_service.dart";
 class RoomUsdzViewerService {
   RoomUsdzViewerService._();
 
-  /// Matches UyDosh's `AppColors.floorObject3dTint` (0xFF795548).
-  static const String _floorObjectTintHex = "795548";
+  /// Makon slate floor tint from the logo secondary face (`#273C4A`).
+  static const String _floorObjectTintHex = "273C4A";
 
   /// Downloads USDZ to the per-scan temp cache (for mini preview or fullscreen).
   /// Returns null on non-iOS. [pathOrUrl] may be relative or absolute.
@@ -193,6 +193,20 @@ class RoomUsdzViewerService {
           l("room_3d_floor_plan_delete_furniture_confirm_message"),
       "floorPlanDeleteFurnitureUpdated":
           l("room_3d_floor_plan_delete_furniture_updated"),
+      "floorPlanFurnitureSizeTitle":
+          l("room_3d_floor_plan_furniture_size_title"),
+      "floorPlanFurnitureSizeWidth":
+          l("room_3d_floor_plan_furniture_size_width"),
+      "floorPlanFurnitureSizeLength":
+          l("room_3d_floor_plan_furniture_size_length"),
+      "floorPlanFurnitureSizeHeight":
+          l("room_3d_floor_plan_furniture_size_height"),
+      "floorPlanFurnitureSizeMetersFormat":
+          l("room_3d_floor_plan_furniture_size_meters_format"),
+      "floorPlanAddFurniture": l("room_3d_floor_plan_add_furniture"),
+      "floorPlanAddFurnitureTitle": l("room_3d_floor_plan_add_furniture_title"),
+      "floorPlanAddFurnitureUpdated":
+          l("room_3d_floor_plan_add_furniture_updated"),
       "floorPlanEditDimensionTitle": l("room_3d_floor_plan_edit_dimension_title"),
       "floorPlanEditDimensionCurrent":
           l("room_3d_floor_plan_edit_dimension_current"),

@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:flutter_svg/flutter_svg.dart";
 import "package:flutter_test/flutter_test.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
@@ -16,16 +17,7 @@ void main() {
     await tester.pump();
 
     expect(find.byType(SplashScreen), findsOneWidget);
-    expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is Image &&
-            widget.image is AssetImage &&
-            (widget.image as AssetImage).assetName ==
-                "assets/branding/makon3d_logo.png",
-      ),
-      findsOneWidget,
-    );
+    expect(find.byType(SvgPicture), findsOneWidget);
 
     // Fade-in (450ms) + hold (1200ms) + route fade (350ms).
     await tester.pump(const Duration(milliseconds: 500));
@@ -33,7 +25,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();
 
-    expect(find.text("3D room scan"), findsOneWidget);
+    expect(find.text("Projects"), findsOneWidget);
     expect(find.text("Scans"), findsOneWidget);
   });
 }

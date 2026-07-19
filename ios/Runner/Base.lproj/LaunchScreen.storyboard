@@ -25,7 +25,7 @@
                             <constraint firstItem="YRO-k0-Ey4" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="4X2-HB-R7a"/>
                             <constraint firstItem="YRO-k0-Ey4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Ze5-6b-2t3" secondAttribute="leading" constant="40" id="launch-leading"/>
                             <constraint firstItem="Ze5-6b-2t3" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="YRO-k0-Ey4" secondAttribute="trailing" constant="40" id="launch-trailing"/>
-                            <constraint firstItem="YRO-k0-Ey4" firstAttribute="width" relation="lessThanOrEqual" constant="420" id="launch-max-width"/>
+                            <constraint firstItem="YRO-k0-Ey4" firstAttribute="width" relation="lessThanOrEqual" constant="280" id="launch-max-width"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -35,6 +35,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="LaunchImage" width="143" height="160"/>
+        <image name="LaunchImage" width="220" height="173"/>
     </resources>
 </document>

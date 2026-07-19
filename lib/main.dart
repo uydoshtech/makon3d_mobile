@@ -3,6 +3,7 @@ import "package:flutter_localizations/flutter_localizations.dart";
 
 import "package:makon3d_mobile/l10n/l10n.dart";
 import "package:makon3d_mobile/screens/splash_screen.dart";
+import "package:makon3d_mobile/theme/makon_theme.dart";
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,10 +29,7 @@ class Makon3DApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          theme: ThemeData(
-            useMaterial3: true,
-            colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4B3A2F)),
-          ),
+          theme: buildMakonTheme(),
           home: const SplashScreen(),
         );
       },

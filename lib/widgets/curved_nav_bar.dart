@@ -2,9 +2,9 @@ import "package:curved_navigation_bar/curved_navigation_bar.dart";
 import "package:flutter/material.dart";
 
 import "package:makon3d_mobile/l10n/l10n.dart";
+import "package:makon3d_mobile/theme/makon_colors.dart";
 
-/// Slim 2-tab curved bottom bar (Projects / Scans), matching UyDosh's look via
-/// [curved_navigation_bar] + a neumorphic active orb — without auth/gig coupling.
+/// Slim 2-tab curved bottom bar (Projects / Scans) in Makon3D brand slate/teal.
 class MakonCurvedNavBar extends StatelessWidget {
   const MakonCurvedNavBar({
     required this.currentIndex,
@@ -15,10 +15,10 @@ class MakonCurvedNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  static const Color _barColor = Color(0xFF4B3A2F);
-  static const Color _orbColor = Color(0xFF6D5647);
-  static const Color _notchColor = Color(0xFF3A2C23);
-  static const Color _labelColor = Color(0xFFF5F0EB);
+  static const Color _barColor = MakonColors.slateElevated;
+  static const Color _orbColor = MakonColors.teal;
+  static const Color _notchColor = MakonColors.slate;
+  static const Color _labelColor = MakonColors.onDark;
 
   @override
   Widget build(BuildContext context) {
