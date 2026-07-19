@@ -72,8 +72,8 @@ class _SplashScreenState extends State<SplashScreen>
               "assets/branding/makon3d_logo.png",
               fit: BoxFit.contain,
               // Same logical size as the native launch screen's intrinsic
-              // LaunchImage (137x160 pt) so the handoff is seamless.
-              width: 137,
+              // LaunchImage (143x160 pt) so the handoff is seamless.
+              width: 143,
             ),
           ),
         ),
