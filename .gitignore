@@ -32,6 +32,9 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+# Local-only: path-override sibling checkout of room_scan_kit.
+# CI resolves the git ref from pubspec.yaml.
+pubspec_overrides.yaml
 
 # Symbolication related
 app.*.symbols

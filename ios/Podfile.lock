@@ -4,7 +4,7 @@ PODS:
     - Flutter
   - permission_handler_apple (9.4.8):
     - Flutter
-  - room_scan_kit (0.6.9):
+  - room_scan_kit (0.6.11):
     - Flutter
   - shared_preferences_foundation (0.0.1):
     - Flutter
@@ -33,7 +33,7 @@ SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_roomplan: a0df08e00ddc20fda094f6480163255a13bbd3bc
   permission_handler_apple: ee2fe0fd04551b304eb002714ff067c371c822ed
-  room_scan_kit: dfe7f40525968c472fffa3ef92ab7c19e9257fd2
+  room_scan_kit: e1e952ab5019fa4066d69411b67d558d990319ef
   shared_preferences_foundation: 5086985c1d43c5ba4d5e69a4e8083a389e2909e6
 
 PODFILE CHECKSUM: e456311ed89e6034ed590c85efa486c1de60a60f
