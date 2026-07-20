@@ -154,6 +154,7 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
       }
       await RoomUsdzViewerService.presentLocalFile(
         path,
+        scanId: widget.projectId.hashCode,
         languageCode: LanguageState().currentLanguage,
       );
     } catch (_) {
@@ -180,6 +181,7 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
       Toasts.showSuccess(context, L10n.get('project_combined_success'));
       await RoomUsdzViewerService.presentLocalFile(
         path,
+        scanId: widget.projectId.hashCode,
         languageCode: LanguageState().currentLanguage,
       );
     } catch (e) {

@@ -48,6 +48,7 @@ class _ScanScreenState extends State<ScanScreen>
 
   String? _lastScanPath;
   double? _lastScanBearingDeg;
+  int? _lastScanId;
 
   late final AnimationController _iconRotationController;
   late final Animation<double> _iconRotationAnimation;
@@ -123,6 +124,7 @@ class _ScanScreenState extends State<ScanScreen>
       setState(() {
         _lastScanPath = path;
         _lastScanBearingDeg = uploadedMetrics?.worldPlusXBearingDeg;
+        _lastScanId = result.id;
         _uploading = false;
       });
       Toasts.showSuccess(context, L10n.get("room_scan_success"));
@@ -144,6 +146,7 @@ class _ScanScreenState extends State<ScanScreen>
       // Keep the local scan viewable even when the upload failed.
       setState(() {
         _lastScanPath = path;
+        _lastScanId = path.hashCode;
       });
     }
   }
@@ -151,6 +154,7 @@ class _ScanScreenState extends State<ScanScreen>
   Future<void> _presentViewer(String path, double? bearingDeg) async {
     await RoomUsdzViewerService.presentLocalFile(
       path,
+      scanId: _lastScanId ?? path.hashCode,
       languageCode: LanguageState().currentLanguage,
       worldPlusXBearingDeg: bearingDeg,
     );

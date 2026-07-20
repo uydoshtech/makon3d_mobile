@@ -1,19 +1,79 @@
+import "dart:convert";
 import "dart:io";
 
 import "package:dio/dio.dart";
+import "package:flutter/foundation.dart";
 import "package:path_provider/path_provider.dart";
 import "package:room_scan_kit/room_scan_kit.dart";
+import "package:shared_preferences/shared_preferences.dart";
 
 import "package:makon3d_mobile/base/ios_device.dart";
 import "package:makon3d_mobile/l10n/l10n.dart";
 import "package:makon3d_mobile/services/scan_upload_service.dart";
 
 /// Host wrapper: download / l10n, then present via [room_scan_kit].
+///
+/// Makon users always own their scans, so the viewer opens in owner-edit mode
+/// (`isListingOwner: true` + positive [scanId] as kit `listingId`) so chrome
+/// such as Add furniture is visible. Furniture edits persist locally per scan.
 class RoomUsdzViewerService {
   RoomUsdzViewerService._();
 
   /// Makon slate floor tint from the logo secondary face (`#273C4A`).
   static const String _floorObjectTintHex = "273C4A";
+
+  static const String _furnitureEditsPrefsPrefix = "makon_furniture_edits_";
+
+  static bool _furnitureSinkWired = false;
+
+  /// Kit requires `listingId > 0`; [HousingScan.id.hashCode] can be ≤ 0.
+  static int viewerListingId(int scanId) {
+    final id = scanId.abs();
+    return id == 0 ? 1 : id;
+  }
+
+  static String _furnitureEditsKey(int listingId) =>
+      "$_furnitureEditsPrefsPrefix$listingId";
+
+  static Future<Map<String, dynamic>?> _loadFurnitureEdits(int listingId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_furnitureEditsKey(listingId));
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map<String, dynamic>) return decoded;
+      if (decoded is Map) return Map<String, dynamic>.from(decoded);
+    } catch (e) {
+      debugPrint("Furniture edits load failed ($listingId): $e");
+    }
+    return null;
+  }
+
+  static Future<void> _saveFurnitureEdits(
+    int listingId,
+    Map<String, dynamic>? furnitureEdits,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = _furnitureEditsKey(listingId);
+    if (furnitureEdits == null) {
+      await prefs.remove(key);
+      return;
+    }
+    await prefs.setString(key, jsonEncode(furnitureEdits));
+  }
+
+  static void _ensureFurnitureEditsSink() {
+    if (_furnitureSinkWired) return;
+    _furnitureSinkWired = true;
+    RoomUsdzViewer.onFurnitureEditsChanged =
+        (listingId, furnitureEdits) async {
+      try {
+        await _saveFurnitureEdits(listingId, furnitureEdits);
+      } catch (e) {
+        debugPrint("Furniture edits save failed: $e");
+      }
+    };
+  }
 
   /// Downloads USDZ to the per-scan temp cache (for mini preview or fullscreen).
   /// Returns null on non-iOS. [pathOrUrl] may be relative or absolute.
@@ -53,6 +113,7 @@ class RoomUsdzViewerService {
     if (file == null) return false;
     return presentLocalFile(
       file.path,
+      scanId: scanId,
       languageCode: languageCode,
       worldPlusXBearingDeg: worldPlusXBearingDeg,
     );
@@ -78,6 +139,7 @@ class RoomUsdzViewerService {
       if (file.existsSync() && file.lengthSync() > 0) {
         return presentLocalFile(
           file.path,
+          scanId: scanId,
           languageCode: languageCode,
           worldPlusXBearingDeg: worldPlusXBearingDeg,
         );
@@ -98,16 +160,24 @@ class RoomUsdzViewerService {
   }
 
   /// Returns true if the native viewer was presented.
+  ///
+  /// [scanId] is passed to the kit as `listingId` (must resolve to > 0) so
+  /// owner-edit chrome (Add furniture, north adjust) is enabled.
   static Future<bool> presentLocalFile(
     String path, {
+    required int scanId,
     required String languageCode,
     double? worldPlusXBearingDeg,
+    Map<String, dynamic>? furnitureEdits,
   }) async {
     if (!isIOSDevice) return false;
     final file = File(path);
     if (!file.existsSync() || file.lengthSync() == 0) {
       throw StateError("USDZ not found at $path");
     }
+    final listingId = viewerListingId(scanId);
+    _ensureFurnitureEditsSink();
+    final edits = furnitureEdits ?? await _loadFurnitureEdits(listingId);
     String l(String key) => L10n.getForLanguage(key, languageCode);
     final strings = <String, String>{
       "title": l("room_3d_viewer_title"),
@@ -266,7 +336,10 @@ class RoomUsdzViewerService {
     return RoomUsdzViewer.presentLocalFile(
       path: path,
       strings: strings,
+      listingId: listingId,
+      isListingOwner: true,
       worldPlusXBearingDeg: worldPlusXBearingDeg,
+      furnitureEdits: edits,
     );
   }
 }
