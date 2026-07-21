@@ -1,3 +1,4 @@
+import "dart:async";
 import "dart:convert";
 import "dart:io";
 
@@ -9,6 +10,7 @@ import "package:shared_preferences/shared_preferences.dart";
 
 import "package:makon3d_mobile/base/ios_device.dart";
 import "package:makon3d_mobile/l10n/l10n.dart";
+import "package:makon3d_mobile/services/scan_share_service.dart";
 import "package:makon3d_mobile/services/scan_upload_service.dart";
 
 /// Host wrapper: download / l10n, then present via [room_scan_kit].
@@ -16,6 +18,9 @@ import "package:makon3d_mobile/services/scan_upload_service.dart";
 /// Makon users always own their scans, so the viewer opens in owner-edit mode
 /// (`isListingOwner: true` + positive [scanId] as kit `listingId`) so chrome
 /// such as Add furniture is visible. Furniture edits persist locally per scan.
+///
+/// When [shareScanId] is set (remote API id), the native Share button is shown
+/// and shares the server rotation GIF + viewer link.
 class RoomUsdzViewerService {
   RoomUsdzViewerService._();
 
@@ -25,6 +30,9 @@ class RoomUsdzViewerService {
   static const String _furnitureEditsPrefsPrefix = "makon_furniture_edits_";
 
   static bool _furnitureSinkWired = false;
+  static bool _shareSinkWired = false;
+  static String _shareLanguageCode = "en";
+  static final Map<int, int> _shareScanIdByListingId = <int, int>{};
 
   /// Kit requires `listingId > 0`; [HousingScan.id.hashCode] can be ≤ 0.
   static int viewerListingId(int scanId) {
@@ -75,6 +83,21 @@ class RoomUsdzViewerService {
     };
   }
 
+  static void _ensureShareSink() {
+    if (_shareSinkWired) return;
+    _shareSinkWired = true;
+    RoomUsdzViewer.onShareTapped = (listingId) {
+      final remoteId = _shareScanIdByListingId[listingId] ?? listingId;
+      // Fire-and-forget; share sheet is async UI.
+      unawaited(
+        ScanShareService.shareScan(
+          remoteId,
+          languageCode: _shareLanguageCode,
+        ),
+      );
+    };
+  }
+
   /// Downloads USDZ to the per-scan temp cache (for mini preview or fullscreen).
   /// Returns null on non-iOS. [pathOrUrl] may be relative or absolute.
   static Future<File?> downloadUsdToCache(
@@ -108,6 +131,7 @@ class RoomUsdzViewerService {
     required int scanId,
     required String languageCode,
     double? worldPlusXBearingDeg,
+    int? shareScanId,
   }) async {
     final file = await downloadUsdToCache(pathOrUrl, scanId: scanId);
     if (file == null) return false;
@@ -116,6 +140,7 @@ class RoomUsdzViewerService {
       scanId: scanId,
       languageCode: languageCode,
       worldPlusXBearingDeg: worldPlusXBearingDeg,
+      shareScanId: shareScanId,
     );
   }
 
@@ -130,6 +155,7 @@ class RoomUsdzViewerService {
     required int scanId,
     required String languageCode,
     double? worldPlusXBearingDeg,
+    int? shareScanId,
   }) async {
     if (!isIOSDevice) return false;
 
@@ -142,6 +168,7 @@ class RoomUsdzViewerService {
           scanId: scanId,
           languageCode: languageCode,
           worldPlusXBearingDeg: worldPlusXBearingDeg,
+          shareScanId: shareScanId,
         );
       }
     }
@@ -153,6 +180,7 @@ class RoomUsdzViewerService {
         scanId: scanId,
         languageCode: languageCode,
         worldPlusXBearingDeg: worldPlusXBearingDeg,
+        shareScanId: shareScanId,
       );
     }
 
@@ -163,12 +191,16 @@ class RoomUsdzViewerService {
   ///
   /// [scanId] is passed to the kit as `listingId` (must resolve to > 0) so
   /// owner-edit chrome (Add furniture, north adjust) is enabled.
+  ///
+  /// When [shareScanId] is a positive remote API id, the native Share button
+  /// is shown and shares GIF + viewer link for that scan.
   static Future<bool> presentLocalFile(
     String path, {
     required int scanId,
     required String languageCode,
     double? worldPlusXBearingDeg,
     Map<String, dynamic>? furnitureEdits,
+    int? shareScanId,
   }) async {
     if (!isIOSDevice) return false;
     final file = File(path);
@@ -177,6 +209,12 @@ class RoomUsdzViewerService {
     }
     final listingId = viewerListingId(scanId);
     _ensureFurnitureEditsSink();
+    final enableShare = shareScanId != null && shareScanId > 0;
+    if (enableShare) {
+      _shareLanguageCode = languageCode;
+      _shareScanIdByListingId[listingId] = shareScanId;
+      _ensureShareSink();
+    }
     final edits = furnitureEdits ?? await _loadFurnitureEdits(listingId);
     String l(String key) => L10n.getForLanguage(key, languageCode);
     final strings = <String, String>{
@@ -191,6 +229,7 @@ class RoomUsdzViewerService {
       "loadErrorTitle": l("room_3d_load_error_title"),
       "alertOk": l("ok"),
       "back": l("back"),
+      "share": l("share_3d_scan_title"),
       "floorOnlyButton": l("room_3d_floor_only_button"),
       "fullRoomButton": l("room_3d_full_room_button"),
       "floorOnlyUnavailable": l("room_3d_floor_only_unavailable"),
@@ -338,6 +377,7 @@ class RoomUsdzViewerService {
       strings: strings,
       listingId: listingId,
       isListingOwner: true,
+      shareEnabled: enableShare,
       worldPlusXBearingDeg: worldPlusXBearingDeg,
       furnitureEdits: edits,
     );

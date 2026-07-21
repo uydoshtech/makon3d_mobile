@@ -96,6 +96,7 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
         scanId: scan.remoteScanId ?? scan.id.hashCode,
         languageCode: LanguageState().currentLanguage,
         worldPlusXBearingDeg: scan.worldPlusXBearingDeg,
+        shareScanId: scan.remoteScanId,
       );
       if (!ok && mounted) {
         Toasts.showError(context, L10n.get('scans_open_error'));

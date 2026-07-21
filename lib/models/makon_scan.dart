@@ -8,6 +8,10 @@ class MakonScan {
     this.heightM,
     this.floorAreaM2,
     this.worldPlusXBearingDeg,
+    this.rotationGifUrl,
+    this.posterImageUrl,
+    this.viewerUrl,
+    this.mediaGenerationStatus,
     this.createdAt,
   });
 
@@ -19,6 +23,10 @@ class MakonScan {
   final double? heightM;
   final double? floorAreaM2;
   final double? worldPlusXBearingDeg;
+  final String? rotationGifUrl;
+  final String? posterImageUrl;
+  final String? viewerUrl;
+  final String? mediaGenerationStatus;
   final DateTime? createdAt;
 
   factory MakonScan.fromJson(Map<String, dynamic> json) {
@@ -31,6 +39,10 @@ class MakonScan {
       heightM: (json["heightM"] as num?)?.toDouble(),
       floorAreaM2: (json["floorAreaM2"] as num?)?.toDouble(),
       worldPlusXBearingDeg: (json["worldPlusXBearingDeg"] as num?)?.toDouble(),
+      rotationGifUrl: json["rotationGifUrl"] as String?,
+      posterImageUrl: json["posterImageUrl"] as String?,
+      viewerUrl: json["viewerUrl"] as String?,
+      mediaGenerationStatus: json["mediaGenerationStatus"] as String?,
       createdAt: json["createdAt"] != null
           ? DateTime.tryParse(json["createdAt"].toString())
           : null,

@@ -49,6 +49,8 @@ class _ScanScreenState extends State<ScanScreen>
   String? _lastScanPath;
   double? _lastScanBearingDeg;
   int? _lastScanId;
+  /// Set only after a successful API upload (enables Share + GIF).
+  int? _lastRemoteScanId;
 
   late final AnimationController _iconRotationController;
   late final Animation<double> _iconRotationAnimation;
@@ -125,6 +127,7 @@ class _ScanScreenState extends State<ScanScreen>
         _lastScanPath = path;
         _lastScanBearingDeg = uploadedMetrics?.worldPlusXBearingDeg;
         _lastScanId = result.id;
+        _lastRemoteScanId = result.id;
         _uploading = false;
       });
       Toasts.showSuccess(context, L10n.get("room_scan_success"));
@@ -147,6 +150,7 @@ class _ScanScreenState extends State<ScanScreen>
       setState(() {
         _lastScanPath = path;
         _lastScanId = path.hashCode;
+        _lastRemoteScanId = null;
       });
     }
   }
@@ -157,6 +161,7 @@ class _ScanScreenState extends State<ScanScreen>
       scanId: _lastScanId ?? path.hashCode,
       languageCode: LanguageState().currentLanguage,
       worldPlusXBearingDeg: bearingDeg,
+      shareScanId: _lastRemoteScanId,
     );
   }
 

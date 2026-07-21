@@ -20,6 +20,7 @@ dependencies:
   flutter_svg: ^2.2.0
   path_provider: ^2.1.4
   permission_handler: ^12.0.3
+  share_plus: ^13.2.0
   room_scan_kit:
     git:
       url: https://github.com/uydoshtech/room_scan_kit.git

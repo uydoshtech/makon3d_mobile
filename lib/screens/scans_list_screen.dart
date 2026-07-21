@@ -105,6 +105,7 @@ class _ScansListScreenState extends State<ScansListScreen> {
         scanId: scan.id,
         languageCode: LanguageState().currentLanguage,
         worldPlusXBearingDeg: scan.worldPlusXBearingDeg,
+        shareScanId: scan.id,
       );
     } catch (_) {
       if (!mounted) return;

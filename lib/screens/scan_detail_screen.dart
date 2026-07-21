@@ -48,6 +48,7 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
         scanId: _cacheScanId,
         languageCode: LanguageState().currentLanguage,
         worldPlusXBearingDeg: widget.scan.worldPlusXBearingDeg,
+        shareScanId: widget.scan.remoteScanId,
       );
       if (!ok && mounted) {
         Toasts.showError(context, L10n.get('scans_open_error'));
