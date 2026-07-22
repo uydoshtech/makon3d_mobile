@@ -361,6 +361,7 @@ class RoomUsdzViewerService {
       "floorPlanObjectTelevision": l("room_3d_floor_plan_object_television"),
       "floorPlanObjectFixture": l("room_3d_floor_plan_object_fixture"),
       "floorPlanObjectDoor": l("room_3d_floor_plan_object_door"),
+      "floorPlanObjectWindow": l("room_3d_floor_plan_object_window"),
       "floorPlanObjectUnknown": l("room_3d_floor_plan_object_unknown"),
       "sunToggleLabel": l("room_3d_sun_toggle_label"),
       "sunToggleHint": l("room_3d_sun_toggle_hint"),
