@@ -6,6 +6,8 @@ PODS:
     - Flutter
   - room_scan_kit (0.6.11):
     - Flutter
+  - share_plus (0.0.1):
+    - Flutter
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -15,6 +17,7 @@ DEPENDENCIES:
   - flutter_roomplan (from `.symlinks/plugins/flutter_roomplan/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - room_scan_kit (from `.symlinks/plugins/room_scan_kit/ios`)
+  - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
 
 EXTERNAL SOURCES:
@@ -26,6 +29,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   room_scan_kit:
     :path: ".symlinks/plugins/room_scan_kit/ios"
+  share_plus:
+    :path: ".symlinks/plugins/share_plus/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
 
@@ -34,8 +39,9 @@ SPEC CHECKSUMS:
   flutter_roomplan: a0df08e00ddc20fda094f6480163255a13bbd3bc
   permission_handler_apple: ee2fe0fd04551b304eb002714ff067c371c822ed
   room_scan_kit: e1e952ab5019fa4066d69411b67d558d990319ef
+  share_plus: 8b6f8b3447e494cca5317c8c3073de39b3600d1f
   shared_preferences_foundation: 5086985c1d43c5ba4d5e69a4e8083a389e2909e6
 
-PODFILE CHECKSUM: e456311ed89e6034ed590c85efa486c1de60a60f
+PODFILE CHECKSUM: a4be289dbe165666b96931c9c8169eda94a1e3ec
 
 COCOAPODS: 1.16.2
