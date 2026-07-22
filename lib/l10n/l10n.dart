@@ -292,6 +292,7 @@ class L10n {
       "room_3d_floor_plan_object_cabinet": "Cabinet",
       "room_3d_floor_plan_object_television": "TV",
       "room_3d_floor_plan_object_fixture": "Fixture",
+      "room_3d_floor_plan_object_door": "Door",
       "room_3d_floor_plan_object_unknown": "Object",
       "room_3d_floor_plan_rotate_furniture_title": "Adjust furniture",
       "room_3d_floor_plan_rotate_furniture_message":
@@ -584,6 +585,7 @@ class L10n {
       "room_3d_floor_plan_object_cabinet": "Шкаф",
       "room_3d_floor_plan_object_television": "ТВ",
       "room_3d_floor_plan_object_fixture": "Сантехника",
+      "room_3d_floor_plan_object_door": "Дверь",
       "room_3d_floor_plan_object_unknown": "Объект",
       "room_3d_floor_plan_rotate_furniture_title": "Настройка мебели",
       "room_3d_floor_plan_rotate_furniture_message":
@@ -876,6 +878,7 @@ class L10n {
       "room_3d_floor_plan_object_cabinet": "Shkaf",
       "room_3d_floor_plan_object_television": "TV",
       "room_3d_floor_plan_object_fixture": "Sanitar jihoz",
+      "room_3d_floor_plan_object_door": "Eshik",
       "room_3d_floor_plan_object_unknown": "Buyum",
       "room_3d_floor_plan_rotate_furniture_title": "Mebelni sozlash",
       "room_3d_floor_plan_rotate_furniture_message":
