@@ -4,7 +4,7 @@ import "package:flutter/material.dart";
 import "package:makon3d_mobile/l10n/l10n.dart";
 import "package:makon3d_mobile/theme/makon_colors.dart";
 
-/// Slim 2-tab curved bottom bar (Projects / Scans) in Makon3D brand slate/teal.
+/// Slim 2-tab curved bottom bar (Projects / Scans) in Makon brand black/yellow.
 class MakonCurvedNavBar extends StatelessWidget {
   const MakonCurvedNavBar({
     required this.currentIndex,
@@ -15,9 +15,9 @@ class MakonCurvedNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  static const Color _barColor = MakonColors.slateElevated;
-  static const Color _orbColor = MakonColors.teal;
-  static const Color _notchColor = MakonColors.slate;
+  static const Color _barColor = MakonColors.inkElevated;
+  static const Color _orbColor = MakonColors.yellow;
+  static const Color _notchColor = MakonColors.ink;
   static const Color _labelColor = MakonColors.onDark;
 
   @override
@@ -56,10 +56,11 @@ class MakonCurvedNavBar extends StatelessWidget {
     required String labelKey,
     required bool selected,
   }) {
+    // Selected icon sits on the yellow orb, so it flips to brand black.
     final iconWidget = Icon(
       icon,
       size: 26,
-      color: _labelColor,
+      color: selected ? MakonColors.black : _labelColor,
     );
     return Column(
       mainAxisSize: MainAxisSize.min,

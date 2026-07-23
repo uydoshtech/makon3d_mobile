@@ -1,31 +1,31 @@
 import "package:flutter/material.dart";
 
-/// Brand colors from the Makon logo lockup.
+/// Brand colors from the Makon logo (black mark on yellow field).
 abstract final class MakonColors {
-  /// Splash / deep brand black.
+  /// Brand mark / primary chrome black.
   static const Color black = Color(0xFF000000);
 
-  /// Full-screen splash + app-icon field (Makon yellow).
+  /// Splash / app-icon field + primary accent (Makon yellow).
   static const Color yellow = Color(0xFFFFCC00);
 
-  /// Legacy cube top face + "3D" wordmark accent.
-  static const Color teal = Color(0xFF28A5AC);
+  /// Brighter yellow highlight (active/pressed accents).
+  static const Color yellowBright = Color(0xFFFFDB4D);
 
-  /// Brighter teal highlight (derived from logo accent).
-  static const Color tealBright = Color(0xFF34C8CC);
+  /// Pale yellow for tinted containers and chips.
+  static const Color yellowSoft = Color(0xFFFFF3C2);
 
-  /// Cube left face / primary slate.
-  static const Color slate = Color(0xFF1E2F3D);
+  /// Primary text / dark surfaces (softened brand black).
+  static const Color ink = Color(0xFF161616);
 
-  /// Cube right face / elevated slate.
-  static const Color slateElevated = Color(0xFF273C4A);
+  /// Elevated dark chrome (nav bar, dark sheets).
+  static const Color inkElevated = Color(0xFF242424);
 
-  /// "Makon" wordmark slate.
-  static const Color slateMuted = Color(0xFF2C3E50);
+  /// Secondary text.
+  static const Color inkMuted = Color(0xFF5C5C5C);
 
   /// Light chrome on dark surfaces (nav labels, etc.).
-  static const Color onDark = Color(0xFFF2F7F8);
+  static const Color onDark = Color(0xFFFAF7EF);
 
-  /// Soft cool surface for light UI.
-  static const Color surface = Color(0xFFF3F7F8);
+  /// Soft warm surface for light UI.
+  static const Color surface = Color(0xFFFAF8F3);
 }

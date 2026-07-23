@@ -24,8 +24,8 @@ import "package:makon3d_mobile/services/scan_upload_service.dart";
 class RoomUsdzViewerService {
   RoomUsdzViewerService._();
 
-  /// Makon slate floor tint from the logo secondary face (`#273C4A`).
-  static const String _floorObjectTintHex = "273C4A";
+  /// Makon charcoal floor tint matching the black brand mark.
+  static const String _floorObjectTintHex = "262626";
 
   static const String _furnitureEditsPrefsPrefix = "makon_furniture_edits_";
 
