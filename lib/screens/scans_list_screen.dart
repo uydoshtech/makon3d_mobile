@@ -10,7 +10,8 @@ import "package:makon3d_mobile/services/scan_upload_service.dart";
 import "package:makon3d_mobile/services/scans_refresh_notifier.dart";
 import "package:makon3d_mobile/widgets/toasts.dart";
 
-/// Lists anonymous scans uploaded from this install (`device_id`).
+/// Lists all recent public scans (everyone's, for now — same feed as the
+/// Makon3D web gallery).
 class ScansListScreen extends StatefulWidget {
   const ScansListScreen({super.key, this.isActive = false});
 
@@ -69,7 +70,7 @@ class _ScansListScreenState extends State<ScansListScreen> {
       _error = null;
     });
     try {
-      final scans = await ScanUploadService.listScansForThisDevice(
+      final scans = await ScanUploadService.listAllScans(
         cancelToken: token,
       );
       if (!mounted || token.isCancelled) return;

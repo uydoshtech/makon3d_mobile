@@ -68,13 +68,33 @@ class ScanUploadService {
     );
   }
 
+  /// Scans uploaded from this install only — used by the legacy-scan →
+  /// project migration, which must not import other people's scans.
   static Future<List<MakonScan>> listScansForThisDevice({
     CancelToken? cancelToken,
   }) async {
     final deviceId = await DeviceIdentity.get();
+    return _listScans(
+      queryParameters: <String, dynamic>{"device_id": deviceId},
+      cancelToken: cancelToken,
+    );
+  }
+
+  /// All recent public scans across devices — the Scans tab shows everything
+  /// for now (same feed as the Makon3D web gallery / Telegram bot).
+  static Future<List<MakonScan>> listAllScans({
+    CancelToken? cancelToken,
+  }) {
+    return _listScans(cancelToken: cancelToken);
+  }
+
+  static Future<List<MakonScan>> _listScans({
+    Map<String, dynamic>? queryParameters,
+    CancelToken? cancelToken,
+  }) async {
     final response = await _dio.get<Map<String, dynamic>>(
       "/makon3d/scans",
-      queryParameters: <String, dynamic>{"device_id": deviceId},
+      queryParameters: queryParameters,
       cancelToken: cancelToken,
       options: Options(
         sendTimeout: const Duration(seconds: 30),
