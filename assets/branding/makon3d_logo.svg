@@ -1,18 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 220" role="img" aria-label="Makon3D">
-  <!-- Isometric cube brand mark + wordmark (logo lockup) -->
-  <g transform="translate(65, 0)">
-    <polygon fill="#1E2F3D" points="13.00,45.50 74.50,83.00 74.50,148.00 13.00,112.50"/>
-    <polygon fill="#273C4A" points="136.00,45.50 136.00,112.50 74.50,148.00 74.50,83.00"/>
-    <polygon fill="#28A5AC" points="74.50,10.00 136.00,45.50 74.50,83.00 13.00,45.50"/>
-    <!-- Structural accents (white, matching brand lockup) -->
-    <polygon fill="#FFFFFF" points="13.00,45.50 74.50,83.00 74.50,91.00 13.00,53.50"/>
-    <polygon fill="#FFFFFF" points="136.00,45.50 74.50,83.00 74.50,91.00 136.00,53.50"/>
-    <polygon fill="#FFFFFF" points="39.50,64.25 48.00,64.25 48.00,86.25 39.50,86.25"/>
-    <polygon fill="#FFFFFF" points="101.00,64.25 109.50,64.25 109.50,86.25 101.00,86.25"/>
-    <polygon fill="#FFFFFF" points="72.90,84.20 76.10,84.20 76.10,148.00 72.90,148.00"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 538 538" role="img" aria-label="Makon">
+  <!-- Brand mark only (no wordmark) -->
+  <g transform="translate(25.0,0.0)">
+    <g transform="translate(0.000000,538.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
+      <path d="M1744 4392 c-380 -229 -691 -421 -692 -427 -2 -10 1374 -845 1392 -845 10 0 1364 816 1383 834 10 8 -14 27 -98 79 l-110 67 -462 -277 c-254 -153 -471 -278 -482 -278 -21 0 -474 264 -475 277 0 4 209 132 465 285 255 153 464 280 464 283 0 5 -671 413 -686 417 -4 1 -319 -186 -699 -415z M600 2656 l0 -984 292 -173 c160 -96 295 -175 300 -177 4 -2 8 301 8 673 0 373 4 675 9 673 4 -1 117 -68 250 -148 l241 -145 2 -684 3 -685 370 -221 369 -220 368 220 367 220 1 833 c0 457 3 832 6 832 3 0 115 -66 250 -146 l244 -147 0 -528 c0 -291 2 -529 5 -529 3 0 138 79 300 175 l295 176 0 986 0 985 -22 -14 c-13 -8 -426 -257 -920 -552 l-896 -538 -849 508 c-466 279 -881 527 -920 551 l-73 43 0 -984z"/>
+    </g>
   </g>
-  <text x="140" y="200" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="36" font-weight="700">
-    <tspan fill="#2C3E50">Makon</tspan><tspan fill="#28A5AC">3D</tspan>
-  </text>
 </svg>

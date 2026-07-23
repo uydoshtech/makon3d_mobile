@@ -8,8 +8,9 @@ import "package:makon3d_mobile/theme/makon_colors.dart";
 
 /// Brief branded splash before the main tab shell.
 ///
-/// Matches the native iOS launch screen (white + centered logo) so the
-/// handoff from LaunchScreen.storyboard feels continuous.
+/// Full-screen Makon yellow with the black brand mark centered — matches the
+/// native iOS launch screen so the handoff from LaunchScreen.storyboard
+/// feels continuous.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -62,44 +63,18 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final markWidth = (size.shortestSide * 0.42).clamp(140.0, 220.0);
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: MakonColors.yellow,
       body: FadeTransition(
         opacity: _fade,
         child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SvgPicture.asset(
-                  "assets/branding/makon3d_mark.svg",
-                  fit: BoxFit.contain,
-                  width: 140,
-                ),
-                const SizedBox(height: 18),
-                Text.rich(
-                  TextSpan(
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.2,
-                      height: 1,
-                    ),
-                    children: const [
-                      TextSpan(
-                        text: "Makon",
-                        style: TextStyle(color: MakonColors.slateMuted),
-                      ),
-                      TextSpan(
-                        text: "3D",
-                        style: TextStyle(color: MakonColors.teal),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          child: SvgPicture.asset(
+            "assets/branding/makon3d_mark.svg",
+            fit: BoxFit.contain,
+            width: markWidth,
           ),
         ),
       ),

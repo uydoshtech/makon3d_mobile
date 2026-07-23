@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Generate Makon 3D brand images from the SVG lockup / mark.
+"""Generate Makon brand images from the SVG mark.
 
 Requires `rsvg-convert` (librsvg) on PATH.
 
 Writes:
-  - every size in AppIcon.appiconset (white bg, cube mark),
-  - LaunchImage 1x/2x/3x (transparent full lockup),
-  - assets/branding/makon3d_logo.png (transparent full lockup).
+  - every size in AppIcon.appiconset (yellow bg, black mark, no wordmark),
+  - LaunchImage 1x/2x/3x (transparent mark only),
+  - assets/branding/makon3d_logo.png (transparent mark).
 """
 
 from __future__ import annotations
@@ -25,6 +25,9 @@ LAUNCHSET = ROOT / "ios/Runner/Assets.xcassets/LaunchImage.imageset"
 BRANDING = ROOT / "assets/branding"
 MARK_SVG = BRANDING / "makon3d_mark.svg"
 LOGO_SVG = BRANDING / "makon3d_logo.svg"
+
+# Makon yellow — matches MakonColors.yellow / LaunchScreen.storyboard.
+YELLOW = (255, 204, 0)
 
 SIZES = [
     ("Icon-App-20x20@1x.png", 20),
@@ -70,11 +73,11 @@ def main() -> None:
         mark_png = tmp_path / "mark.png"
         logo_png = tmp_path / "logo.png"
         _rasterize(rsvg, MARK_SVG, mark_png, 1024, 1024)
-        _rasterize(rsvg, LOGO_SVG, logo_png, 1024)
+        _rasterize(rsvg, LOGO_SVG, logo_png, 1024, 1024)
 
         mark = Image.open(mark_png).convert("RGBA")
-        # App Store icons must not have alpha — flatten onto white.
-        icon_master = Image.new("RGB", (1024, 1024), (255, 255, 255))
+        # App Store icons must not have alpha — flatten onto Makon yellow.
+        icon_master = Image.new("RGB", (1024, 1024), YELLOW)
         icon_master.paste(mark, mask=mark.split()[3])
 
         for name, size in SIZES:
@@ -83,19 +86,17 @@ def main() -> None:
             print(f"wrote {name} ({size}x{size})")
 
         logo = Image.open(logo_png).convert("RGBA")
-        # Launch image: @3x tallest around 520px, keep aspect.
-        h3 = 520
-        w3 = round(logo.width * h3 / logo.height)
-        launch3 = logo.resize((w3, h3), Image.LANCZOS)
+        # Launch image: transparent mark only (storyboard supplies yellow field).
+        side3 = 520
+        launch3 = logo.resize((side3, side3), Image.LANCZOS)
         for scale, name in ((3, "LaunchImage@3x.png"), (2, "LaunchImage@2x.png"), (1, "LaunchImage.png")):
-            size = (round(w3 * scale / 3), round(h3 * scale / 3))
-            launch3.resize(size, Image.LANCZOS).save(LAUNCHSET / name, "PNG")
-            print(f"wrote {name} {size}")
+            side = round(side3 * scale / 3)
+            launch3.resize((side, side), Image.LANCZOS).save(LAUNCHSET / name, "PNG")
+            print(f"wrote {name} ({side}x{side})")
 
-        brand_h = 1024
-        brand_w = round(logo.width * brand_h / logo.height)
-        logo.resize((brand_w, brand_h), Image.LANCZOS).save(BRANDING / "makon3d_logo.png", "PNG")
-        print(f"wrote assets/branding/makon3d_logo.png ({brand_w}x{brand_h})")
+        brand_side = 1024
+        logo.resize((brand_side, brand_side), Image.LANCZOS).save(BRANDING / "makon3d_logo.png", "PNG")
+        print(f"wrote assets/branding/makon3d_logo.png ({brand_side}x{brand_side})")
 
 
 if __name__ == "__main__":

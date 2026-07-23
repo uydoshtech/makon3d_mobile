@@ -1,11 +1,14 @@
 import "package:flutter/material.dart";
 
-/// Brand colors from the Makon3D logo lockup.
+/// Brand colors from the Makon logo lockup.
 abstract final class MakonColors {
   /// Splash / deep brand black.
   static const Color black = Color(0xFF000000);
 
-  /// Cube top face + "3D" wordmark.
+  /// Full-screen splash + app-icon field (Makon yellow).
+  static const Color yellow = Color(0xFFFFCC00);
+
+  /// Legacy cube top face + "3D" wordmark accent.
   static const Color teal = Color(0xFF28A5AC);
 
   /// Brighter teal highlight (derived from logo accent).
