@@ -75,6 +75,9 @@ class L10n {
       "nav_scan": "Scan",
       "nav_projects": "Projects",
       "nav_scans": "Scans",
+      "nav_settings": "Settings",
+      "settings_title": "Settings",
+      "settings_language_title": "Language",
       "projects_list_title": "Projects",
       "projects_empty":
           "No projects yet.\nCreate a project to choose how you want to scan.",
@@ -367,6 +370,9 @@ class L10n {
       "nav_scan": "Скан",
       "nav_projects": "Проекты",
       "nav_scans": "Сканы",
+      "nav_settings": "Настройки",
+      "settings_title": "Настройки",
+      "settings_language_title": "Язык",
       "projects_list_title": "Проекты",
       "projects_empty":
           "Пока нет проектов.\nСоздайте проект и выберите способ сканирования.",
@@ -661,6 +667,9 @@ class L10n {
       "nav_scan": "Skan",
       "nav_projects": "Loyihalar",
       "nav_scans": "Skanlar",
+      "nav_settings": "Sozlamalar",
+      "settings_title": "Sozlamalar",
+      "settings_language_title": "Til",
       "projects_list_title": "Loyihalar",
       "projects_empty":
           "Hali loyiha yo'q.\nSkanlash usulini tanlash uchun loyiha yarating.",

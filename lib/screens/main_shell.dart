@@ -7,9 +7,10 @@ import 'package:makon3d_mobile/l10n/l10n.dart';
 import 'package:makon3d_mobile/screens/new_project_screen.dart';
 import 'package:makon3d_mobile/screens/projects_list_screen.dart';
 import 'package:makon3d_mobile/screens/scans_list_screen.dart';
+import 'package:makon3d_mobile/screens/settings_screen.dart';
 import 'package:makon3d_mobile/widgets/curved_nav_bar.dart';
 
-/// Two-tab shell: Projects + legacy device scans list.
+/// Three-tab shell: Projects + legacy device scans list + settings.
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -48,6 +49,7 @@ class _MainShellState extends State<MainShell> {
             onCreateProject: () => unawaited(_openNewProject()),
           ),
           ScansListScreen(isActive: _index == _scansListTab),
+          const SettingsScreen(),
         ],
       ),
       floatingActionButton: onProjects

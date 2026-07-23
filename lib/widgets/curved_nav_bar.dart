@@ -4,7 +4,8 @@ import "package:flutter/material.dart";
 import "package:makon3d_mobile/l10n/l10n.dart";
 import "package:makon3d_mobile/theme/makon_colors.dart";
 
-/// Slim 2-tab curved bottom bar (Projects / Scans) in Makon brand black/yellow.
+/// Slim 3-tab curved bottom bar (Projects / Scans / Settings) in Makon brand
+/// black/yellow.
 class MakonCurvedNavBar extends StatelessWidget {
   const MakonCurvedNavBar({
     required this.currentIndex,
@@ -32,6 +33,11 @@ class MakonCurvedNavBar extends StatelessWidget {
         icon: Icons.view_list_rounded,
         labelKey: "nav_scans",
         selected: currentIndex == 1,
+      ),
+      _navItem(
+        icon: Icons.settings_outlined,
+        labelKey: "nav_settings",
+        selected: currentIndex == 2,
       ),
     ];
 
