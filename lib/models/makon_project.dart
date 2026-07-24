@@ -17,6 +17,7 @@ class MakonProject {
     this.rooms = const [],
     this.mergedStructureLocalPath,
     this.entireHousingFloorTilePrefs,
+    this.entireHousingWallTilePrefs,
   });
 
   final String id;
@@ -34,6 +35,9 @@ class MakonProject {
   /// Floor-tile settings when [scanMode] is entire housing (one space).
   final FloorTilePrefs? entireHousingFloorTilePrefs;
 
+  /// Wall-tile settings when [scanMode] is entire housing (one space).
+  final FloorTilePrefs? entireHousingWallTilePrefs;
+
   bool get hasEntireHousingModel => entireHousingScan?.hasModel == true;
 
   int get scannedRoomCount => rooms.where((r) => r.isScanned).length;
@@ -49,6 +53,7 @@ class MakonProject {
         'rooms': rooms.map((r) => r.toJson()).toList(),
         'mergedStructureLocalPath': mergedStructureLocalPath,
         'entireHousingFloorTilePrefs': entireHousingFloorTilePrefs?.toJson(),
+        'entireHousingWallTilePrefs': entireHousingWallTilePrefs?.toJson(),
       };
 
   factory MakonProject.fromJson(Map<String, dynamic> json) {
@@ -101,6 +106,8 @@ class MakonProject {
                       ),
                     )
                   : null,
+      entireHousingWallTilePrefs:
+          FloorTilePrefs.tryFromJson(json['entireHousingWallTilePrefs']),
     );
   }
 
@@ -130,6 +137,7 @@ class MakonProject {
     List<ProjectRoom>? rooms,
     String? mergedStructureLocalPath,
     FloorTilePrefs? entireHousingFloorTilePrefs,
+    FloorTilePrefs? entireHousingWallTilePrefs,
     bool clearEntireHousingScan = false,
   }) {
     return MakonProject(
@@ -147,6 +155,8 @@ class MakonProject {
           mergedStructureLocalPath ?? this.mergedStructureLocalPath,
       entireHousingFloorTilePrefs:
           entireHousingFloorTilePrefs ?? this.entireHousingFloorTilePrefs,
+      entireHousingWallTilePrefs:
+          entireHousingWallTilePrefs ?? this.entireHousingWallTilePrefs,
     );
   }
 }

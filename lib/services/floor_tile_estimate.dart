@@ -53,6 +53,25 @@ class FloorTileEstimator {
         floorShortM > 0;
   }
 
+  /// Approximate wall area from the footprint bounding box:
+  /// perimeter (2 × (long + short)) × ceiling height. Door/window openings
+  /// are not subtracted.
+  static double? resolveWallAreaM2({
+    double? floorLongM,
+    double? floorShortM,
+    double? heightM,
+  }) {
+    if (floorLongM == null ||
+        floorShortM == null ||
+        heightM == null ||
+        floorLongM <= 0 ||
+        floorShortM <= 0 ||
+        heightM <= 0) {
+      return null;
+    }
+    return 2 * (floorLongM + floorShortM) * heightM;
+  }
+
   static FloorTileEstimate? estimate({
     required double floorAreaM2,
     required double widthCm,

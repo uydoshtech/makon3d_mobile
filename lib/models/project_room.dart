@@ -14,6 +14,7 @@ class ProjectRoom {
     this.layoutOffsetZM,
     this.layoutYawDeg,
     this.floorTilePrefs,
+    this.wallTilePrefs,
   });
 
   final String id;
@@ -31,6 +32,9 @@ class ProjectRoom {
   /// Last floor-tile estimate settings for this room (local only).
   final FloorTilePrefs? floorTilePrefs;
 
+  /// Last wall-tile estimate settings for this room (local only).
+  final FloorTilePrefs? wallTilePrefs;
+
   bool get isScanned => scan?.hasModel == true;
 
   bool get hasExplicitLayout =>
@@ -46,6 +50,7 @@ class ProjectRoom {
         'layoutOffsetZM': layoutOffsetZM,
         'layoutYawDeg': layoutYawDeg,
         'floorTilePrefs': floorTilePrefs?.toJson(),
+        'wallTilePrefs': wallTilePrefs?.toJson(),
       };
 
   factory ProjectRoom.fromJson(Map<String, dynamic> json) {
@@ -71,6 +76,7 @@ class ProjectRoom {
                   Map<String, dynamic>.from(json['floorTilePrefs'] as Map),
                 )
               : null,
+      wallTilePrefs: FloorTilePrefs.tryFromJson(json['wallTilePrefs']),
     );
   }
 
@@ -82,6 +88,7 @@ class ProjectRoom {
     double? layoutOffsetZM,
     double? layoutYawDeg,
     FloorTilePrefs? floorTilePrefs,
+    FloorTilePrefs? wallTilePrefs,
     bool clearLayout = false,
   }) {
     return ProjectRoom(
@@ -96,6 +103,7 @@ class ProjectRoom {
           clearLayout ? null : (layoutOffsetZM ?? this.layoutOffsetZM),
       layoutYawDeg: clearLayout ? null : (layoutYawDeg ?? this.layoutYawDeg),
       floorTilePrefs: floorTilePrefs ?? this.floorTilePrefs,
+      wallTilePrefs: wallTilePrefs ?? this.wallTilePrefs,
     );
   }
 }

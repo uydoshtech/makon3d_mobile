@@ -1,4 +1,5 @@
-/// Per-room (or entire-housing) floor tile estimate settings.
+/// Per-room (or entire-housing) tile estimate settings for one surface
+/// (floor or walls).
 class FloorTilePrefs {
   const FloorTilePrefs({
     this.widthCm = 40,
@@ -7,6 +8,9 @@ class FloorTilePrefs {
   });
 
   static const defaults = FloorTilePrefs();
+
+  /// Common wall tile format.
+  static const wallDefaults = FloorTilePrefs(widthCm: 30, heightCm: 60);
 
   final double widthCm;
   final double heightCm;
@@ -19,6 +23,15 @@ class FloorTilePrefs {
         'heightCm': heightCm,
         'wastePercent': wastePercent,
       };
+
+  /// Lenient parse for optional persisted prefs; null when absent/invalid.
+  static FloorTilePrefs? tryFromJson(Object? json) {
+    if (json is Map<String, dynamic>) return FloorTilePrefs.fromJson(json);
+    if (json is Map) {
+      return FloorTilePrefs.fromJson(Map<String, dynamic>.from(json));
+    }
+    return null;
+  }
 
   factory FloorTilePrefs.fromJson(Map<String, dynamic>? json) {
     if (json == null) return defaults;

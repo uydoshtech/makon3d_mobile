@@ -12,11 +12,15 @@ import 'package:makon3d_mobile/services/floor_tile_estimate.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
 import 'package:makon3d_mobile/widgets/keyboard_dismiss_scope.dart';
 
-/// Per-room (or entire-housing) floor tile quantity estimate.
-class RoomFloorMaterialsScreen extends StatefulWidget {
-  const RoomFloorMaterialsScreen({
+/// Surface whose tile quantity is being estimated.
+enum MaterialsSurface { floor, walls }
+
+/// Per-room (or entire-housing) tile quantity estimate for floor or walls.
+class RoomMaterialsScreen extends StatefulWidget {
+  const RoomMaterialsScreen({
     required this.projectId,
     this.roomId,
+    this.initialSurface = MaterialsSurface.floor,
     super.key,
   });
 
@@ -25,9 +29,10 @@ class RoomFloorMaterialsScreen extends StatefulWidget {
   /// Null = entire-housing project (one measured space).
   final String? roomId;
 
+  final MaterialsSurface initialSurface;
+
   @override
-  State<RoomFloorMaterialsScreen> createState() =>
-      _RoomFloorMaterialsScreenState();
+  State<RoomMaterialsScreen> createState() => _RoomMaterialsScreenState();
 }
 
 class _Preset {
@@ -39,7 +44,7 @@ class _Preset {
       (w - widthCm).abs() < 0.001 && (h - heightCm).abs() < 0.001;
 }
 
-class _RoomFloorMaterialsScreenState extends State<RoomFloorMaterialsScreen> {
+class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
   static const _squarePresets = <_Preset>[
     _Preset(30, 30),
     _Preset(40, 40),
@@ -51,6 +56,7 @@ class _RoomFloorMaterialsScreenState extends State<RoomFloorMaterialsScreen> {
     _Preset(40, 50),
   ];
 
+  late MaterialsSurface _surface;
   late bool _isSquare;
   late double _widthCm;
   late double _heightCm;
@@ -62,7 +68,8 @@ class _RoomFloorMaterialsScreenState extends State<RoomFloorMaterialsScreen> {
   @override
   void initState() {
     super.initState();
-    final prefs = _loadPrefs();
+    _surface = widget.initialSurface;
+    final prefs = _loadPrefs(_surface);
     _isSquare = prefs.isSquare;
     _widthCm = prefs.widthCm;
     _heightCm = prefs.heightCm;
@@ -106,11 +113,22 @@ class _RoomFloorMaterialsScreenState extends State<RoomFloorMaterialsScreen> {
   HousingScan? get _scan =>
       widget.roomId != null ? _room?.scan : _project?.entireHousingScan;
 
-  FloorTilePrefs _loadPrefs() {
+  FloorTilePrefs _loadPrefs(MaterialsSurface surface) {
+    final fallback = surface == MaterialsSurface.walls
+        ? FloorTilePrefs.wallDefaults
+        : FloorTilePrefs.defaults;
     if (widget.roomId != null) {
-      return _room?.floorTilePrefs ?? FloorTilePrefs.defaults;
+      final room = _room;
+      return (surface == MaterialsSurface.walls
+              ? room?.wallTilePrefs
+              : room?.floorTilePrefs) ??
+          fallback;
     }
-    return _project?.entireHousingFloorTilePrefs ?? FloorTilePrefs.defaults;
+    final project = _project;
+    return (surface == MaterialsSurface.walls
+            ? project?.entireHousingWallTilePrefs
+            : project?.entireHousingFloorTilePrefs) ??
+        fallback;
   }
 
   String get _title {
@@ -125,6 +143,24 @@ class _RoomFloorMaterialsScreenState extends State<RoomFloorMaterialsScreen> {
   String _formatCm(double value) {
     if (value == value.roundToDouble()) return value.round().toString();
     return value.toStringAsFixed(1);
+  }
+
+  void _setSurface(MaterialsSurface surface) {
+    if (surface == _surface) return;
+    KeyboardDismissScope.dismiss();
+    // Flush pending edits for the surface we are leaving.
+    _persistDebounce?.cancel();
+    unawaited(_persistPrefs(_surface));
+    final prefs = _loadPrefs(surface);
+    setState(() {
+      _surface = surface;
+      _isSquare = prefs.isSquare;
+      _widthCm = prefs.widthCm;
+      _heightCm = prefs.heightCm;
+      _wastePercent = prefs.wastePercent;
+      _widthController.text = _formatCm(_widthCm);
+      _heightController.text = _formatCm(_heightCm);
+    });
   }
 
   void _applyPreset(_Preset preset) {
@@ -181,13 +217,14 @@ class _RoomFloorMaterialsScreenState extends State<RoomFloorMaterialsScreen> {
   }
 
   void _schedulePersist() {
+    final surface = _surface;
     _persistDebounce?.cancel();
     _persistDebounce = Timer(const Duration(milliseconds: 350), () {
-      unawaited(_persistPrefs());
+      unawaited(_persistPrefs(surface));
     });
   }
 
-  Future<void> _persistPrefs() async {
+  Future<void> _persistPrefs(MaterialsSurface surface) async {
     final project = _project;
     if (project == null) return;
     final prefs = FloorTilePrefs(
@@ -195,18 +232,41 @@ class _RoomFloorMaterialsScreenState extends State<RoomFloorMaterialsScreen> {
       heightCm: _heightCm,
       wastePercent: _wastePercent,
     );
+    final walls = surface == MaterialsSurface.walls;
     if (widget.roomId != null) {
       final rooms = project.rooms.map((room) {
         if (room.id != widget.roomId) return room;
-        return room.copyWith(floorTilePrefs: prefs);
+        return walls
+            ? room.copyWith(wallTilePrefs: prefs)
+            : room.copyWith(floorTilePrefs: prefs);
       }).toList(growable: false);
       await MakonProjectStore.instance.upsert(project.copyWith(rooms: rooms));
       return;
     }
     await MakonProjectStore.instance.upsert(
-      project.copyWith(entireHousingFloorTilePrefs: prefs),
+      walls
+          ? project.copyWith(entireHousingWallTilePrefs: prefs)
+          : project.copyWith(entireHousingFloorTilePrefs: prefs),
     );
   }
+
+  /// Measured surface area in m², or null when the scan lacks the metrics.
+  double? _resolveSurfaceArea(HousingScan? scan) {
+    if (_surface == MaterialsSurface.walls) {
+      return FloorTileEstimator.resolveWallAreaM2(
+        floorLongM: scan?.floorLongM,
+        floorShortM: scan?.floorShortM,
+        heightM: scan?.heightM,
+      );
+    }
+    return FloorTileEstimator.resolveFloorAreaM2(
+      floorAreaM2: scan?.floorAreaM2,
+      floorLongM: scan?.floorLongM,
+      floorShortM: scan?.floorShortM,
+    );
+  }
+
+  bool get _walls => _surface == MaterialsSurface.walls;
 
   @override
   Widget build(BuildContext context) {
@@ -220,31 +280,34 @@ class _RoomFloorMaterialsScreenState extends State<RoomFloorMaterialsScreen> {
     }
 
     final scan = _scan;
-    final floorArea = FloorTileEstimator.resolveFloorAreaM2(
-      floorAreaM2: scan?.floorAreaM2,
-      floorLongM: scan?.floorLongM,
-      floorShortM: scan?.floorShortM,
-    );
-    final usedFallback = FloorTileEstimator.usedBoundingFallback(
-      floorAreaM2: scan?.floorAreaM2,
-      floorLongM: scan?.floorLongM,
-      floorShortM: scan?.floorShortM,
-    );
-    final estimate = floorArea == null
+    final surfaceArea = _resolveSurfaceArea(scan);
+    // Walls are always a bounding-box approximation (perimeter × height).
+    final approximate = _walls
+        ? surfaceArea != null
+        : FloorTileEstimator.usedBoundingFallback(
+            floorAreaM2: scan?.floorAreaM2,
+            floorLongM: scan?.floorLongM,
+            floorShortM: scan?.floorShortM,
+          );
+    final estimate = surfaceArea == null
         ? null
         : FloorTileEstimator.estimate(
-            floorAreaM2: floorArea,
+            floorAreaM2: surfaceArea,
             widthCm: _widthCm,
             heightCm: _heightCm,
             wastePercent: _wastePercent,
-            usedBoundingFallback: usedFallback,
+            usedBoundingFallback: approximate,
           );
 
     final presets = _isSquare ? _squarePresets : _rectPresets;
+    final noAreaKey =
+        _walls ? 'materials_walls_no_area' : 'materials_floor_no_area';
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(L10n.get('materials_floor_title')),
+        title: Text(
+          L10n.get(_walls ? 'materials_walls_title' : 'materials_floor_title'),
+        ),
       ),
       body: KeyboardDismissScope(
         child: ListView(
@@ -257,33 +320,52 @@ class _RoomFloorMaterialsScreenState extends State<RoomFloorMaterialsScreen> {
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            L10n.get('materials_floor_surface'),
-            style: theme.textTheme.labelLarge?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+          const SizedBox(height: 12),
+          SegmentedButton<MaterialsSurface>(
+            segments: [
+              ButtonSegment<MaterialsSurface>(
+                value: MaterialsSurface.floor,
+                label: Text(L10n.get('materials_floor_surface')),
+              ),
+              ButtonSegment<MaterialsSurface>(
+                value: MaterialsSurface.walls,
+                label: Text(L10n.get('materials_walls_surface')),
+              ),
+            ],
+            selected: {_surface},
+            onSelectionChanged: (next) {
+              if (next.isEmpty) return;
+              _setSurface(next.first);
+            },
           ),
           const SizedBox(height: 12),
-          if (floorArea != null)
+          if (surfaceArea != null)
             Text(
-              L10n.get('materials_floor_area_template').replaceAll(
+              L10n.get(
+                _walls
+                    ? 'materials_walls_area_template'
+                    : 'materials_floor_area_template',
+              ).replaceAll(
                 '{area}',
-                floorArea.toStringAsFixed(1),
+                surfaceArea.toStringAsFixed(1),
               ),
               style: theme.textTheme.bodyLarge,
             )
           else
             Text(
-              L10n.get('materials_floor_no_area'),
+              L10n.get(noAreaKey),
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.colorScheme.error,
               ),
             ),
-          if (usedFallback) ...[
+          if (approximate) ...[
             const SizedBox(height: 4),
             Text(
-              L10n.get('materials_floor_area_approx'),
+              L10n.get(
+                _walls
+                    ? 'materials_walls_area_approx'
+                    : 'materials_floor_area_approx',
+              ),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -408,7 +490,7 @@ class _RoomFloorMaterialsScreenState extends State<RoomFloorMaterialsScreen> {
               padding: const EdgeInsets.all(16),
               child: estimate == null
                   ? Text(
-                      L10n.get('materials_floor_no_area'),
+                      L10n.get(noAreaKey),
                       style: theme.textTheme.bodyLarge,
                     )
                   : Column(

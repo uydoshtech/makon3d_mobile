@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:makon3d_mobile/l10n/l10n.dart';
 import 'package:makon3d_mobile/models/housing_scan.dart';
-import 'package:makon3d_mobile/screens/room_floor_materials_screen.dart';
+import 'package:makon3d_mobile/screens/room_materials_screen.dart';
 import 'package:makon3d_mobile/services/room_usdz_viewer_service.dart';
 import 'package:makon3d_mobile/widgets/scan_mini_preview.dart';
 import 'package:makon3d_mobile/widgets/toasts.dart';
@@ -145,12 +145,12 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.grid_view_rounded),
               title: Text(L10n.get('room_action_materials')),
-              subtitle: Text(L10n.get('materials_floor_surface')),
+              subtitle: Text(L10n.get('materials_surfaces_summary')),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 Navigator.of(context).push<void>(
                   MaterialPageRoute<void>(
-                    builder: (_) => RoomFloorMaterialsScreen(
+                    builder: (_) => RoomMaterialsScreen(
                       projectId: widget.projectId!,
                       roomId: widget.roomId,
                     ),
