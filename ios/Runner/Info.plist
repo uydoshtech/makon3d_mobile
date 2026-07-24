@@ -38,6 +38,8 @@
 	<string>Makon 3D uses the camera to scan rooms in 3D on supported devices.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Makon 3D uses your location to orient the floor plan compass toward true north.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Makon 3D uses your location to orient the floor plan compass toward true north.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

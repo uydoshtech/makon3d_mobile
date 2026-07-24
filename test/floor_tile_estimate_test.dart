@@ -47,35 +47,56 @@ void main() {
     });
   });
 
-  group('FloorTileEstimator.resolveWallAreaM2', () {
-    test('perimeter × height', () {
-      expect(
-        FloorTileEstimator.resolveWallAreaM2(
-          floorLongM: 5,
-          floorShortM: 4,
-          heightM: 2.5,
-        ),
-        // 2 × (5 + 4) × 2.5
-        45,
-      );
+  group('FloorTileEstimator.estimateWallpaper', () {
+    test('standard roll on 18 m perimeter, 2.5 m walls', () {
+      final result = FloorTileEstimator.estimateWallpaper(
+        perimeterM: 18,
+        wallHeightM: 2.5,
+        rollWidthM: 0.53,
+        rollLengthM: 10.05,
+      )!;
+      // strips: ceil(18 / 0.53) = 34; per roll: floor(10.05 / 2.5) = 4;
+      // rolls: ceil(34 / 4) = 9
+      expect(result.stripsNeeded, 34);
+      expect(result.stripsPerRoll, 4);
+      expect(result.rollCount, 9);
+      expect(result.stripLengthM, 2.5);
     });
 
-    test('returns null without height', () {
-      expect(
-        FloorTileEstimator.resolveWallAreaM2(
-          floorLongM: 5,
-          floorShortM: 4,
-        ),
-        isNull,
-      );
+    test('pattern repeat lengthens each strip', () {
+      final result = FloorTileEstimator.estimateWallpaper(
+        perimeterM: 18,
+        wallHeightM: 2.5,
+        rollWidthM: 0.53,
+        rollLengthM: 10.05,
+        repeatCm: 64,
+      )!;
+      // strip 3.14 m → floor(10.05 / 3.14) = 3 per roll → ceil(34 / 3) = 12
+      expect(result.stripLengthM, closeTo(3.14, 1e-9));
+      expect(result.stripsPerRoll, 3);
+      expect(result.rollCount, 12);
     });
 
-    test('returns null for non-positive dimensions', () {
+    test('falls back to linear meters when roll is shorter than one strip',
+        () {
+      final result = FloorTileEstimator.estimateWallpaper(
+        perimeterM: 10,
+        wallHeightM: 12,
+        rollWidthM: 1,
+        rollLengthM: 10,
+      )!;
+      // 10 strips × 12 m = 120 m of paper → 12 rolls of 10 m
+      expect(result.stripsPerRoll, 0);
+      expect(result.rollCount, 12);
+    });
+
+    test('rejects non-positive inputs', () {
       expect(
-        FloorTileEstimator.resolveWallAreaM2(
-          floorLongM: 5,
-          floorShortM: 0,
-          heightM: 2.5,
+        FloorTileEstimator.estimateWallpaper(
+          perimeterM: 0,
+          wallHeightM: 2.5,
+          rollWidthM: 0.53,
+          rollLengthM: 10.05,
         ),
         isNull,
       );

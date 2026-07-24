@@ -109,13 +109,19 @@ class L10n {
           "Using room length × width (approximate).",
       "materials_floor_no_area":
           "No floor area yet. Scan this room to estimate tiles.",
-      "materials_walls_title": "Wall tiles",
+      "materials_wallpaper_title": "Wallpaper",
       "materials_walls_surface": "Walls",
-      "materials_walls_area_template": "Wall area: ~{area} m²",
-      "materials_walls_area_approx":
-          "Perimeter × height, door and window openings not subtracted.",
+      "materials_perimeter_height_template":
+          "Perimeter: ~{perimeter} m · Height: ~{height} m",
+      "materials_openings_note":
+          "Door and window openings are not subtracted.",
       "materials_walls_no_area":
-          "No wall measurements yet. Scan this room to estimate tiles.",
+          "No wall measurements yet. Scan this room to estimate wallpaper.",
+      "materials_roll_size_m": "Roll size (m)",
+      "materials_pattern_repeat_cm": "Pattern repeat",
+      "materials_result_rolls_template": "{count} rolls",
+      "materials_result_strips_template": "{strips} strips × {stripLength} m",
+      "materials_strips_per_roll_template": "{count} strips per roll",
       "materials_surfaces_summary": "Floor · Walls",
       "materials_tile_shape": "Tile shape",
       "materials_tile_square": "Square",
@@ -412,13 +418,19 @@ class L10n {
           "Используется длина × ширина комнаты (приблизительно).",
       "materials_floor_no_area":
           "Площадь пола пока неизвестна. Отсканируйте комнату.",
-      "materials_walls_title": "Плитка на стены",
+      "materials_wallpaper_title": "Обои на стены",
       "materials_walls_surface": "Стены",
-      "materials_walls_area_template": "Площадь стен: ~{area} m²",
-      "materials_walls_area_approx":
-          "Периметр × высота, без вычета дверных и оконных проёмов.",
+      "materials_perimeter_height_template":
+          "Периметр: ~{perimeter} м · Высота: ~{height} м",
+      "materials_openings_note":
+          "Без вычета дверных и оконных проёмов.",
       "materials_walls_no_area":
           "Замеров стен пока нет. Отсканируйте комнату.",
+      "materials_roll_size_m": "Размер рулона (м)",
+      "materials_pattern_repeat_cm": "Раппорт",
+      "materials_result_rolls_template": "{count} рулонов",
+      "materials_result_strips_template": "{strips} полос × {stripLength} м",
+      "materials_strips_per_roll_template": "Полос с рулона: {count}",
       "materials_surfaces_summary": "Пол · Стены",
       "materials_tile_shape": "Форма плитки",
       "materials_tile_square": "Квадрат",
@@ -717,13 +729,19 @@ class L10n {
           "Xona uzunligi × kengligi ishlatiladi (taxminiy).",
       "materials_floor_no_area":
           "Pol maydoni hali yo'q. Hisoblash uchun xonani skanerlang.",
-      "materials_walls_title": "Devor plitkasi",
+      "materials_wallpaper_title": "Devor uchun oboylar",
       "materials_walls_surface": "Devorlar",
-      "materials_walls_area_template": "Devorlar maydoni: ~{area} m²",
-      "materials_walls_area_approx":
-          "Perimetr × balandlik, eshik va deraza o'rinlari chegirilmagan.",
+      "materials_perimeter_height_template":
+          "Perimetr: ~{perimeter} m · Balandlik: ~{height} m",
+      "materials_openings_note":
+          "Eshik va deraza o'rinlari chegirilmagan.",
       "materials_walls_no_area":
           "Devor o'lchovlari hali yo'q. Hisoblash uchun xonani skanerlang.",
+      "materials_roll_size_m": "Rulon o'lchami (m)",
+      "materials_pattern_repeat_cm": "Naqsh takrori",
+      "materials_result_rolls_template": "{count} rulon",
+      "materials_result_strips_template": "{strips} polosa × {stripLength} m",
+      "materials_strips_per_roll_template": "Har rulondan {count} polosa",
       "materials_surfaces_summary": "Pol · Devorlar",
       "materials_tile_shape": "Plitka shakli",
       "materials_tile_square": "Kvadrat",

@@ -1,6 +1,7 @@
 import 'package:makon3d_mobile/models/floor_tile_prefs.dart';
 import 'package:makon3d_mobile/models/housing_scan.dart';
 import 'package:makon3d_mobile/models/room_type.dart';
+import 'package:makon3d_mobile/models/wallpaper_prefs.dart';
 
 /// One independently scanned room inside a room-by-room Makon project.
 class ProjectRoom {
@@ -14,7 +15,7 @@ class ProjectRoom {
     this.layoutOffsetZM,
     this.layoutYawDeg,
     this.floorTilePrefs,
-    this.wallTilePrefs,
+    this.wallpaperPrefs,
   });
 
   final String id;
@@ -32,8 +33,8 @@ class ProjectRoom {
   /// Last floor-tile estimate settings for this room (local only).
   final FloorTilePrefs? floorTilePrefs;
 
-  /// Last wall-tile estimate settings for this room (local only).
-  final FloorTilePrefs? wallTilePrefs;
+  /// Last wallpaper estimate settings for this room (local only).
+  final WallpaperPrefs? wallpaperPrefs;
 
   bool get isScanned => scan?.hasModel == true;
 
@@ -50,7 +51,7 @@ class ProjectRoom {
         'layoutOffsetZM': layoutOffsetZM,
         'layoutYawDeg': layoutYawDeg,
         'floorTilePrefs': floorTilePrefs?.toJson(),
-        'wallTilePrefs': wallTilePrefs?.toJson(),
+        'wallpaperPrefs': wallpaperPrefs?.toJson(),
       };
 
   factory ProjectRoom.fromJson(Map<String, dynamic> json) {
@@ -76,7 +77,7 @@ class ProjectRoom {
                   Map<String, dynamic>.from(json['floorTilePrefs'] as Map),
                 )
               : null,
-      wallTilePrefs: FloorTilePrefs.tryFromJson(json['wallTilePrefs']),
+      wallpaperPrefs: WallpaperPrefs.tryFromJson(json['wallpaperPrefs']),
     );
   }
 
@@ -88,7 +89,7 @@ class ProjectRoom {
     double? layoutOffsetZM,
     double? layoutYawDeg,
     FloorTilePrefs? floorTilePrefs,
-    FloorTilePrefs? wallTilePrefs,
+    WallpaperPrefs? wallpaperPrefs,
     bool clearLayout = false,
   }) {
     return ProjectRoom(
@@ -103,7 +104,7 @@ class ProjectRoom {
           clearLayout ? null : (layoutOffsetZM ?? this.layoutOffsetZM),
       layoutYawDeg: clearLayout ? null : (layoutYawDeg ?? this.layoutYawDeg),
       floorTilePrefs: floorTilePrefs ?? this.floorTilePrefs,
-      wallTilePrefs: wallTilePrefs ?? this.wallTilePrefs,
+      wallpaperPrefs: wallpaperPrefs ?? this.wallpaperPrefs,
     );
   }
 }

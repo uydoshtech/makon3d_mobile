@@ -1,2 +1,3 @@
 "NSCameraUsageDescription" = "Makon 3D uses the camera to scan rooms in 3D on supported devices.";
 "NSLocationWhenInUseUsageDescription" = "Makon 3D uses your location to orient the floor plan compass toward true north.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "Makon 3D uses your location to orient the floor plan compass toward true north.";

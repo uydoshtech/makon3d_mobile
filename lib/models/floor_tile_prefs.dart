@@ -1,5 +1,4 @@
-/// Per-room (or entire-housing) tile estimate settings for one surface
-/// (floor or walls).
+/// Per-room (or entire-housing) floor tile estimate settings.
 class FloorTilePrefs {
   const FloorTilePrefs({
     this.widthCm = 40,
@@ -8,9 +7,6 @@ class FloorTilePrefs {
   });
 
   static const defaults = FloorTilePrefs();
-
-  /// Common wall tile format.
-  static const wallDefaults = FloorTilePrefs(widthCm: 30, heightCm: 60);
 
   final double widthCm;
   final double heightCm;

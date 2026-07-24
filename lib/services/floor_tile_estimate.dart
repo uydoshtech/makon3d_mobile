@@ -21,6 +21,24 @@ class FloorTileEstimate {
   final bool usedBoundingFallback;
 }
 
+/// Result of a wallpaper roll estimate (strip-based, not area-based —
+/// computing rolls from m² is how people end up one roll short).
+class WallpaperEstimate {
+  const WallpaperEstimate({
+    required this.stripLengthM,
+    required this.stripsNeeded,
+    required this.stripsPerRoll,
+    required this.rollCount,
+  });
+
+  final double stripLengthM;
+  final int stripsNeeded;
+
+  /// 0 when the roll is shorter than one strip (linear-meters fallback).
+  final int stripsPerRoll;
+  final int rollCount;
+}
+
 /// Pure floor-tile math. Tile sizes are in centimeters.
 class FloorTileEstimator {
   const FloorTileEstimator._();
@@ -75,23 +93,35 @@ class FloorTileEstimator {
   static int plinthStripCount(double perimeterM) =>
       math.max(1, (perimeterM / plinthStripLengthM).ceil());
 
-  /// Approximate wall area from the footprint bounding box:
-  /// perimeter (2 × (long + short)) × ceiling height. Door/window openings
-  /// are not subtracted.
-  static double? resolveWallAreaM2({
-    double? floorLongM,
-    double? floorShortM,
-    double? heightM,
+  static WallpaperEstimate? estimateWallpaper({
+    required double perimeterM,
+    required double wallHeightM,
+    required double rollWidthM,
+    required double rollLengthM,
+    double repeatCm = 0,
   }) {
-    if (floorLongM == null ||
-        floorShortM == null ||
-        heightM == null ||
-        floorLongM <= 0 ||
-        floorShortM <= 0 ||
-        heightM <= 0) {
+    if (perimeterM <= 0 ||
+        wallHeightM <= 0 ||
+        rollWidthM <= 0 ||
+        rollLengthM <= 0) {
       return null;
     }
-    return 2 * (floorLongM + floorShortM) * heightM;
+    // Each strip is cut to wall height plus one pattern repeat for alignment.
+    final stripLengthM = wallHeightM + repeatCm.clamp(0, 500) / 100;
+    final stripsNeeded = math.max(1, (perimeterM / rollWidthM).ceil());
+    final stripsPerRoll = (rollLengthM / stripLengthM).floor();
+    // Roll shorter than one strip (very tall space): fall back to linear
+    // meters so the answer stays a usable over-estimate instead of dividing
+    // by zero strips.
+    final rollCount = stripsPerRoll >= 1
+        ? (stripsNeeded / stripsPerRoll).ceil()
+        : ((stripsNeeded * stripLengthM) / rollLengthM).ceil();
+    return WallpaperEstimate(
+      stripLengthM: stripLengthM,
+      stripsNeeded: stripsNeeded,
+      stripsPerRoll: stripsPerRoll,
+      rollCount: math.max(1, rollCount),
+    );
   }
 
   static FloorTileEstimate? estimate({
