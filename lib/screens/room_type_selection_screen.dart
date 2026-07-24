@@ -7,17 +7,6 @@ import 'package:makon3d_mobile/models/room_type.dart';
 class RoomTypeSelectionScreen extends StatelessWidget {
   const RoomTypeSelectionScreen({super.key});
 
-  IconData _iconFor(RoomType type) {
-    return switch (type) {
-      RoomType.livingRoom => Icons.weekend_outlined,
-      RoomType.bedroom => Icons.bed_outlined,
-      RoomType.kitchen => Icons.kitchen_outlined,
-      RoomType.bathroom => Icons.bathtub_outlined,
-      RoomType.hallway => Icons.door_front_door_outlined,
-      RoomType.other => Icons.meeting_room_outlined,
-    };
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +24,7 @@ class RoomTypeSelectionScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             tileColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-            leading: Icon(_iconFor(type)),
+            leading: Icon(type.icon),
             title: Text(L10n.get(type.titleKey)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.of(context).pop(type),

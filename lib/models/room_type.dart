@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 /// Room category for Makon room-by-room projects.
 enum RoomType {
   livingRoom,
@@ -11,6 +13,15 @@ enum RoomType {
 
   /// Localization key for display name.
   String get titleKey => 'room_type_$name';
+
+  IconData get icon => switch (this) {
+        RoomType.livingRoom => Icons.weekend_outlined,
+        RoomType.bedroom => Icons.bed_outlined,
+        RoomType.kitchen => Icons.kitchen_outlined,
+        RoomType.bathroom => Icons.bathtub_outlined,
+        RoomType.hallway => Icons.door_front_door_outlined,
+        RoomType.other => Icons.meeting_room_outlined,
+      };
 
   static RoomType? tryParse(String? value) {
     if (value == null || value.isEmpty) return null;

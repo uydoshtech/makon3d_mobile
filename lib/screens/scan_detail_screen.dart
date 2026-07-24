@@ -14,6 +14,7 @@ class ScanDetailScreen extends StatefulWidget {
   const ScanDetailScreen({
     required this.title,
     required this.scan,
+    this.titleIcon,
     this.projectId,
     this.roomId,
     this.onRescan,
@@ -21,6 +22,10 @@ class ScanDetailScreen extends StatefulWidget {
   });
 
   final String title;
+
+  /// Room-type icon shown before the title (matches the add-room picker).
+  final IconData? titleIcon;
+
   final HousingScan scan;
 
   /// When set with [roomId] (or alone for entire housing), enables materials.
@@ -70,7 +75,20 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
         scan.floorAreaM2 != null;
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (widget.titleIcon != null) ...[
+              Icon(widget.titleIcon),
+              const SizedBox(width: 8),
+            ],
+            Flexible(
+              child: Text(widget.title, overflow: TextOverflow.ellipsis),
+            ),
+          ],
+        ),
+      ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
         children: [
@@ -82,13 +100,6 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
             onOpenFullscreen: () => unawaited(_openFullscreen()),
           ),
           const SizedBox(height: 16),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.view_in_ar),
-            title: Text(L10n.get('project_action_3d_model')),
-            trailing: const Icon(Icons.fullscreen),
-            onTap: () => unawaited(_openFullscreen()),
-          ),
           if (hasDims)
             ListTile(
               contentPadding: EdgeInsets.zero,
@@ -112,6 +123,12 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
                   L10n.get('room_3d_dimensions_line2_template').replaceAll(
                     '{floorArea}',
                     scan.floorAreaM2!.toStringAsFixed(1),
+                  ),
+                  // Approximate footprint perimeter from the OBB dims.
+                  L10n.get('room_scan_results_perimeter').replaceAll(
+                    '{value}',
+                    (2 * (scan.floorLongM! + scan.floorShortM!))
+                        .toStringAsFixed(1),
                   ),
                 ].join('\n'),
               ),

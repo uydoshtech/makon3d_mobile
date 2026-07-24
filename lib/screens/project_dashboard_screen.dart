@@ -119,6 +119,7 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
       MaterialPageRoute<void>(
         builder: (_) => ScanDetailScreen(
           title: title,
+          titleIcon: room.roomType.icon,
           scan: scan,
           projectId: widget.projectId,
           roomId: room.id,
@@ -394,9 +395,7 @@ class _RoomByRoomBody extends StatelessWidget {
             return ListTile(
               contentPadding: EdgeInsets.zero,
               leading: Icon(
-                room.isScanned
-                    ? Icons.check_circle
-                    : Icons.radio_button_unchecked,
+                room.roomType.icon,
                 color: room.isScanned
                     ? theme.colorScheme.primary
                     : theme.colorScheme.outline,
