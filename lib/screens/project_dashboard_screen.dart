@@ -454,17 +454,6 @@ class _RoomByRoomBody extends StatelessWidget {
             label: Text(L10n.get('project_open_combined')),
           ),
         ],
-        const SizedBox(height: 10),
-        OutlinedButton.icon(
-          onPressed: () {
-            Toasts.showInfo(
-              context,
-              L10n.get('project_materials_coming_soon'),
-            );
-          },
-          icon: const Icon(Icons.construction_outlined),
-          label: Text(L10n.get('project_action_materials')),
-        ),
       ],
     );
   }

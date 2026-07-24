@@ -95,8 +95,6 @@ class L10n {
       "project_action_3d_model": "3D Model",
       "project_action_measurements": "Measurements",
       "project_action_materials": "Material Estimates",
-      "project_materials_coming_soon":
-          "Open a room to estimate floor tiles for that room.",
       "project_rescan": "Rescan property",
       "materials_floor_title": "Floor tiles",
       "materials_floor_surface": "Floor",
@@ -390,8 +388,6 @@ class L10n {
       "project_action_3d_model": "3D-модель",
       "project_action_measurements": "Размеры",
       "project_action_materials": "Расчёт материалов",
-      "project_materials_coming_soon":
-          "Откройте комнату, чтобы рассчитать плитку для пола.",
       "project_rescan": "Пересканировать объект",
       "materials_floor_title": "Плитка на пол",
       "materials_floor_surface": "Пол",
@@ -687,8 +683,6 @@ class L10n {
       "project_action_3d_model": "3D model",
       "project_action_measurements": "O'lchamlar",
       "project_action_materials": "Material hisobi",
-      "project_materials_coming_soon":
-          "Pol plitkasi hisobi uchun xonani oching.",
       "project_rescan": "Ob'ektni qayta skanerlash",
       "materials_floor_title": "Pol plitkasi",
       "materials_floor_surface": "Pol",
