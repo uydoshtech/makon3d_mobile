@@ -7,6 +7,10 @@ class MakonScan {
     this.floorShortM,
     this.heightM,
     this.floorAreaM2,
+    this.wallPerimeterM,
+    this.doorwayWidthM,
+    this.doorwayAreaM2,
+    this.windowAreaM2,
     this.worldPlusXBearingDeg,
     this.rotationGifUrl,
     this.posterImageUrl,
@@ -22,6 +26,12 @@ class MakonScan {
   final double? floorShortM;
   final double? heightM;
   final double? floorAreaM2;
+
+  /// Wall-run metrics measured by the backend from the converted GLB.
+  final double? wallPerimeterM;
+  final double? doorwayWidthM;
+  final double? doorwayAreaM2;
+  final double? windowAreaM2;
   final double? worldPlusXBearingDeg;
   final String? rotationGifUrl;
   final String? posterImageUrl;
@@ -38,6 +48,10 @@ class MakonScan {
       floorShortM: (json["floorShortM"] as num?)?.toDouble(),
       heightM: (json["heightM"] as num?)?.toDouble(),
       floorAreaM2: (json["floorAreaM2"] as num?)?.toDouble(),
+      wallPerimeterM: (json["wallPerimeterM"] as num?)?.toDouble(),
+      doorwayWidthM: (json["doorwayWidthM"] as num?)?.toDouble(),
+      doorwayAreaM2: (json["doorwayAreaM2"] as num?)?.toDouble(),
+      windowAreaM2: (json["windowAreaM2"] as num?)?.toDouble(),
       worldPlusXBearingDeg: (json["worldPlusXBearingDeg"] as num?)?.toDouble(),
       rotationGifUrl: json["rotationGifUrl"] as String?,
       posterImageUrl: json["posterImageUrl"] as String?,

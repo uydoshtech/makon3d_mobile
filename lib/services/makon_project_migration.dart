@@ -57,6 +57,10 @@ class MakonProjectMigration {
       floorShortM: scan.floorShortM,
       heightM: scan.heightM,
       floorAreaM2: scan.floorAreaM2,
+      wallPerimeterM: scan.wallPerimeterM,
+      doorwayWidthM: scan.doorwayWidthM,
+      doorwayAreaM2: scan.doorwayAreaM2,
+      windowAreaM2: scan.windowAreaM2,
       worldPlusXBearingDeg: scan.worldPlusXBearingDeg,
       capturedAt: created,
     );

@@ -126,6 +126,10 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
         floorShortM: metrics?.floorShortM,
         heightM: metrics?.heightM,
         floorAreaM2: metrics?.floorAreaM2,
+        wallPerimeterM: upload.wallPerimeterM,
+        doorwayWidthM: upload.doorwayWidthM,
+        doorwayAreaM2: upload.doorwayAreaM2,
+        windowAreaM2: upload.windowAreaM2,
         worldPlusXBearingDeg: metrics?.worldPlusXBearingDeg,
         capturedAt: DateTime.now(),
       );

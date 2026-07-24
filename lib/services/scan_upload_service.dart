@@ -8,11 +8,26 @@ import "package:makon3d_mobile/models/room_scan_metrics.dart";
 import "package:makon3d_mobile/services/device_identity.dart";
 
 class ScanUploadResult {
-  const ScanUploadResult({required this.id, this.usdzUrl, this.glbUrl});
+  const ScanUploadResult({
+    required this.id,
+    this.usdzUrl,
+    this.glbUrl,
+    this.wallPerimeterM,
+    this.doorwayWidthM,
+    this.doorwayAreaM2,
+    this.windowAreaM2,
+  });
 
   final int id;
   final String? usdzUrl;
   final String? glbUrl;
+
+  /// Wall-run metrics the backend measures from the converted GLB — null for
+  /// scans where no walls were identified (or older backends).
+  final double? wallPerimeterM;
+  final double? doorwayWidthM;
+  final double? doorwayAreaM2;
+  final double? windowAreaM2;
 }
 
 /// Anonymous scan upload / list against the UyDosh backend (`/makon3d/scans`).
@@ -65,6 +80,10 @@ class ScanUploadService {
       id: (data["id"] as num?)?.toInt() ?? 0,
       usdzUrl: data["usdzUrl"] as String?,
       glbUrl: data["glbUrl"] as String?,
+      wallPerimeterM: (data["wallPerimeterM"] as num?)?.toDouble(),
+      doorwayWidthM: (data["doorwayWidthM"] as num?)?.toDouble(),
+      doorwayAreaM2: (data["doorwayAreaM2"] as num?)?.toDouble(),
+      windowAreaM2: (data["windowAreaM2"] as num?)?.toDouble(),
     );
   }
 

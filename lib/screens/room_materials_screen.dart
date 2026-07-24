@@ -538,15 +538,48 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
       floorLongM: scan?.floorLongM,
       floorShortM: scan?.floorShortM,
     );
-    final plinthPerimeterM = FloorTileEstimator.resolvePerimeterM(
+    // True wall-run perimeter measured by the backend from the GLB; null for
+    // scans that predate the metric (fall back to the OBB approximation).
+    final measuredPerimeterM =
+        (scan?.wallPerimeterM != null && scan!.wallPerimeterM! > 0)
+            ? scan.wallPerimeterM
+            : null;
+    final obbPerimeterM = FloorTileEstimator.resolvePerimeterM(
       floorLongM: scan?.floorLongM,
       floorShortM: scan?.floorShortM,
     );
 
+    // Plinth: wall perimeter minus door/opening widths when measured,
+    // otherwise the OBB perimeter with doorways not subtracted.
+    final double? plinthPerimeterM;
+    final String plinthNote;
+    if (measuredPerimeterM != null) {
+      final doorwayWidth =
+          (scan?.doorwayWidthM ?? 0) > 0 ? scan!.doorwayWidthM! : 0.0;
+      plinthPerimeterM = (measuredPerimeterM - doorwayWidth) > 0
+          ? measuredPerimeterM - doorwayWidth
+          : 0.0;
+      plinthNote = doorwayWidth > 0
+          ? L10n.get('materials_plinth_minus_doorways_template')
+              .replaceAll('{length}', measuredPerimeterM.toStringAsFixed(1))
+              .replaceAll('{doorways}', doorwayWidth.toStringAsFixed(1))
+          : L10n.get('materials_plinth_no_doorways');
+    } else {
+      plinthPerimeterM = obbPerimeterM;
+      plinthNote = L10n.get('materials_plinth_note');
+    }
+
     // Walls: wallpaper strips from perimeter × wall height.
-    final perimeterM = plinthPerimeterM;
+    final perimeterM = measuredPerimeterM ?? obbPerimeterM;
     final wallHeightM =
         (scan?.heightM != null && scan!.heightM! > 0) ? scan.heightM : null;
+
+    // Opening face areas measured by the backend; null when unmeasured, so
+    // the honest "not subtracted" note can be shown instead.
+    final openingAreaM2 =
+        (scan?.doorwayAreaM2 != null || scan?.windowAreaM2 != null)
+            ? (scan?.doorwayAreaM2 ?? 0) + (scan?.windowAreaM2 ?? 0)
+            : null;
 
     final tileEstimate = floorArea == null
         ? null
@@ -626,7 +659,11 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
               ),
               const SizedBox(height: 4),
               Text(
-                L10n.get('materials_openings_note'),
+                _wallOpeningsNote(
+                  perimeterM: perimeterM,
+                  wallHeightM: wallHeightM,
+                  openingAreaM2: openingAreaM2,
+                ),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -665,6 +702,7 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
                         theme,
                         tileEstimate,
                         plinthPerimeterM,
+                        plinthNote,
                         noAreaKey,
                       ),
               ),
@@ -675,10 +713,33 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
     );
   }
 
+  /// Net wall area when the backend measured opening areas; the honest
+  /// "not subtracted" disclaimer for scans that predate the metric. The roll
+  /// count stays strip-based over the full perimeter — strips still run
+  /// above doors and around windows.
+  String _wallOpeningsNote({
+    required double perimeterM,
+    required double wallHeightM,
+    required double? openingAreaM2,
+  }) {
+    if (openingAreaM2 == null) return L10n.get('materials_openings_note');
+    final grossM2 = perimeterM * wallHeightM;
+    final netM2 =
+        (grossM2 - openingAreaM2) > 0 ? grossM2 - openingAreaM2 : 0.0;
+    if (openingAreaM2 > 0.05) {
+      return L10n.get('materials_wall_net_area_template')
+          .replaceAll('{net}', netM2.toStringAsFixed(1))
+          .replaceAll('{openings}', openingAreaM2.toStringAsFixed(1));
+    }
+    return L10n.get('materials_wall_no_openings_template')
+        .replaceAll('{net}', netM2.toStringAsFixed(1));
+  }
+
   Widget _buildTileResult(
     ThemeData theme,
     FloorTileEstimate? estimate,
     double? plinthPerimeterM,
+    String plinthNote,
     String noAreaKey,
   ) {
     if (estimate == null) {
@@ -724,7 +785,7 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
-        if (plinthPerimeterM != null) ...[
+        if (plinthPerimeterM != null && plinthPerimeterM > 0) ...[
           const SizedBox(height: 12),
           const Divider(height: 1),
           const SizedBox(height: 12),
@@ -745,7 +806,7 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            L10n.get('materials_plinth_note'),
+            plinthNote,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

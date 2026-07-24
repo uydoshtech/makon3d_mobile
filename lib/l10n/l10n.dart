@@ -115,6 +115,10 @@ class L10n {
           "Perimeter: ~{perimeter} m · Height: ~{height} m",
       "materials_openings_note":
           "Door and window openings are not subtracted.",
+      "materials_wall_net_area_template":
+          "Wall area: ~{net} m² (openings ~{openings} m² subtracted).",
+      "materials_wall_no_openings_template":
+          "Wall area: ~{net} m²; no openings detected.",
       "materials_walls_no_area":
           "No wall measurements yet. Scan this room to estimate wallpaper.",
       "materials_roll_size_m": "Roll size (m)",
@@ -137,6 +141,9 @@ class L10n {
           "Tile {tileArea} m² · with waste ~{effectiveArea} m²",
       "materials_plinth_template": "Plinth: ~{length} m · {count} pcs × 2.5 m",
       "materials_plinth_note": "Perimeter, door openings not subtracted.",
+      "materials_plinth_minus_doorways_template":
+          "Wall perimeter ~{length} m minus ~{doorways} m of doorways.",
+      "materials_plinth_no_doorways": "Wall perimeter; no doorways detected.",
       "room_action_materials": "Material estimates",
       "project_rooms_heading": "Rooms",
       "project_rooms_empty": "No rooms yet. Add a room to start scanning.",
@@ -424,6 +431,10 @@ class L10n {
           "Периметр: ~{perimeter} м · Высота: ~{height} м",
       "materials_openings_note":
           "Без вычета дверных и оконных проёмов.",
+      "materials_wall_net_area_template":
+          "Площадь стен: ~{net} м² (проёмы ~{openings} м² вычтены).",
+      "materials_wall_no_openings_template":
+          "Площадь стен: ~{net} м²; проёмы не обнаружены.",
       "materials_walls_no_area":
           "Замеров стен пока нет. Отсканируйте комнату.",
       "materials_roll_size_m": "Размер рулона (м)",
@@ -446,6 +457,10 @@ class L10n {
           "Плитка {tileArea} m² · с запасом ~{effectiveArea} m²",
       "materials_plinth_template": "Плинтус: ~{length} м · {count} шт × 2,5 м",
       "materials_plinth_note": "Периметр, без вычета дверных проёмов.",
+      "materials_plinth_minus_doorways_template":
+          "Периметр стен ~{length} м минус ~{doorways} м дверных проёмов.",
+      "materials_plinth_no_doorways":
+          "Периметр стен; дверные проёмы не обнаружены.",
       "room_action_materials": "Расчёт материалов",
       "project_rooms_heading": "Комнаты",
       "project_rooms_empty":
@@ -735,6 +750,10 @@ class L10n {
           "Perimetr: ~{perimeter} m · Balandlik: ~{height} m",
       "materials_openings_note":
           "Eshik va deraza o'rinlari chegirilmagan.",
+      "materials_wall_net_area_template":
+          "Devor maydoni: ~{net} m² (o'rinlar ~{openings} m² chegirilgan).",
+      "materials_wall_no_openings_template":
+          "Devor maydoni: ~{net} m²; o'rinlar topilmadi.",
       "materials_walls_no_area":
           "Devor o'lchovlari hali yo'q. Hisoblash uchun xonani skanerlang.",
       "materials_roll_size_m": "Rulon o'lchami (m)",
@@ -758,6 +777,10 @@ class L10n {
       "materials_plinth_template":
           "Plintus: ~{length} m · {count} dona × 2,5 m",
       "materials_plinth_note": "Perimetr, eshik o'rinlari chegirilmagan.",
+      "materials_plinth_minus_doorways_template":
+          "Devor perimetri ~{length} m minus eshik o'rinlari ~{doorways} m.",
+      "materials_plinth_no_doorways":
+          "Devor perimetri; eshik o'rinlari topilmadi.",
       "room_action_materials": "Material hisobi",
       "project_rooms_heading": "Xonalar",
       "project_rooms_empty":
