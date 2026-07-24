@@ -126,6 +126,24 @@ jobs:
           cd ios
           bundle exec pod install --repo-update
 
+      # Freshly generated profiles pick up entitlements added to
+      # Runner.entitlements (e.g. the App Clip association) that the static
+      # IOS_PROVISION_PROFILE_BASE64 snapshot may predate. Writes
+      # /tmp/Makon3D_AppStore.mobileprovision, which the next step prefers
+      # over the secret.
+      - name: Regenerate App Store profile via ASC API
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${ASC_KEY_ID:-}" || -z "${ASC_ISSUER_ID:-}" || -z "${ASC_KEY_P8_BASE64:-}" ]]; then
+            echo "ASC API key secrets not set; will fall back to IOS_PROVISION_PROFILE_BASE64."
+            exit 0
+          fi
+          bundle exec fastlane ios regen_app_profile
+
       - name: Install Distribution certificate and App Store profile
         env:
           IOS_DIST_P12_BASE64: ${{ secrets.IOS_DIST_P12_BASE64 }}
@@ -142,8 +160,8 @@ jobs:
             echo "Missing GitHub secret IOS_DIST_P12_PASSWORD."
             exit 1
           fi
-          if [[ -z "${IOS_PROVISION_PROFILE_BASE64:-}" ]]; then
-            echo "Missing GitHub secret IOS_PROVISION_PROFILE_BASE64 (base64 of App Store .mobileprovision for com.makon3d.app)."
+          if [[ ! -s /tmp/Makon3D_AppStore.mobileprovision && -z "${IOS_PROVISION_PROFILE_BASE64:-}" ]]; then
+            echo "No regenerated profile and missing GitHub secret IOS_PROVISION_PROFILE_BASE64 (base64 of App Store .mobileprovision for com.makon3d.app)."
             echo "See tool/TESTFLIGHT_CI.md."
             exit 1
           fi
@@ -186,7 +204,11 @@ jobs:
             exit 1
           fi
 
-          printf '%s' "${IOS_PROVISION_PROFILE_BASE64}" | tr -d '\n\r ' | base64 -d > /tmp/Makon3D_AppStore.mobileprovision
+          if [[ -s /tmp/Makon3D_AppStore.mobileprovision ]]; then
+            echo "Using App Store profile regenerated via the ASC API."
+          else
+            printf '%s' "${IOS_PROVISION_PROFILE_BASE64}" | tr -d '\n\r ' | base64 -d > /tmp/Makon3D_AppStore.mobileprovision
+          fi
           test -s /tmp/Makon3D_AppStore.mobileprovision
 
           security cms -D -i /tmp/Makon3D_AppStore.mobileprovision > /tmp/embedded.mobileprovision.plist

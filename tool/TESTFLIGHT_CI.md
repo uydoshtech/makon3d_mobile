@@ -24,7 +24,7 @@ Repo: `uydoshtech/makon3d_mobile` → Settings → Secrets and variables → Act
 |--------|------------|
 | `IOS_DIST_P12_BASE64` | Base64 of the Apple Distribution `.p12` (same cert as UyDosh / team `D5THR62Q33`) |
 | `IOS_DIST_P12_PASSWORD` | Password for that `.p12` |
-| `IOS_PROVISION_PROFILE_BASE64` | Base64 of an **App Store** provisioning profile for `com.makon3d.app` |
+| `IOS_PROVISION_PROFILE_BASE64` | Base64 of an **App Store** provisioning profile for `com.makon3d.app` (fallback only — when the `ASC_*` secrets are set, CI regenerates this profile via the ASC API each release so new `Runner.entitlements` entries are always covered) |
 | `ASC_KEY_ID` | App Store Connect API key id |
 | `ASC_ISSUER_ID` | App Store Connect API issuer id |
 | `ASC_KEY_P8_BASE64` | Base64 of the API key `.p8` file |
