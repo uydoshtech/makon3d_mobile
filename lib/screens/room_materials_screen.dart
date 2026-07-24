@@ -302,6 +302,13 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
     final presets = _isSquare ? _squarePresets : _rectPresets;
     final noAreaKey =
         _walls ? 'materials_walls_no_area' : 'materials_floor_no_area';
+    // Skirting board rides along with the floor surface only.
+    final plinthPerimeterM = _walls
+        ? null
+        : FloorTileEstimator.resolvePerimeterM(
+            floorLongM: scan?.floorLongM,
+            floorShortM: scan?.floorShortM,
+          );
 
     return Scaffold(
       appBar: AppBar(
@@ -535,6 +542,34 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
+                        if (plinthPerimeterM != null) ...[
+                          const SizedBox(height: 12),
+                          const Divider(height: 1),
+                          const SizedBox(height: 12),
+                          Text(
+                            L10n.get('materials_plinth_template')
+                                .replaceAll(
+                                  '{length}',
+                                  plinthPerimeterM.toStringAsFixed(1),
+                                )
+                                .replaceAll(
+                                  '{count}',
+                                  FloorTileEstimator.plinthStripCount(
+                                    plinthPerimeterM,
+                                  ).toString(),
+                                ),
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            L10n.get('materials_plinth_note'),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
             ),

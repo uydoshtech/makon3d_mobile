@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:makon3d_mobile/services/native_language_service.dart";
 import "package:shared_preferences/shared_preferences.dart";
 
 /// Supported app locales (uz, ru, en) — same set as UyDosh.
@@ -43,6 +44,11 @@ class LanguageState extends ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_prefsKey, code);
+    // Keep iOS `AppleLanguages` in step with the persisted value. Required by
+    // `RoomScanKitAppleLanguages.syncAtLaunch`: it treats a divergence between
+    // the two at launch as "changed in iOS Settings" and would otherwise
+    // revert this in-app choice on the next cold start.
+    await NativeLanguageService.setPreferredLanguage(code);
   }
 }
 
@@ -123,6 +129,8 @@ class L10n {
       "materials_result_buy_area_template": "~{area} m² of tiles",
       "materials_result_detail_template":
           "Tile {tileArea} m² · with waste ~{effectiveArea} m²",
+      "materials_plinth_template": "Plinth: ~{length} m · {count} pcs × 2.5 m",
+      "materials_plinth_note": "Perimeter, door openings not subtracted.",
       "room_action_materials": "Material estimates",
       "project_rooms_heading": "Rooms",
       "project_rooms_empty": "No rooms yet. Add a room to start scanning.",
@@ -424,6 +432,8 @@ class L10n {
       "materials_result_buy_area_template": "~{area} m² плитки",
       "materials_result_detail_template":
           "Плитка {tileArea} m² · с запасом ~{effectiveArea} m²",
+      "materials_plinth_template": "Плинтус: ~{length} м · {count} шт × 2,5 м",
+      "materials_plinth_note": "Периметр, без вычета дверных проёмов.",
       "room_action_materials": "Расчёт материалов",
       "project_rooms_heading": "Комнаты",
       "project_rooms_empty":
@@ -727,6 +737,9 @@ class L10n {
       "materials_result_buy_area_template": "~{area} m² plitka",
       "materials_result_detail_template":
           "Plitka {tileArea} m² · zaxira bilan ~{effectiveArea} m²",
+      "materials_plinth_template":
+          "Plintus: ~{length} m · {count} dona × 2,5 m",
+      "materials_plinth_note": "Perimetr, eshik o'rinlari chegirilmagan.",
       "room_action_materials": "Material hisobi",
       "project_rooms_heading": "Xonalar",
       "project_rooms_empty":

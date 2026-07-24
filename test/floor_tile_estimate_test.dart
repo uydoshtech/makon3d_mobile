@@ -29,6 +29,24 @@ void main() {
     });
   });
 
+  group('FloorTileEstimator plinth', () {
+    test('perimeter is 2 × (long + short)', () {
+      expect(
+        FloorTileEstimator.resolvePerimeterM(floorLongM: 5, floorShortM: 4),
+        18,
+      );
+    });
+
+    test('returns null without both dims', () {
+      expect(FloorTileEstimator.resolvePerimeterM(floorLongM: 5), isNull);
+    });
+
+    test('strip count ceils at 2.5 m per strip', () {
+      // 18 / 2.5 = 7.2 → 8
+      expect(FloorTileEstimator.plinthStripCount(18), 8);
+    });
+  });
+
   group('FloorTileEstimator.resolveWallAreaM2', () {
     test('perimeter × height', () {
       expect(

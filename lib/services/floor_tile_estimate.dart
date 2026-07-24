@@ -53,6 +53,28 @@ class FloorTileEstimator {
         floorShortM > 0;
   }
 
+  /// Standard skirting-board strip length.
+  static const plinthStripLengthM = 2.5;
+
+  /// Approximate footprint perimeter from the OBB dims: 2 × (long + short).
+  /// Door openings are not subtracted.
+  static double? resolvePerimeterM({
+    double? floorLongM,
+    double? floorShortM,
+  }) {
+    if (floorLongM == null ||
+        floorShortM == null ||
+        floorLongM <= 0 ||
+        floorShortM <= 0) {
+      return null;
+    }
+    return 2 * (floorLongM + floorShortM);
+  }
+
+  /// Whole [plinthStripLengthM] strips needed to cover [perimeterM].
+  static int plinthStripCount(double perimeterM) =>
+      math.max(1, (perimeterM / plinthStripLengthM).ceil());
+
   /// Approximate wall area from the footprint bounding box:
   /// perimeter (2 × (long + short)) × ceiling height. Door/window openings
   /// are not subtracted.
