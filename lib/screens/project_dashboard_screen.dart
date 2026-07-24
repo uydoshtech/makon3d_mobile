@@ -10,7 +10,7 @@ import 'package:makon3d_mobile/models/makon_project.dart';
 import 'package:makon3d_mobile/models/project_room.dart';
 import 'package:makon3d_mobile/scan_flow/makon_entire_housing_coordinator.dart';
 import 'package:makon3d_mobile/scan_flow/makon_room_by_room_coordinator.dart';
-import 'package:makon3d_mobile/screens/room_floor_materials_screen.dart';
+import 'package:makon3d_mobile/screens/room_materials_screen.dart';
 import 'package:makon3d_mobile/screens/scan_detail_screen.dart';
 import 'package:makon3d_mobile/services/housing_assemble_service.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
@@ -135,7 +135,7 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
   Future<void> _openEntireHousingMaterials() async {
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
-        builder: (_) => RoomFloorMaterialsScreen(
+        builder: (_) => RoomMaterialsScreen(
           projectId: widget.projectId,
         ),
       ),
@@ -305,7 +305,7 @@ class _EntireHousingBody extends StatelessWidget {
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.grid_view_rounded),
             title: Text(L10n.get('project_action_materials')),
-            subtitle: Text(L10n.get('materials_floor_surface')),
+            subtitle: Text(L10n.get('materials_surfaces_summary')),
             trailing: const Icon(Icons.chevron_right),
             onTap: onOpenMaterials,
           ),

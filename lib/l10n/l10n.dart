@@ -103,6 +103,14 @@ class L10n {
           "Using room length × width (approximate).",
       "materials_floor_no_area":
           "No floor area yet. Scan this room to estimate tiles.",
+      "materials_walls_title": "Wall tiles",
+      "materials_walls_surface": "Walls",
+      "materials_walls_area_template": "Wall area: ~{area} m²",
+      "materials_walls_area_approx":
+          "Perimeter × height, door and window openings not subtracted.",
+      "materials_walls_no_area":
+          "No wall measurements yet. Scan this room to estimate tiles.",
+      "materials_surfaces_summary": "Floor · Walls",
       "materials_tile_shape": "Tile shape",
       "materials_tile_square": "Square",
       "materials_tile_rect": "Rectangle",
@@ -396,6 +404,14 @@ class L10n {
           "Используется длина × ширина комнаты (приблизительно).",
       "materials_floor_no_area":
           "Площадь пола пока неизвестна. Отсканируйте комнату.",
+      "materials_walls_title": "Плитка на стены",
+      "materials_walls_surface": "Стены",
+      "materials_walls_area_template": "Площадь стен: ~{area} m²",
+      "materials_walls_area_approx":
+          "Периметр × высота, без вычета дверных и оконных проёмов.",
+      "materials_walls_no_area":
+          "Замеров стен пока нет. Отсканируйте комнату.",
+      "materials_surfaces_summary": "Пол · Стены",
       "materials_tile_shape": "Форма плитки",
       "materials_tile_square": "Квадрат",
       "materials_tile_rect": "Прямоугольник",
@@ -691,6 +707,14 @@ class L10n {
           "Xona uzunligi × kengligi ishlatiladi (taxminiy).",
       "materials_floor_no_area":
           "Pol maydoni hali yo'q. Hisoblash uchun xonani skanerlang.",
+      "materials_walls_title": "Devor plitkasi",
+      "materials_walls_surface": "Devorlar",
+      "materials_walls_area_template": "Devorlar maydoni: ~{area} m²",
+      "materials_walls_area_approx":
+          "Perimetr × balandlik, eshik va deraza o'rinlari chegirilmagan.",
+      "materials_walls_no_area":
+          "Devor o'lchovlari hali yo'q. Hisoblash uchun xonani skanerlang.",
+      "materials_surfaces_summary": "Pol · Devorlar",
       "materials_tile_shape": "Plitka shakli",
       "materials_tile_square": "Kvadrat",
       "materials_tile_rect": "To'rtburchak",

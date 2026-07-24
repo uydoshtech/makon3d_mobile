@@ -29,6 +29,41 @@ void main() {
     });
   });
 
+  group('FloorTileEstimator.resolveWallAreaM2', () {
+    test('perimeter × height', () {
+      expect(
+        FloorTileEstimator.resolveWallAreaM2(
+          floorLongM: 5,
+          floorShortM: 4,
+          heightM: 2.5,
+        ),
+        // 2 × (5 + 4) × 2.5
+        45,
+      );
+    });
+
+    test('returns null without height', () {
+      expect(
+        FloorTileEstimator.resolveWallAreaM2(
+          floorLongM: 5,
+          floorShortM: 4,
+        ),
+        isNull,
+      );
+    });
+
+    test('returns null for non-positive dimensions', () {
+      expect(
+        FloorTileEstimator.resolveWallAreaM2(
+          floorLongM: 5,
+          floorShortM: 0,
+          heightM: 2.5,
+        ),
+        isNull,
+      );
+    });
+  });
+
   group('FloorTileEstimator.estimate', () {
     test('40×40 cm tiles on 10 m² with 10% waste', () {
       final result = FloorTileEstimator.estimate(
