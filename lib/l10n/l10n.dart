@@ -104,6 +104,19 @@ class L10n {
       "project_delete_cancel": "Cancel",
       "project_delete_confirm": "Delete",
       "project_deleted": "Project deleted",
+      "use_current_location": "Use current location",
+      "location_services_disabled":
+          "Location services are off. Turn them on to use current location.",
+      "location_permission_denied":
+          "Location permission is required to use current location.",
+      "current_location_address_failed":
+          "Could not determine the address from your current location.",
+      "scan_delete": "Delete scan",
+      "scan_delete_confirm_title": "Delete scan?",
+      "scan_delete_confirm_message":
+          "Scan #{id} will be deleted. This cannot be undone.",
+      "scan_deleted": "Scan deleted",
+      "scan_delete_failed": "Could not delete the scan. Try again later.",
       "project_scan_mode_label": "Scan mode",
       "project_action_3d_model": "3D Model",
       "project_action_measurements": "Measurements",
@@ -427,6 +440,19 @@ class L10n {
       "project_delete_cancel": "Отмена",
       "project_delete_confirm": "Удалить",
       "project_deleted": "Проект удалён",
+      "use_current_location": "Моя геолокация",
+      "location_services_disabled":
+          "Геолокация выключена. Включите её, чтобы использовать текущее местоположение.",
+      "location_permission_denied":
+          "Для текущего местоположения нужен доступ к геолокации.",
+      "current_location_address_failed":
+          "Не удалось определить адрес по текущему местоположению.",
+      "scan_delete": "Удалить скан",
+      "scan_delete_confirm_title": "Удалить скан?",
+      "scan_delete_confirm_message":
+          "Скан #{id} будет удалён. Это действие нельзя отменить.",
+      "scan_deleted": "Скан удалён",
+      "scan_delete_failed": "Не удалось удалить скан. Попробуйте позже.",
       "project_scan_mode_label": "Режим сканирования",
       "project_action_3d_model": "3D-модель",
       "project_action_measurements": "Размеры",
@@ -753,6 +779,19 @@ class L10n {
       "project_delete_cancel": "Bekor qilish",
       "project_delete_confirm": "O'chirish",
       "project_deleted": "Loyiha o'chirildi",
+      "use_current_location": "Joriy joylashuv",
+      "location_services_disabled":
+          "Joylashuv xizmatlari o'chiq. Joriy joylashuvdan foydalanish uchun ularni yoqing.",
+      "location_permission_denied":
+          "Joriy joylashuvdan foydalanish uchun joylashuv ruxsati kerak.",
+      "current_location_address_failed":
+          "Joriy joylashuv bo'yicha manzilni aniqlab bo'lmadi.",
+      "scan_delete": "Skanni o'chirish",
+      "scan_delete_confirm_title": "Skan o'chirilsinmi?",
+      "scan_delete_confirm_message":
+          "Skan #{id} o'chiriladi. Buni ortga qaytarib bo'lmaydi.",
+      "scan_deleted": "Skan o'chirildi",
+      "scan_delete_failed": "Skanni o'chirib bo'lmadi. Keyinroq urinib ko'ring.",
       "project_scan_mode_label": "Skanlash rejimi",
       "project_action_3d_model": "3D model",
       "project_action_measurements": "O'lchamlar",

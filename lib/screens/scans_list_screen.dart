@@ -27,6 +27,7 @@ class _ScansListScreenState extends State<ScansListScreen> {
   Object? _error;
   bool _loading = false;
   int? _openingId;
+  int? _deletingId;
   CancelToken? _loadToken;
   bool _loadedOnce = false;
 
@@ -113,6 +114,64 @@ class _ScansListScreenState extends State<ScansListScreen> {
       Toasts.showError(context, L10n.get("scans_open_error"));
     } finally {
       if (mounted) setState(() => _openingId = null);
+    }
+  }
+
+  Future<void> _deleteScan(MakonScan scan) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        final colors = Theme.of(dialogContext).colorScheme;
+        return AlertDialog(
+          title: Text(L10n.get("scan_delete_confirm_title")),
+          content: Text(
+            L10n.get("scan_delete_confirm_message")
+                .replaceAll("{id}", scan.id.toString()),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(L10n.get("project_delete_cancel")),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: colors.error,
+                foregroundColor: colors.onError,
+              ),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(L10n.get("project_delete_confirm")),
+            ),
+          ],
+        );
+      },
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() => _deletingId = scan.id);
+    try {
+      await ScanUploadService.deleteScan(scan.id);
+      if (!mounted) return;
+      setState(() {
+        _scans = _scans?.where((s) => s.id != scan.id).toList(growable: false);
+        _deletingId = null;
+      });
+      Toasts.showSuccess(context, L10n.get("scan_deleted"));
+    } on DioException catch (e) {
+      if (!mounted) return;
+      // 404 = already gone — that's the outcome we wanted.
+      if (e.response?.statusCode == 404) {
+        setState(() {
+          _scans =
+              _scans?.where((s) => s.id != scan.id).toList(growable: false);
+          _deletingId = null;
+        });
+        return;
+      }
+      setState(() => _deletingId = null);
+      Toasts.showError(context, L10n.get("scan_delete_failed"));
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _deletingId = null);
+      Toasts.showError(context, L10n.get("scan_delete_failed"));
     }
   }
 
@@ -212,6 +271,7 @@ class _ScansListScreenState extends State<ScansListScreen> {
         itemBuilder: (context, index) {
           final scan = scans[index];
           final opening = _openingId == scan.id;
+          final deleting = _deletingId == scan.id;
           return ListTile(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -231,8 +291,23 @@ class _ScansListScreenState extends State<ScansListScreen> {
             ),
             title: Text("${L10n.get("scans_item_title")} #${scan.id}"),
             subtitle: Text(_subtitle(scan)),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: opening ? null : () => unawaited(_openScan(scan)),
+            trailing: deleting
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : IconButton(
+                    tooltip: L10n.get("scan_delete"),
+                    icon: Icon(
+                      Icons.delete_outline,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                    onPressed: () => unawaited(_deleteScan(scan)),
+                  ),
+            onTap: opening || deleting
+                ? null
+                : () => unawaited(_openScan(scan)),
           );
         },
       ),

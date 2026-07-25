@@ -5,6 +5,11 @@ PODS:
   - flutter_secure_storage_darwin (10.0.0):
     - Flutter
     - FlutterMacOS
+  - geolocator_apple (1.2.0):
+    - Flutter
+    - FlutterMacOS
+  - package_info_plus (0.4.5):
+    - Flutter
   - permission_handler_apple (9.4.8):
     - Flutter
   - room_scan_kit (0.6.14):
@@ -19,6 +24,8 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_roomplan (from `.symlinks/plugins/flutter_roomplan/ios`)
   - flutter_secure_storage_darwin (from `.symlinks/plugins/flutter_secure_storage_darwin/darwin`)
+  - geolocator_apple (from `.symlinks/plugins/geolocator_apple/darwin`)
+  - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - room_scan_kit (from `.symlinks/plugins/room_scan_kit/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
@@ -31,6 +38,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_roomplan/ios"
   flutter_secure_storage_darwin:
     :path: ".symlinks/plugins/flutter_secure_storage_darwin/darwin"
+  geolocator_apple:
+    :path: ".symlinks/plugins/geolocator_apple/darwin"
+  package_info_plus:
+    :path: ".symlinks/plugins/package_info_plus/ios"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   room_scan_kit:
@@ -44,6 +55,8 @@ SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_roomplan: a0df08e00ddc20fda094f6480163255a13bbd3bc
   flutter_secure_storage_darwin: 557817588b80e60213cbecb573c45c76b788018d
+  geolocator_apple: 66b711889fd333205763b83c9dcf0a57a28c7afd
+  package_info_plus: c0502532a26c7662a62a356cebe2692ec5fe4ec4
   permission_handler_apple: ee2fe0fd04551b304eb002714ff067c371c822ed
   room_scan_kit: 773aea27860610f9e971f760121e0141ae660ea0
   share_plus: 8b6f8b3447e494cca5317c8c3073de39b3600d1f

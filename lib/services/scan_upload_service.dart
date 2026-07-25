@@ -107,6 +107,18 @@ class ScanUploadService {
     return _listScans(cancelToken: cancelToken);
   }
 
+  /// Deletes a scan from the backend gallery (row + media files). Throws on
+  /// failure so callers can surface an error toast.
+  static Future<void> deleteScan(int scanId) async {
+    await _dio.delete<void>(
+      "/makon3d/scans/$scanId",
+      options: Options(
+        sendTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 30),
+      ),
+    );
+  }
+
   static Future<List<MakonScan>> _listScans({
     Map<String, dynamic>? queryParameters,
     CancelToken? cancelToken,

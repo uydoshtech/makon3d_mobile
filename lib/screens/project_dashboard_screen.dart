@@ -222,7 +222,10 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
         actions: [
           IconButton(
             tooltip: L10n.get('project_delete'),
-            icon: const Icon(Icons.delete_outline),
+            icon: Icon(
+              Icons.delete_outline,
+              color: Theme.of(context).colorScheme.error,
+            ),
             onPressed: () => unawaited(_deleteProject(project)),
           ),
         ],
