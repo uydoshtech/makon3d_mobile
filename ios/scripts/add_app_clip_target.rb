@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # Adds (or regenerates) the Makon3DAppClip target in Runner.xcodeproj.
 #
-# Ported from uydosh_client/ios/scripts/add_app_clip_target.rb — the two App
+# Ported from uydosh_mobile/ios/scripts/add_app_clip_target.rb — the two App
 # Clips intentionally share their scan-flow sources (ios/Shared) and this
 # generation approach; keep the scripts aligned when changing either.
 #

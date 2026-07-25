@@ -30,7 +30,7 @@ Repo: `uydoshtech/makon3d_mobile` → Settings → Secrets and variables → Act
 | `ASC_KEY_P8_BASE64` | Base64 of the API key `.p8` file |
 
 The distribution cert and ASC API key can be the **same values** already used on
-`uydosh_client`. The provisioning profile must be **new** for Makon 3D.
+`uydosh_mobile`. The provisioning profile must be **new** for Makon 3D.
 
 ### Create the Makon 3D App Store profile
 
@@ -51,7 +51,7 @@ gh secret set IOS_PROVISION_PROFILE_BASE64 -R uydoshtech/makon3d_mobile
 ### Copy shared secrets from UyDosh (same team)
 
 You cannot read secret values back from GitHub. Re-set them from your local
-copies (same files you used for `uydosh_client`):
+copies (same files you used for `uydosh_mobile`):
 
 ```bash
 REPO=uydoshtech/makon3d_mobile

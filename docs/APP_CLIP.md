@@ -9,7 +9,7 @@ the gallery viewer.
 
 This target is a product-branded sibling of the UyDosh App Clip — the scan
 flow, backend contract, testing setup, and release process are identical, so
-**uydosh_client/docs/APP_CLIP.md is the reference documentation**. This file
+**uydosh_mobile/docs/APP_CLIP.md is the reference documentation**. This file
 covers only what differs.
 
 ```
@@ -33,14 +33,14 @@ read start_param=scan_{id} ◀────────────────�
 
 | | UyDosh clip | Makon3D clip |
 |---|---|---|
-| Target / sources | `UyDoshAppClip` (uydosh_client) | `Makon3DAppClip` (this repo) |
+| Target / sources | `UyDoshAppClip` (uydosh_mobile) | `Makon3DAppClip` (this repo) |
 | Bundle ID | `com.uydosh.app.Clip` | `com.makon3d.app.Clip` (parent `com.makon3d.app`) |
 | Invocation host | `scan.uydosh.com` | `scan.makon3d.uydosh.com` |
 | Session target | `listing` | `makon3d` |
 | Return deep link | `t.me/uydosh_bot/app` | `t.me/makon3d_bot/app` |
 | Team / deployment | D5THR62Q33 / iOS 17.0 | same |
 
-`ios/Shared/` is copied from uydosh_client (pure Swift, no Flutter/CocoaPods
+`ios/Shared/` is copied from uydosh_mobile (pure Swift, no Flutter/CocoaPods
 — a Flutter dependency cannot fit the App Clip size budget); only
 `Shared/AppClipCore/AppClipConfig.swift` differs (host, bot). When fixing
 scan-flow bugs, mirror the change in both repos.
