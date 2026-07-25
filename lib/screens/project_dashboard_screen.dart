@@ -15,6 +15,7 @@ import 'package:makon3d_mobile/screens/scan_detail_screen.dart';
 import 'package:makon3d_mobile/services/housing_assemble_service.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
 import 'package:makon3d_mobile/services/room_usdz_viewer_service.dart';
+import 'package:makon3d_mobile/widgets/project_delete_dialog.dart';
 import 'package:makon3d_mobile/widgets/scan_mini_preview.dart';
 import 'package:makon3d_mobile/widgets/toasts.dart';
 
@@ -107,6 +108,11 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
     } finally {
       if (mounted) setState(() => _openingFullscreen = false);
     }
+  }
+
+  Future<void> _deleteProject(MakonProject project) async {
+    final deleted = await confirmAndDeleteProject(context, project);
+    if (deleted && mounted) Navigator.of(context).pop();
   }
 
   Future<void> _openRoomDetail(ProjectRoom room) async {
@@ -213,6 +219,13 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(project.name),
+        actions: [
+          IconButton(
+            tooltip: L10n.get('project_delete'),
+            icon: const Icon(Icons.delete_outline),
+            onPressed: () => unawaited(_deleteProject(project)),
+          ),
+        ],
       ),
       body: project.scanMode == ScanMode.entireHousing
           ? _EntireHousingBody(

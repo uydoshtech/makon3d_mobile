@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:makon3d_mobile/models/housing_scan.dart';
 import 'package:makon3d_mobile/models/makon_project.dart';
 import 'package:makon3d_mobile/services/project_sync_service.dart';
 
@@ -98,10 +100,48 @@ class MakonProjectStore extends ChangeNotifier {
 
   Future<void> delete(String id) async {
     await ensureLoaded();
+    final project = getById(id);
     _projects = _projects.where((p) => p.id != id).toList();
     await _persist();
     notifyListeners();
     unawaited(ProjectSyncService.deleteProject(id));
+    if (project != null) {
+      unawaited(_cleanupDeletedProject(project));
+    }
+  }
+
+  /// Best-effort teardown after a delete: removes the project's uploaded
+  /// scans from the backend (they'd otherwise linger in the public web
+  /// gallery as ungrouped scans) and its local USDZ files from disk.
+  Future<void> _cleanupDeletedProject(MakonProject project) async {
+    final remoteIds = <int>{};
+    final localPaths = <String>{};
+    void collect(HousingScan? scan) {
+      if (scan == null) return;
+      final remoteId = scan.remoteScanId;
+      if (remoteId != null && remoteId > 0) remoteIds.add(remoteId);
+      final path = scan.localUsdzPath;
+      if (path != null && path.isNotEmpty) localPaths.add(path);
+    }
+
+    collect(project.entireHousingScan);
+    for (final room in project.rooms) {
+      collect(room.scan);
+    }
+    final merged = project.mergedStructureLocalPath;
+    if (merged != null && merged.isNotEmpty) localPaths.add(merged);
+
+    for (final scanId in remoteIds) {
+      await ProjectSyncService.deleteRemoteScan(scanId);
+    }
+    for (final path in localPaths) {
+      try {
+        final file = File(path);
+        if (file.existsSync()) await file.delete();
+      } catch (e) {
+        debugPrint('MakonProjectStore file cleanup failed ($path): $e');
+      }
+    }
   }
 
   Future<void> replaceAll(List<MakonProject> projects) async {

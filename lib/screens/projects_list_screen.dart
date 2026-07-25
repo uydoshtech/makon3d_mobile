@@ -6,6 +6,7 @@ import 'package:makon3d_mobile/l10n/l10n.dart';
 import 'package:makon3d_mobile/models/makon_project.dart';
 import 'package:makon3d_mobile/screens/project_dashboard_screen.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
+import 'package:makon3d_mobile/widgets/project_delete_dialog.dart';
 
 /// Device-local Makon projects. Opening a project never re-asks for scan mode.
 class ProjectsListScreen extends StatefulWidget {
@@ -119,6 +120,9 @@ class _ProjectsListScreenState extends State<ProjectsListScreen> {
                       subtitle: Text(_subtitle(project)),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => unawaited(_openProject(project)),
+                      onLongPress: () => unawaited(
+                        confirmAndDeleteProject(context, project),
+                      ),
                     );
                   },
                 ),

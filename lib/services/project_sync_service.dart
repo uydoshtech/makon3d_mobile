@@ -60,6 +60,17 @@ class ProjectSyncService {
     }
   }
 
+  /// Deletes an uploaded scan from the backend gallery — called when its
+  /// project is deleted so the scan doesn't linger in the public web feed.
+  static Future<void> deleteRemoteScan(int scanId) async {
+    if (scanId <= 0) return;
+    try {
+      await _dio.delete<void>("/makon3d/scans/$scanId");
+    } catch (e) {
+      debugPrint("ProjectSyncService scan delete failed ($scanId): $e");
+    }
+  }
+
   /// Remote backups for this device (empty on any failure). Local file paths
   /// are stripped: they point into the previous install's sandbox, and a
   /// never-uploaded scan is unrecoverable anyway — better to show the room as
