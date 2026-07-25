@@ -2,7 +2,7 @@ name: makon3d_mobile
 description: "Makon 3D — LiDAR 3D room scanning app."
 publish_to: 'none'
 
-version: 1.0.0+28
+version: 1.0.0+29
 
 environment:
   sdk: ^3.12.2
@@ -13,12 +13,16 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
+  crypto: ^3.0.6
   cupertino_icons: ^1.0.8
   curved_navigation_bar: ^1.0.6
   dio: ^5.10.0
+  firebase_auth: ^6.5.4
+  firebase_core: ^4.11.0
   flutter_roomplan: ^1.0.7
   flutter_svg: ^2.2.0
   geolocator: ^14.0.3
+  google_sign_in: ^7.2.0
   path_provider: ^2.1.4
   permission_handler: ^12.0.3
   share_plus: ^13.2.0
@@ -27,6 +31,8 @@ dependencies:
       url: https://github.com/uydoshtech/room_scan_kit.git
       ref: v0.6.15
   shared_preferences: ^2.5.3
+  sign_in_with_apple: ^8.1.0
+  telegram_login: ^1.2.1
   flutter_secure_storage: ^10.3.1
 
 dev_dependencies:

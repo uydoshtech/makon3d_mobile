@@ -1,0 +1,40 @@
+/// Telegram Login **native SDK** configuration for Makon3D.
+///
+/// The BotFather registration is **per app**: register `com.makon3d.app` in
+/// @BotFather → Bot Settings → Login Widget → Native Login, which assigns a
+/// Makon3D-specific App URL (`https://appXXXXXXXXXX-login.tg.dev`). The
+/// UyDosh values cannot be reused — they are bound to `com.uydosh.app`.
+///
+/// Until that registration exists the defaults below stay empty,
+/// [isConfigured] is false, and the Telegram button is hidden. To enable,
+/// build with:
+///
+/// ```
+/// --dart-define=TELEGRAM_OIDC_CLIENT_ID=<bot client id>
+/// --dart-define=TELEGRAM_NATIVE_REDIRECT_URI_IOS=https://appXXXXXXXXXX-login.tg.dev
+/// ```
+///
+/// and add that host to Runner's Associated Domains (`applinks:` +
+/// `webcredentials:`) — see docs/AUTH_SETUP.md.
+abstract final class TelegramNativeLoginConfig {
+  /// Bot client id from @BotFather (matches backend `TELEGRAM_OIDC_CLIENT_ID`).
+  static const clientId = String.fromEnvironment(
+    "TELEGRAM_OIDC_CLIENT_ID",
+    defaultValue: "",
+  );
+
+  /// iOS native login redirect URI (App URL from BotFather's iOS entry).
+  static const redirectUri = String.fromEnvironment(
+    "TELEGRAM_NATIVE_REDIRECT_URI_IOS",
+    defaultValue: "",
+  );
+
+  /// OAuth scopes requested from Telegram (openid is implicit in native SDK).
+  static const scopes = ["profile"];
+
+  static bool get isConfigured {
+    if (clientId.trim().isEmpty) return false;
+    final uri = Uri.tryParse(redirectUri);
+    return uri != null && uri.host.isNotEmpty;
+  }
+}
