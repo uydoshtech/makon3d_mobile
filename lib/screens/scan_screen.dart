@@ -47,6 +47,7 @@ class _ScanScreenState extends State<ScanScreen>
   PhotogrammetryUploadProgress? _photogrammetryProgress;
   bool _standardUploadComplete = false;
   bool _photogrammetryFinished = false;
+  bool _photogrammetryEnabled = false;
 
   /// Null until [RoomPlanCapability.isSupportedOnDevice] resolves on iOS.
   bool? _roomPlanSupported;
@@ -80,6 +81,16 @@ class _ScanScreenState extends State<ScanScreen>
     }
     unawaited(_resolveSupportAndRegisterCapture());
     PhotogrammetryUpload.instance.listen(_uploadPhotogrammetryPackage);
+    unawaited(
+      PhotogrammetryPreference.load().then((value) {
+        if (mounted) setState(() => _photogrammetryEnabled = value);
+      }),
+    );
+    unawaited(
+      PhotogrammetryUpload.instance.resumePendingMonitors(
+        apiBaseUrl: ScanUploadService.basePath,
+      ),
+    );
   }
 
   @override
@@ -197,7 +208,7 @@ class _ScanScreenState extends State<ScanScreen>
     setState(() {
       _starting = true;
       _standardUploadComplete = false;
-      _photogrammetryFinished = false;
+      _photogrammetryFinished = !_photogrammetryEnabled;
       _photogrammetryProgress = null;
     });
     try {
@@ -228,6 +239,7 @@ class _ScanScreenState extends State<ScanScreen>
       await _roomplanChannel.invokeMethod<void>("startScan", <String, dynamic>{
         // Single-room only: hide the post-scan "Scan Other Rooms" button.
         "enableMultiRoom": false,
+        "enablePhotogrammetry": _photogrammetryEnabled,
         "strings": <String, String>{
           "cancel": L10n.get("cancel"),
           "done": L10n.get("done"),
@@ -400,6 +412,18 @@ class _ScanScreenState extends State<ScanScreen>
               ],
             )
           else ...[
+            SwitchListTile.adaptive(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Photogrammetry'),
+              subtitle: const Text('Create a textured 3D model after scanning'),
+              value: _photogrammetryEnabled,
+              onChanged: loading
+                  ? null
+                  : (value) {
+                      setState(() => _photogrammetryEnabled = value);
+                      unawaited(PhotogrammetryPreference.save(value));
+                    },
+            ),
             if (_photogrammetryProgress case final progress?) ...[
               const SizedBox(height: 12),
               LinearProgressIndicator(
