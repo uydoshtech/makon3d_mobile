@@ -26,17 +26,24 @@ class BackendSession {
       throw Exception("Backend auth response is missing sessionToken");
     }
     final user = json["user"];
-    final userMap =
-        user is Map ? Map<String, dynamic>.from(user) : const <String, dynamic>{};
+    final userMap = user is Map
+        ? Map<String, dynamic>.from(user)
+        : const <String, dynamic>{};
     final profile = json["profile"];
-    final profileMap =
-        profile is Map ? Map<String, dynamic>.from(profile) : const <String, dynamic>{};
+    final profileMap = profile is Map
+        ? Map<String, dynamic>.from(profile)
+        : const <String, dynamic>{};
     return BackendSession(
       sessionToken: token,
       userId: (userMap["id"] as num?)?.toInt() ?? 0,
       email: userMap["email"] as String?,
-      displayName: profileMap["full_name"] as String?,
-      avatarUrl: profileMap["avatar_url"] as String?,
+      displayName:
+          profileMap["full_name"] as String? ??
+          profileMap["name"] as String? ??
+          userMap["name"] as String?,
+      avatarUrl:
+          profileMap["avatar_url"] as String? ??
+          userMap["avatar_url"] as String?,
     );
   }
 }
@@ -50,24 +57,26 @@ abstract final class AuthApi {
     defaultValue: "https://api.uydosh.com",
   );
 
-  static final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: basePath,
-      connectTimeout: const Duration(seconds: 30),
-      sendTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-    ),
-  )..interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) async {
-          final token = await SessionManager.getToken();
-          if (token != null && token.isNotEmpty) {
-            options.headers["Authorization"] = "Bearer $token";
-          }
-          handler.next(options);
-        },
-      ),
-    );
+  static final Dio _dio =
+      Dio(
+          BaseOptions(
+            baseUrl: basePath,
+            connectTimeout: const Duration(seconds: 30),
+            sendTimeout: const Duration(seconds: 30),
+            receiveTimeout: const Duration(seconds: 30),
+          ),
+        )
+        ..interceptors.add(
+          InterceptorsWrapper(
+            onRequest: (options, handler) async {
+              final token = await SessionManager.getToken();
+              if (token != null && token.isNotEmpty) {
+                options.headers["Authorization"] = "Bearer $token";
+              }
+              handler.next(options);
+            },
+          ),
+        );
 
   /// POST `/users/firebase-auth` — provider-agnostic (Google and Apple both
   /// arrive here after Firebase sign-in; the backend only verifies the
