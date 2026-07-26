@@ -365,10 +365,10 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
                     const SizedBox(height: 8),
                     Text(
                       progress.phase == PhotogrammetryUploadPhase.complete
-                          ? 'Textured model ready'
+                          ? L10n.get("room_scan_success")
                           : progress.phase == PhotogrammetryUploadPhase.failed
-                          ? 'Textured model processing failed'
-                          : 'Preparing textured model…',
+                          ? L10n.get("room_scan_error")
+                          : L10n.get("room_scan_uploading"),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
