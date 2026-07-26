@@ -13,6 +13,17 @@ Future<bool> confirmAndDeleteProject(
   BuildContext context,
   MakonProject project,
 ) async {
+  if (!await confirmDeleteProject(context, project)) return false;
+  if (!context.mounted) return false;
+  await deleteProject(context, project);
+  return true;
+}
+
+/// Displays confirmation before a project deletion.
+Future<bool> confirmDeleteProject(
+  BuildContext context,
+  MakonProject project,
+) async {
   final confirmed = await showDialog<bool>(
     context: context,
     builder: (dialogContext) {
@@ -20,8 +31,9 @@ Future<bool> confirmAndDeleteProject(
       return AlertDialog(
         title: Text(L10n.get('project_delete_confirm_title')),
         content: Text(
-          L10n.get('project_delete_confirm_message')
-              .replaceAll('{name}', project.name),
+          L10n.get(
+            'project_delete_confirm_message',
+          ).replaceAll('{name}', project.name),
         ),
         actions: [
           TextButton(
@@ -40,10 +52,13 @@ Future<bool> confirmAndDeleteProject(
       );
     },
   );
-  if (confirmed != true) return false;
+  return confirmed == true;
+}
+
+/// Deletes a confirmed project and presents a success message.
+Future<void> deleteProject(BuildContext context, MakonProject project) async {
   await MakonProjectStore.instance.delete(project.id);
   if (context.mounted) {
     Toasts.showSuccess(context, L10n.get('project_deleted'));
   }
-  return true;
 }

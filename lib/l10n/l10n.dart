@@ -235,6 +235,10 @@ class L10n {
       "room_scan_start": "Start scan",
       "room_scan_finish": "Finish",
       "room_scan_scan_other_rooms": "Scan Other Rooms",
+      "project_room_delete_confirm_title": "Remove room?",
+      "project_room_delete_confirm_message":
+          "\"{name}\" and its scan will be deleted. This cannot be undone.",
+      "project_room_deleted": "Room removed",
       "room_scan_stats_walls": "Walls",
       "room_scan_stats_doors": "Doors",
       "room_scan_stats_windows": "Windows",
@@ -589,6 +593,10 @@ class L10n {
       "room_scan_start": "Начать сканирование",
       "room_scan_finish": "Завершить",
       "room_scan_scan_other_rooms": "Сканировать другие комнаты",
+      "project_room_delete_confirm_title": "Удалить комнату?",
+      "project_room_delete_confirm_message":
+          "Комната «{name}» и её скан будут удалены. Это действие нельзя отменить.",
+      "project_room_deleted": "Комната удалена",
       "room_scan_stats_walls": "Стены",
       "room_scan_stats_doors": "Двери",
       "room_scan_stats_windows": "Окна",
@@ -948,6 +956,10 @@ class L10n {
       "room_scan_start": "Skanlashni boshlash",
       "room_scan_finish": "Yakunlash",
       "room_scan_scan_other_rooms": "Boshqa xonalarni skanerlash",
+      "project_room_delete_confirm_title": "Xona olib tashlansinmi?",
+      "project_room_delete_confirm_message":
+          "\"{name}\" xonasi va uning skani o'chiriladi. Buni ortga qaytarib bo'lmaydi.",
+      "project_room_deleted": "Xona olib tashlandi",
       "room_scan_stats_walls": "Devorlar",
       "room_scan_stats_doors": "Eshiklar",
       "room_scan_stats_windows": "Derazalar",

@@ -40,8 +40,7 @@ class ScanDetailScreen extends StatefulWidget {
 class _ScanDetailScreenState extends State<ScanDetailScreen> {
   bool _openingFullscreen = false;
 
-  int get _cacheScanId =>
-      widget.scan.remoteScanId ?? widget.scan.id.hashCode;
+  int get _cacheScanId => widget.scan.remoteScanId ?? widget.scan.id.hashCode;
 
   Future<void> _openFullscreen() async {
     if (_openingFullscreen) return;
@@ -69,7 +68,8 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final scan = widget.scan;
-    final hasDims = scan.floorLongM != null &&
+    final hasDims =
+        scan.floorLongM != null &&
         scan.floorShortM != null &&
         scan.heightM != null &&
         scan.floorAreaM2 != null;
@@ -116,10 +116,9 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
                         '{floorShort}',
                         scan.floorShortM!.toStringAsFixed(1),
                       ),
-                  L10n.get('room_3d_dimensions_height_template').replaceAll(
-                    '{height}',
-                    scan.heightM!.toStringAsFixed(1),
-                  ),
+                  L10n.get(
+                    'room_3d_dimensions_height_template',
+                  ).replaceAll('{height}', scan.heightM!.toStringAsFixed(1)),
                   L10n.get('room_3d_dimensions_line2_template').replaceAll(
                     '{floorArea}',
                     scan.floorAreaM2!.toStringAsFixed(1),
@@ -140,12 +139,11 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
               title: Text(L10n.get('project_action_measurements')),
               subtitle: Text(L10n.get('scans_no_metrics')),
             ),
-          if (widget.projectId != null)
+          if (widget.projectId != null) ...[
             ListTile(
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.grid_view_rounded),
-              title: Text(L10n.get('room_action_materials')),
-              subtitle: Text(L10n.get('materials_surfaces_summary')),
+              title: Text(L10n.get('materials_floor_surface')),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 Navigator.of(context).push<void>(
@@ -153,11 +151,31 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
                     builder: (_) => RoomMaterialsScreen(
                       projectId: widget.projectId!,
                       roomId: widget.roomId,
+                      showSurfaceSelector: false,
                     ),
                   ),
                 );
               },
             ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.format_paint_outlined),
+              title: Text(L10n.get('materials_walls_surface')),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                Navigator.of(context).push<void>(
+                  MaterialPageRoute<void>(
+                    builder: (_) => RoomMaterialsScreen(
+                      projectId: widget.projectId!,
+                      roomId: widget.roomId,
+                      initialSurface: MaterialsSurface.walls,
+                      showSurfaceSelector: false,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
           if (widget.onRescan != null) ...[
             const SizedBox(height: 12),
             OutlinedButton.icon(

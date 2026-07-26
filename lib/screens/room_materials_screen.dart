@@ -23,6 +23,7 @@ class RoomMaterialsScreen extends StatefulWidget {
     required this.projectId,
     this.roomId,
     this.initialSurface = MaterialsSurface.floor,
+    this.showSurfaceSelector = true,
     super.key,
   });
 
@@ -32,6 +33,10 @@ class RoomMaterialsScreen extends StatefulWidget {
   final String? roomId;
 
   final MaterialsSurface initialSurface;
+
+  /// Room details opens one material type directly; project-wide estimates
+  /// retain the selector because they can cover both surfaces.
+  final bool showSurfaceSelector;
 
   @override
   State<RoomMaterialsScreen> createState() => _RoomMaterialsScreenState();
@@ -109,10 +114,12 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
     _rollWidthM = wallpaperPrefs.rollWidthM;
     _rollLengthM = wallpaperPrefs.rollLengthM;
     _repeatCm = wallpaperPrefs.repeatCm;
-    _rollWidthController =
-        TextEditingController(text: _formatNumber(_rollWidthM));
-    _rollLengthController =
-        TextEditingController(text: _formatNumber(_rollLengthM));
+    _rollWidthController = TextEditingController(
+      text: _formatNumber(_rollWidthM),
+    );
+    _rollLengthController = TextEditingController(
+      text: _formatNumber(_rollLengthM),
+    );
     _repeatController = TextEditingController(text: _formatNumber(_repeatCm));
 
     MakonProjectStore.instance.addListener(_onStoreChanged);
@@ -312,12 +319,13 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
         repeatCm: _repeatCm,
       );
       if (widget.roomId != null) {
-        final rooms = project.rooms.map((room) {
-          if (room.id != widget.roomId) return room;
-          return room.copyWith(wallpaperPrefs: prefs);
-        }).toList(growable: false);
-        await MakonProjectStore.instance
-            .upsert(project.copyWith(rooms: rooms));
+        final rooms = project.rooms
+            .map((room) {
+              if (room.id != widget.roomId) return room;
+              return room.copyWith(wallpaperPrefs: prefs);
+            })
+            .toList(growable: false);
+        await MakonProjectStore.instance.upsert(project.copyWith(rooms: rooms));
         return;
       }
       await MakonProjectStore.instance.upsert(
@@ -331,10 +339,12 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
       wastePercent: _wastePercent,
     );
     if (widget.roomId != null) {
-      final rooms = project.rooms.map((room) {
-        if (room.id != widget.roomId) return room;
-        return room.copyWith(floorTilePrefs: prefs);
-      }).toList(growable: false);
+      final rooms = project.rooms
+          .map((room) {
+            if (room.id != widget.roomId) return room;
+            return room.copyWith(floorTilePrefs: prefs);
+          })
+          .toList(growable: false);
       await MakonProjectStore.instance.upsert(project.copyWith(rooms: rooms));
       return;
     }
@@ -359,9 +369,7 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
         border: const OutlineInputBorder(),
       ),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'[\d.,]')),
-      ],
+      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[\d.,]'))],
       onChanged: onChanged,
     );
   }
@@ -434,10 +442,9 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
       ),
       const SizedBox(height: 24),
       Text(
-        L10n.get('materials_waste_label').replaceAll(
-          '{percent}',
-          _wastePercent.round().toString(),
-        ),
+        L10n.get(
+          'materials_waste_label',
+        ).replaceAll('{percent}', _wastePercent.round().toString()),
         style: theme.textTheme.titleSmall,
       ),
       Slider(
@@ -542,8 +549,8 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
     // scans that predate the metric (fall back to the OBB approximation).
     final measuredPerimeterM =
         (scan?.wallPerimeterM != null && scan!.wallPerimeterM! > 0)
-            ? scan.wallPerimeterM
-            : null;
+        ? scan.wallPerimeterM
+        : null;
     final obbPerimeterM = FloorTileEstimator.resolvePerimeterM(
       floorLongM: scan?.floorLongM,
       floorShortM: scan?.floorShortM,
@@ -554,15 +561,16 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
     final double? plinthPerimeterM;
     final String plinthNote;
     if (measuredPerimeterM != null) {
-      final doorwayWidth =
-          (scan?.doorwayWidthM ?? 0) > 0 ? scan!.doorwayWidthM! : 0.0;
+      final doorwayWidth = (scan?.doorwayWidthM ?? 0) > 0
+          ? scan!.doorwayWidthM!
+          : 0.0;
       plinthPerimeterM = (measuredPerimeterM - doorwayWidth) > 0
           ? measuredPerimeterM - doorwayWidth
           : 0.0;
       plinthNote = doorwayWidth > 0
           ? L10n.get('materials_plinth_minus_doorways_template')
-              .replaceAll('{length}', measuredPerimeterM.toStringAsFixed(1))
-              .replaceAll('{doorways}', doorwayWidth.toStringAsFixed(1))
+                .replaceAll('{length}', measuredPerimeterM.toStringAsFixed(1))
+                .replaceAll('{doorways}', doorwayWidth.toStringAsFixed(1))
           : L10n.get('materials_plinth_no_doorways');
     } else {
       plinthPerimeterM = obbPerimeterM;
@@ -571,15 +579,16 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
 
     // Walls: wallpaper strips from perimeter × wall height.
     final perimeterM = measuredPerimeterM ?? obbPerimeterM;
-    final wallHeightM =
-        (scan?.heightM != null && scan!.heightM! > 0) ? scan.heightM : null;
+    final wallHeightM = (scan?.heightM != null && scan!.heightM! > 0)
+        ? scan.heightM
+        : null;
 
     // Opening face areas measured by the backend; null when unmeasured, so
     // the honest "not subtracted" note can be shown instead.
     final openingAreaM2 =
         (scan?.doorwayAreaM2 != null || scan?.windowAreaM2 != null)
-            ? (scan?.doorwayAreaM2 ?? 0) + (scan?.windowAreaM2 ?? 0)
-            : null;
+        ? (scan?.doorwayAreaM2 ?? 0) + (scan?.windowAreaM2 ?? 0)
+        : null;
 
     final tileEstimate = floorArea == null
         ? null
@@ -600,10 +609,12 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
             repeatCm: _repeatCm,
           );
 
-    final hasMeasurements =
-        _walls ? (perimeterM != null && wallHeightM != null) : floorArea != null;
-    final noAreaKey =
-        _walls ? 'materials_walls_no_area' : 'materials_floor_no_area';
+    final hasMeasurements = _walls
+        ? (perimeterM != null && wallHeightM != null)
+        : floorArea != null;
+    final noAreaKey = _walls
+        ? 'materials_walls_no_area'
+        : 'materials_floor_no_area';
 
     return Scaffold(
       appBar: AppBar(
@@ -625,24 +636,26 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            SegmentedButton<MaterialsSurface>(
-              segments: [
-                ButtonSegment<MaterialsSurface>(
-                  value: MaterialsSurface.floor,
-                  label: Text(L10n.get('materials_floor_surface')),
-                ),
-                ButtonSegment<MaterialsSurface>(
-                  value: MaterialsSurface.walls,
-                  label: Text(L10n.get('materials_walls_surface')),
-                ),
-              ],
-              selected: {_surface},
-              onSelectionChanged: (next) {
-                if (next.isEmpty) return;
-                _setSurface(next.first);
-              },
-            ),
-            const SizedBox(height: 12),
+            if (widget.showSurfaceSelector) ...[
+              SegmentedButton<MaterialsSurface>(
+                segments: [
+                  ButtonSegment<MaterialsSurface>(
+                    value: MaterialsSurface.floor,
+                    label: Text(L10n.get('materials_floor_surface')),
+                  ),
+                  ButtonSegment<MaterialsSurface>(
+                    value: MaterialsSurface.walls,
+                    label: Text(L10n.get('materials_walls_surface')),
+                  ),
+                ],
+                selected: {_surface},
+                onSelectionChanged: (next) {
+                  if (next.isEmpty) return;
+                  _setSurface(next.first);
+                },
+              ),
+              const SizedBox(height: 12),
+            ],
             if (!hasMeasurements)
               Text(
                 L10n.get(noAreaKey),
@@ -670,10 +683,9 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
               ),
             ] else ...[
               Text(
-                L10n.get('materials_floor_area_template').replaceAll(
-                  '{area}',
-                  floorArea!.toStringAsFixed(1),
-                ),
+                L10n.get(
+                  'materials_floor_area_template',
+                ).replaceAll('{area}', floorArea!.toStringAsFixed(1)),
                 style: theme.textTheme.bodyLarge,
               ),
               if (floorAreaApprox) ...[
@@ -724,15 +736,15 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
   }) {
     if (openingAreaM2 == null) return L10n.get('materials_openings_note');
     final grossM2 = perimeterM * wallHeightM;
-    final netM2 =
-        (grossM2 - openingAreaM2) > 0 ? grossM2 - openingAreaM2 : 0.0;
+    final netM2 = (grossM2 - openingAreaM2) > 0 ? grossM2 - openingAreaM2 : 0.0;
     if (openingAreaM2 > 0.05) {
       return L10n.get('materials_wall_net_area_template')
           .replaceAll('{net}', netM2.toStringAsFixed(1))
           .replaceAll('{openings}', openingAreaM2.toStringAsFixed(1));
     }
-    return L10n.get('materials_wall_no_openings_template')
-        .replaceAll('{net}', netM2.toStringAsFixed(1));
+    return L10n.get(
+      'materials_wall_no_openings_template',
+    ).replaceAll('{net}', netM2.toStringAsFixed(1));
   }
 
   Widget _buildTileResult(
@@ -754,29 +766,24 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
         ),
         const SizedBox(height: 12),
         Text(
-          L10n.get('materials_result_tiles_template').replaceAll(
-            '{count}',
-            estimate.tileCount.toString(),
-          ),
+          L10n.get(
+            'materials_result_tiles_template',
+          ).replaceAll('{count}', estimate.tileCount.toString()),
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 6),
         Text(
-          L10n.get('materials_result_buy_area_template').replaceAll(
-            '{area}',
-            estimate.buyAreaM2.toStringAsFixed(1),
-          ),
+          L10n.get(
+            'materials_result_buy_area_template',
+          ).replaceAll('{area}', estimate.buyAreaM2.toStringAsFixed(1)),
           style: theme.textTheme.bodyLarge,
         ),
         const SizedBox(height: 8),
         Text(
           L10n.get('materials_result_detail_template')
-              .replaceAll(
-                '{tileArea}',
-                estimate.tileAreaM2.toStringAsFixed(2),
-              )
+              .replaceAll('{tileArea}', estimate.tileAreaM2.toStringAsFixed(2))
               .replaceAll(
                 '{effectiveArea}',
                 estimate.effectiveAreaM2.toStringAsFixed(1),
@@ -791,14 +798,12 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
           const SizedBox(height: 12),
           Text(
             L10n.get('materials_plinth_template')
-                .replaceAll(
-                  '{length}',
-                  plinthPerimeterM.toStringAsFixed(1),
-                )
+                .replaceAll('{length}', plinthPerimeterM.toStringAsFixed(1))
                 .replaceAll(
                   '{count}',
-                  FloorTileEstimator.plinthStripCount(plinthPerimeterM)
-                      .toString(),
+                  FloorTileEstimator.plinthStripCount(
+                    plinthPerimeterM,
+                  ).toString(),
                 ),
             style: theme.textTheme.bodyLarge?.copyWith(
               fontWeight: FontWeight.w600,
@@ -833,10 +838,9 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
         ),
         const SizedBox(height: 12),
         Text(
-          L10n.get('materials_result_rolls_template').replaceAll(
-            '{count}',
-            estimate.rollCount.toString(),
-          ),
+          L10n.get(
+            'materials_result_rolls_template',
+          ).replaceAll('{count}', estimate.rollCount.toString()),
           style: theme.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.w700,
           ),
@@ -854,10 +858,9 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
         if (estimate.stripsPerRoll >= 1) ...[
           const SizedBox(height: 8),
           Text(
-            L10n.get('materials_strips_per_roll_template').replaceAll(
-              '{count}',
-              estimate.stripsPerRoll.toString(),
-            ),
+            L10n.get(
+              'materials_strips_per_roll_template',
+            ).replaceAll('{count}', estimate.stripsPerRoll.toString()),
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

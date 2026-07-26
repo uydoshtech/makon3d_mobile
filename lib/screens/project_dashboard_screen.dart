@@ -113,6 +113,51 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
     if (deleted && mounted) Navigator.of(context).pop();
   }
 
+  Future<bool> _confirmDeleteRoom(ProjectRoom room) async {
+    final title = room.name?.isNotEmpty == true
+        ? room.name!
+        : L10n.get(room.roomType.titleKey);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        final colors = Theme.of(dialogContext).colorScheme;
+        return AlertDialog(
+          title: Text(L10n.get('project_room_delete_confirm_title')),
+          content: Text(
+            L10n.get(
+              'project_room_delete_confirm_message',
+            ).replaceAll('{name}', title),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(L10n.get('project_delete_cancel')),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: colors.error,
+                foregroundColor: colors.onError,
+              ),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(L10n.get('project_delete_confirm')),
+            ),
+          ],
+        );
+      },
+    );
+    return confirmed == true && mounted;
+  }
+
+  Future<void> _deleteRoom(ProjectRoom room) async {
+    await MakonProjectStore.instance.deleteRoom(
+      projectId: widget.projectId,
+      roomId: room.id,
+    );
+    if (mounted) {
+      Toasts.showSuccess(context, L10n.get('project_room_deleted'));
+    }
+  }
+
   Future<void> _editProject(MakonProject project) async {
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
@@ -194,6 +239,8 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
               onAddRoom: _addRoom,
               onOpenRoom: (room) => unawaited(_openRoomDetail(room)),
               onRescanRoom: _rescanRoom,
+              onConfirmDeleteRoom: _confirmDeleteRoom,
+              onDeleteRoom: _deleteRoom,
             ),
     );
   }
@@ -306,12 +353,16 @@ class _RoomByRoomBody extends StatelessWidget {
     required this.onAddRoom,
     required this.onOpenRoom,
     required this.onRescanRoom,
+    required this.onConfirmDeleteRoom,
+    required this.onDeleteRoom,
   });
 
   final MakonProject project;
   final VoidCallback onAddRoom;
   final ValueChanged<ProjectRoom> onOpenRoom;
   final ValueChanged<ProjectRoom> onRescanRoom;
+  final Future<bool> Function(ProjectRoom room) onConfirmDeleteRoom;
+  final ValueChanged<ProjectRoom> onDeleteRoom;
 
   @override
   Widget build(BuildContext context) {
@@ -348,32 +399,47 @@ class _RoomByRoomBody extends StatelessWidget {
                     final title = room.name?.isNotEmpty == true
                         ? room.name!
                         : L10n.get(room.roomType.titleKey);
-                    return ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: Icon(
-                        room.roomType.icon,
-                        color: room.isScanned
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.outline,
+                    return Dismissible(
+                      key: ValueKey(room.id),
+                      direction: DismissDirection.endToStart,
+                      confirmDismiss: (_) => onConfirmDeleteRoom(room),
+                      onDismissed: (_) => onDeleteRoom(room),
+                      background: Container(
+                        alignment: Alignment.centerRight,
+                        color: theme.colorScheme.error,
+                        padding: const EdgeInsets.only(right: 20),
+                        child: Icon(
+                          Icons.delete_outline,
+                          color: theme.colorScheme.onError,
+                        ),
                       ),
-                      title: Text(title),
-                      subtitle: Text(
-                        room.isScanned
-                            ? L10n.get('project_room_scanned')
-                            : L10n.get('project_room_pending'),
+                      child: ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Icon(
+                          room.roomType.icon,
+                          color: room.isScanned
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.outline,
+                        ),
+                        title: Text(title),
+                        subtitle: Text(
+                          room.isScanned
+                              ? L10n.get('project_room_scanned')
+                              : L10n.get('project_room_pending'),
+                        ),
+                        trailing: room.isScanned
+                            ? IconButton(
+                                icon: const Icon(Icons.view_in_ar),
+                                onPressed: () => onOpenRoom(room),
+                              )
+                            : TextButton(
+                                onPressed: () => onRescanRoom(room),
+                                child: Text(L10n.get('room_scan_start')),
+                              ),
+                        onTap: room.isScanned
+                            ? () => onOpenRoom(room)
+                            : () => onRescanRoom(room),
                       ),
-                      trailing: room.isScanned
-                          ? IconButton(
-                              icon: const Icon(Icons.view_in_ar),
-                              onPressed: () => onOpenRoom(room),
-                            )
-                          : TextButton(
-                              onPressed: () => onRescanRoom(room),
-                              child: Text(L10n.get('room_scan_start')),
-                            ),
-                      onTap: room.isScanned
-                          ? () => onOpenRoom(room)
-                          : () => onRescanRoom(room),
                     );
                   }),
               ],

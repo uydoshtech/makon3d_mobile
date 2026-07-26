@@ -42,22 +42,23 @@ class ProjectRoom {
       layoutOffsetXM != null && layoutOffsetZM != null;
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'id': id,
-        'roomType': roomType.wireValue,
-        'createdAt': createdAt.toIso8601String(),
-        'name': name,
-        'scan': scan?.toJson(),
-        'layoutOffsetXM': layoutOffsetXM,
-        'layoutOffsetZM': layoutOffsetZM,
-        'layoutYawDeg': layoutYawDeg,
-        'floorTilePrefs': floorTilePrefs?.toJson(),
-        'wallpaperPrefs': wallpaperPrefs?.toJson(),
-      };
+    'id': id,
+    'roomType': roomType.wireValue,
+    'createdAt': createdAt.toIso8601String(),
+    'name': name,
+    'scan': scan?.toJson(),
+    'layoutOffsetXM': layoutOffsetXM,
+    'layoutOffsetZM': layoutOffsetZM,
+    'layoutYawDeg': layoutYawDeg,
+    'floorTilePrefs': floorTilePrefs?.toJson(),
+    'wallpaperPrefs': wallpaperPrefs?.toJson(),
+  };
 
   factory ProjectRoom.fromJson(Map<String, dynamic> json) {
     return ProjectRoom(
       id: json['id'] as String? ?? '',
-      roomType: RoomType.tryParse(json['roomType'] as String?) ?? RoomType.other,
+      roomType:
+          RoomType.tryParse(json['roomType'] as String?) ?? RoomType.other,
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now()
           : DateTime.now(),
@@ -73,10 +74,10 @@ class ProjectRoom {
               json['floorTilePrefs'] as Map<String, dynamic>,
             )
           : json['floorTilePrefs'] is Map
-              ? FloorTilePrefs.fromJson(
-                  Map<String, dynamic>.from(json['floorTilePrefs'] as Map),
-                )
-              : null,
+          ? FloorTilePrefs.fromJson(
+              Map<String, dynamic>.from(json['floorTilePrefs'] as Map),
+            )
+          : null,
       wallpaperPrefs: WallpaperPrefs.tryFromJson(json['wallpaperPrefs']),
     );
   }
@@ -98,10 +99,12 @@ class ProjectRoom {
       createdAt: createdAt,
       name: name ?? this.name,
       scan: scan ?? this.scan,
-      layoutOffsetXM:
-          clearLayout ? null : (layoutOffsetXM ?? this.layoutOffsetXM),
-      layoutOffsetZM:
-          clearLayout ? null : (layoutOffsetZM ?? this.layoutOffsetZM),
+      layoutOffsetXM: clearLayout
+          ? null
+          : (layoutOffsetXM ?? this.layoutOffsetXM),
+      layoutOffsetZM: clearLayout
+          ? null
+          : (layoutOffsetZM ?? this.layoutOffsetZM),
       layoutYawDeg: clearLayout ? null : (layoutYawDeg ?? this.layoutYawDeg),
       floorTilePrefs: floorTilePrefs ?? this.floorTilePrefs,
       wallpaperPrefs: wallpaperPrefs ?? this.wallpaperPrefs,

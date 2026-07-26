@@ -49,11 +49,11 @@ the corresponding sign-in buttons are simply hidden.
 3. Build with:
 
    ```
-   --dart-define=TELEGRAM_OIDC_CLIENT_ID=<bot client id>
    --dart-define=TELEGRAM_NATIVE_REDIRECT_URI_IOS=https://appXXXXXXXXXX-login.tg.dev
    ```
 
-   (`TELEGRAM_OIDC_CLIENT_ID` must match the backend's OIDC client id.)
+   Makon3D defaults to its `@makon3d_bot` client id (`8923824061`). Pass
+   `TELEGRAM_OIDC_CLIENT_ID` only if BotFather issues a replacement client id.
 
 The Telegram button appears automatically once
 `TelegramNativeLoginConfig.isConfigured` is true. The browser OAuth

@@ -134,11 +134,31 @@ class _ProjectsListScreenState extends State<ProjectsListScreen> {
               separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (context, index) {
                 final project = projects[index];
-                return _ProjectCard(
-                  project: project,
-                  onTap: () => unawaited(_openProject(project)),
-                  onLongPress: () =>
-                      unawaited(confirmAndDeleteProject(context, project)),
+                final theme = Theme.of(context);
+                return Dismissible(
+                  key: ValueKey(project.id),
+                  direction: DismissDirection.endToStart,
+                  confirmDismiss: (_) => confirmDeleteProject(context, project),
+                  onDismissed: (_) =>
+                      unawaited(deleteProject(context, project)),
+                  background: Container(
+                    alignment: Alignment.centerRight,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.error,
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    padding: const EdgeInsets.only(right: 20),
+                    child: Icon(
+                      Icons.delete_outline,
+                      color: theme.colorScheme.onError,
+                    ),
+                  ),
+                  child: _ProjectCard(
+                    project: project,
+                    onTap: () => unawaited(_openProject(project)),
+                    onLongPress: () =>
+                        unawaited(confirmAndDeleteProject(context, project)),
+                  ),
                 );
               },
             ),

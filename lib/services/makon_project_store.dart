@@ -144,6 +144,26 @@ class MakonProjectStore extends ChangeNotifier {
     }
   }
 
+  /// Removes a room and its scan from a project.
+  Future<void> deleteRoom({
+    required String projectId,
+    required String roomId,
+  }) async {
+    await ensureLoaded();
+    if (!AuthState().isSignedIn) return;
+    final project = getById(projectId);
+    if (project == null) return;
+    final roomIndex = project.rooms.indexWhere((room) => room.id == roomId);
+    if (roomIndex < 0) return;
+
+    final scan = project.rooms[roomIndex].scan;
+    final rooms = project.rooms.where((room) => room.id != roomId).toList();
+    await upsert(project.copyWith(rooms: rooms));
+    if (scan != null) {
+      unawaited(_cleanupDeletedScan(scan));
+    }
+  }
+
   /// Best-effort teardown after a delete: removes the project's uploaded
   /// scans from the backend (they'd otherwise linger in the public web
   /// gallery as ungrouped scans) and its local USDZ files from disk.
@@ -175,6 +195,21 @@ class MakonProjectStore extends ChangeNotifier {
       } catch (e) {
         debugPrint('MakonProjectStore file cleanup failed ($path): $e');
       }
+    }
+  }
+
+  Future<void> _cleanupDeletedScan(HousingScan scan) async {
+    final remoteId = scan.remoteScanId;
+    if (remoteId != null && remoteId > 0) {
+      await ProjectSyncService.deleteRemoteScan(remoteId);
+    }
+    final path = scan.localUsdzPath;
+    if (path == null || path.isEmpty) return;
+    try {
+      final file = File(path);
+      if (file.existsSync()) await file.delete();
+    } catch (e) {
+      debugPrint('MakonProjectStore scan file cleanup failed ($path): $e');
     }
   }
 

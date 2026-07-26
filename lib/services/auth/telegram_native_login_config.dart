@@ -5,12 +5,11 @@
 /// Makon3D-specific App URL (`https://appXXXXXXXXXX-login.tg.dev`). The
 /// UyDosh values cannot be reused — they are bound to `com.uydosh.app`.
 ///
-/// Until that registration exists the defaults below stay empty,
+/// Until that registration exists the iOS redirect URI remains empty,
 /// [isConfigured] is false, and the Telegram button is hidden. To enable,
 /// build with:
 ///
 /// ```
-/// --dart-define=TELEGRAM_OIDC_CLIENT_ID=<bot client id>
 /// --dart-define=TELEGRAM_NATIVE_REDIRECT_URI_IOS=https://appXXXXXXXXXX-login.tg.dev
 /// ```
 ///
@@ -20,7 +19,7 @@ abstract final class TelegramNativeLoginConfig {
   /// Bot client id from @BotFather (matches backend `TELEGRAM_OIDC_CLIENT_ID`).
   static const clientId = String.fromEnvironment(
     "TELEGRAM_OIDC_CLIENT_ID",
-    defaultValue: "",
+    defaultValue: "8923824061",
   );
 
   /// iOS native login redirect URI (App URL from BotFather's iOS entry).
