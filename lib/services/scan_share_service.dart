@@ -194,8 +194,7 @@ class ScanShareService {
         },
       );
       // Last-resort: still try to share a constructed viewer URL.
-      final fallbackUrl =
-          "https://uydoshtech.github.io/makon3d/?id=$scanId";
+      final fallbackUrl = "https://uydoshtech.github.io/makon3d/?id=$scanId";
       await SharePlus.instance.share(
         ShareParams(text: _shareMessage(languageCode, fallbackUrl)),
       );
@@ -248,9 +247,7 @@ class ScanShareService {
       // Soft check: if remote Content-Length differs, re-download.
       try {
         final head = await Dio().head<void>(absolute);
-        final len = int.tryParse(
-          head.headers.value("content-length") ?? "",
-        );
+        final len = int.tryParse(head.headers.value("content-length") ?? "");
         if (len != null && len == file.lengthSync()) {
           return file;
         }

@@ -43,7 +43,9 @@ class RoomUsdzViewerService {
   static String _furnitureEditsKey(int listingId) =>
       "$_furnitureEditsPrefsPrefix$listingId";
 
-  static Future<Map<String, dynamic>?> _loadFurnitureEdits(int listingId) async {
+  static Future<Map<String, dynamic>?> _loadFurnitureEdits(
+    int listingId,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_furnitureEditsKey(listingId));
     if (raw == null || raw.isEmpty) return null;
@@ -73,8 +75,7 @@ class RoomUsdzViewerService {
   static void _ensureFurnitureEditsSink() {
     if (_furnitureSinkWired) return;
     _furnitureSinkWired = true;
-    RoomUsdzViewer.onFurnitureEditsChanged =
-        (listingId, furnitureEdits) async {
+    RoomUsdzViewer.onFurnitureEditsChanged = (listingId, furnitureEdits) async {
       try {
         await _saveFurnitureEdits(listingId, furnitureEdits);
       } catch (e) {
@@ -90,10 +91,7 @@ class RoomUsdzViewerService {
       final remoteId = _shareScanIdByListingId[listingId] ?? listingId;
       // Fire-and-forget; share sheet is async UI.
       unawaited(
-        ScanShareService.shareScan(
-          remoteId,
-          languageCode: _shareLanguageCode,
-        ),
+        ScanShareService.shareScan(remoteId, languageCode: _shareLanguageCode),
       );
     };
   }
@@ -257,66 +255,96 @@ class RoomUsdzViewerService {
       "floorPlanAutoAlignOff": l("room_3d_floor_plan_auto_align_off"),
       "floorPlanAdjustNorth": l("room_3d_floor_plan_adjust_north"),
       "floorPlanAdjustNorthTitle": l("room_3d_floor_plan_adjust_north_title"),
-      "floorPlanAdjustNorthMessage": l("room_3d_floor_plan_adjust_north_message"),
+      "floorPlanAdjustNorthMessage": l(
+        "room_3d_floor_plan_adjust_north_message",
+      ),
       "floorPlanAdjustNorthReset": l("room_3d_floor_plan_adjust_north_reset"),
-      "floorPlanAdjustNorthUpdated": l("room_3d_floor_plan_adjust_north_updated"),
-      "floorPlanAdjustNorthDegreesFormat":
-          l("room_3d_floor_plan_adjust_north_degrees_format"),
-      "floorPlanRotateFurnitureTitle":
-          l("room_3d_floor_plan_rotate_furniture_title"),
-      "floorPlanRotateFurnitureMessage":
-          l("room_3d_floor_plan_rotate_furniture_message"),
-      "floorPlanRotateFurnitureUpdated":
-          l("room_3d_floor_plan_rotate_furniture_updated"),
-      "floorPlanRotateFurnitureDegreesFormat":
-          l("room_3d_floor_plan_rotate_furniture_degrees_format"),
+      "floorPlanAdjustNorthUpdated": l(
+        "room_3d_floor_plan_adjust_north_updated",
+      ),
+      "floorPlanAdjustNorthDegreesFormat": l(
+        "room_3d_floor_plan_adjust_north_degrees_format",
+      ),
+      "floorPlanRotateFurnitureTitle": l(
+        "room_3d_floor_plan_rotate_furniture_title",
+      ),
+      "floorPlanRotateFurnitureMessage": l(
+        "room_3d_floor_plan_rotate_furniture_message",
+      ),
+      "floorPlanRotateFurnitureUpdated": l(
+        "room_3d_floor_plan_rotate_furniture_updated",
+      ),
+      "floorPlanRotateFurnitureDegreesFormat": l(
+        "room_3d_floor_plan_rotate_furniture_degrees_format",
+      ),
       "floorPlanMoveFurnitureUp": l("room_3d_floor_plan_move_furniture_up"),
       "floorPlanMoveFurnitureDown": l("room_3d_floor_plan_move_furniture_down"),
       "floorPlanMoveFurnitureLeft": l("room_3d_floor_plan_move_furniture_left"),
-      "floorPlanMoveFurnitureRight": l("room_3d_floor_plan_move_furniture_right"),
+      "floorPlanMoveFurnitureRight": l(
+        "room_3d_floor_plan_move_furniture_right",
+      ),
       "floorPlanRaiseFurniture": l("room_3d_floor_plan_raise_furniture"),
       "floorPlanLowerFurniture": l("room_3d_floor_plan_lower_furniture"),
-      "floorPlanFurnitureVariantTitle":
-          l("room_3d_floor_plan_furniture_variant_title"),
-      "floorPlanFurnitureVariantAccessibility":
-          l("room_3d_floor_plan_furniture_variant_accessibility"),
-      "floorPlanFurnitureRotationTitle":
-          l("room_3d_floor_plan_furniture_rotation_title"),
-      "floorPlanFurnitureColorTitle":
-          l("room_3d_floor_plan_furniture_color_title"),
-      "floorPlanFurnitureColorPartTitle":
-          l("room_3d_floor_plan_furniture_color_part_title"),
-      "floorPlanFurnitureColorRoleFrame":
-          l("room_3d_floor_plan_furniture_color_role_frame"),
-      "floorPlanFurnitureColorRoleFabric":
-          l("room_3d_floor_plan_furniture_color_role_fabric"),
-      "floorPlanFurnitureColorRoleLinen":
-          l("room_3d_floor_plan_furniture_color_role_linen"),
-      "floorPlanFurnitureColorDefault":
-          l("room_3d_floor_plan_furniture_color_default"),
-      "floorPlanFurnitureColorAccessibility":
-          l("room_3d_floor_plan_furniture_color_accessibility"),
+      "floorPlanFurnitureVariantTitle": l(
+        "room_3d_floor_plan_furniture_variant_title",
+      ),
+      "floorPlanFurnitureVariantAccessibility": l(
+        "room_3d_floor_plan_furniture_variant_accessibility",
+      ),
+      "floorPlanFurnitureRotationTitle": l(
+        "room_3d_floor_plan_furniture_rotation_title",
+      ),
+      "floorPlanFurnitureColorTitle": l(
+        "room_3d_floor_plan_furniture_color_title",
+      ),
+      "floorPlanFurnitureColorPartTitle": l(
+        "room_3d_floor_plan_furniture_color_part_title",
+      ),
+      "floorPlanFurnitureColorRoleFrame": l(
+        "room_3d_floor_plan_furniture_color_role_frame",
+      ),
+      "floorPlanFurnitureColorRoleFabric": l(
+        "room_3d_floor_plan_furniture_color_role_fabric",
+      ),
+      "floorPlanFurnitureColorRoleLinen": l(
+        "room_3d_floor_plan_furniture_color_role_linen",
+      ),
+      "floorPlanFurnitureColorDefault": l(
+        "room_3d_floor_plan_furniture_color_default",
+      ),
+      "floorPlanFurnitureColorAccessibility": l(
+        "room_3d_floor_plan_furniture_color_accessibility",
+      ),
       "floorPlanDeleteFurniture": l("room_3d_floor_plan_delete_furniture"),
-      "floorPlanDeleteFurnitureConfirmTitle":
-          l("room_3d_floor_plan_delete_furniture_confirm_title"),
-      "floorPlanDeleteFurnitureConfirmMessage":
-          l("room_3d_floor_plan_delete_furniture_confirm_message"),
-      "floorPlanDeleteFurnitureUpdated":
-          l("room_3d_floor_plan_delete_furniture_updated"),
-      "floorPlanFurnitureSizeTitle":
-          l("room_3d_floor_plan_furniture_size_title"),
-      "floorPlanFurnitureSizeWidth":
-          l("room_3d_floor_plan_furniture_size_width"),
-      "floorPlanFurnitureSizeLength":
-          l("room_3d_floor_plan_furniture_size_length"),
-      "floorPlanFurnitureSizeHeight":
-          l("room_3d_floor_plan_furniture_size_height"),
-      "floorPlanFurnitureSizeMetersFormat":
-          l("room_3d_floor_plan_furniture_size_meters_format"),
+      "floorPlanDeleteFurnitureConfirmTitle": l(
+        "room_3d_floor_plan_delete_furniture_confirm_title",
+      ),
+      "floorPlanDeleteFurnitureConfirmMessage": l(
+        "room_3d_floor_plan_delete_furniture_confirm_message",
+      ),
+      "floorPlanDeleteFurnitureUpdated": l(
+        "room_3d_floor_plan_delete_furniture_updated",
+      ),
+      "floorPlanFurnitureSizeTitle": l(
+        "room_3d_floor_plan_furniture_size_title",
+      ),
+      "floorPlanFurnitureSizeWidth": l(
+        "room_3d_floor_plan_furniture_size_width",
+      ),
+      "floorPlanFurnitureSizeLength": l(
+        "room_3d_floor_plan_furniture_size_length",
+      ),
+      "floorPlanFurnitureSizeHeight": l(
+        "room_3d_floor_plan_furniture_size_height",
+      ),
+      "floorPlanFurnitureSizeMetersFormat": l(
+        "room_3d_floor_plan_furniture_size_meters_format",
+      ),
       "floorPlanAddFurniture": l("room_3d_floor_plan_add_furniture"),
       "floorPlanAddFurnitureTitle": l("room_3d_floor_plan_add_furniture_title"),
-      "floorPlanAddFurnitureUpdated":
-          l("room_3d_floor_plan_add_furniture_updated"),
+      "floorPlanAddFurnitureUpdated": l(
+        "room_3d_floor_plan_add_furniture_updated",
+      ),
       "floorPlanChangeWalls": l("room_3d_floor_plan_change_walls"),
       "floorPlanChangeFloor": l("room_3d_floor_plan_change_floor"),
       "floorPlanChangeWallsTitle": l("room_3d_floor_plan_change_walls_title"),
@@ -330,26 +358,39 @@ class RoomUsdzViewerService {
       "floorPlanFloorCeramicTile": l("room_3d_floor_plan_floor_ceramic_tile"),
       "floorPlanFloorCarpet": l("room_3d_floor_plan_floor_carpet"),
       "floorPlanSurfacesUpdated": l("room_3d_floor_plan_surfaces_updated"),
-      "floorPlanEditDimensionTitle": l("room_3d_floor_plan_edit_dimension_title"),
-      "floorPlanEditDimensionCurrent":
-          l("room_3d_floor_plan_edit_dimension_current"),
-      "floorPlanEditDimensionNewValue":
-          l("room_3d_floor_plan_edit_dimension_new_value"),
-      "floorPlanEditDimensionCancel":
-          l("room_3d_floor_plan_edit_dimension_cancel"),
-      "floorPlanEditDimensionApply": l("room_3d_floor_plan_edit_dimension_apply"),
-      "floorPlanEditDimensionUpdated":
-          l("room_3d_floor_plan_edit_dimension_updated"),
-      "floorPlanEditDimensionLargeChangeTitle":
-          l("room_3d_floor_plan_edit_dimension_large_change_title"),
-      "floorPlanEditDimensionLargeChangeMessage":
-          l("room_3d_floor_plan_edit_dimension_large_change_message"),
-      "floorPlanEditDimensionInvalidTitle":
-          l("room_3d_floor_plan_edit_dimension_invalid_title"),
-      "floorPlanEditDimensionInvalidMessage":
-          l("room_3d_floor_plan_edit_dimension_invalid_message"),
-      "floorPlanEditDimensionConfirmLargeChange":
-          l("room_3d_floor_plan_edit_dimension_confirm_large_change"),
+      "floorPlanEditDimensionTitle": l(
+        "room_3d_floor_plan_edit_dimension_title",
+      ),
+      "floorPlanEditDimensionCurrent": l(
+        "room_3d_floor_plan_edit_dimension_current",
+      ),
+      "floorPlanEditDimensionNewValue": l(
+        "room_3d_floor_plan_edit_dimension_new_value",
+      ),
+      "floorPlanEditDimensionCancel": l(
+        "room_3d_floor_plan_edit_dimension_cancel",
+      ),
+      "floorPlanEditDimensionApply": l(
+        "room_3d_floor_plan_edit_dimension_apply",
+      ),
+      "floorPlanEditDimensionUpdated": l(
+        "room_3d_floor_plan_edit_dimension_updated",
+      ),
+      "floorPlanEditDimensionLargeChangeTitle": l(
+        "room_3d_floor_plan_edit_dimension_large_change_title",
+      ),
+      "floorPlanEditDimensionLargeChangeMessage": l(
+        "room_3d_floor_plan_edit_dimension_large_change_message",
+      ),
+      "floorPlanEditDimensionInvalidTitle": l(
+        "room_3d_floor_plan_edit_dimension_invalid_title",
+      ),
+      "floorPlanEditDimensionInvalidMessage": l(
+        "room_3d_floor_plan_edit_dimension_invalid_message",
+      ),
+      "floorPlanEditDimensionConfirmLargeChange": l(
+        "room_3d_floor_plan_edit_dimension_confirm_large_change",
+      ),
       "floorPlanUnitMeters": l("room_3d_floor_plan_unit_meters"),
       "floorPlanObjectBed": l("room_3d_floor_plan_object_bed"),
       "floorPlanObjectSofa": l("room_3d_floor_plan_object_sofa"),

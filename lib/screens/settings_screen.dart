@@ -53,9 +53,9 @@ class SettingsScreen extends StatelessWidget {
       child: Text(
         title,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: MakonColors.inkMuted,
-              fontWeight: FontWeight.w600,
-            ),
+          color: MakonColors.inkMuted,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -74,10 +74,11 @@ class SettingsScreen extends StatelessWidget {
     final title = auth.displayName?.trim().isNotEmpty == true
         ? auth.displayName!
         : (auth.email?.trim().isNotEmpty == true
-            ? auth.email!
-            : L10n.get("settings_account_title"));
-    final subtitle =
-        auth.displayName?.trim().isNotEmpty == true ? auth.email : null;
+              ? auth.email!
+              : L10n.get("settings_account_title"));
+    final subtitle = auth.displayName?.trim().isNotEmpty == true
+        ? auth.email
+        : null;
 
     return ListTile(
       leading: const Icon(Icons.person, color: MakonColors.yellow),
@@ -86,10 +87,7 @@ class SettingsScreen extends StatelessWidget {
       trailing: IconButton(
         onPressed: () => unawaited(_confirmSignOut(context)),
         tooltip: L10n.get("settings_sign_out"),
-        icon: Icon(
-          Icons.logout,
-          color: Theme.of(context).colorScheme.error,
-        ),
+        icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
       ),
     );
   }

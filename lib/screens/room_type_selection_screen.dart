@@ -10,9 +10,7 @@ class RoomTypeSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(L10n.get('room_type_select_title')),
-      ),
+      appBar: AppBar(title: Text(L10n.get('room_type_select_title'))),
       body: ListView.separated(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
         itemCount: RoomType.values.length,

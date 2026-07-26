@@ -10,10 +10,7 @@ import "package:makon3d_mobile/theme/makon_colors.dart";
 /// users without one (including most Apple and Telegram accounts) see their
 /// first name/email initial instead.
 class AppBarAccountAvatar extends StatelessWidget {
-  const AppBarAccountAvatar({
-    required this.onTap,
-    super.key,
-  });
+  const AppBarAccountAvatar({required this.onTap, super.key});
 
   final VoidCallback onTap;
 
@@ -57,10 +54,8 @@ class AppBarAccountAvatar extends StatelessWidget {
   }
 
   String _initialFor(String? displayName, String? email) {
-    final source = (displayName?.trim().isNotEmpty == true
-            ? displayName
-            : email)
-        ?.trim();
+    final source =
+        (displayName?.trim().isNotEmpty == true ? displayName : email)?.trim();
     if (source == null || source.isEmpty) return "?";
     return source.characters.first.toUpperCase();
   }

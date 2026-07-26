@@ -101,9 +101,7 @@ class ScanUploadService {
 
   /// All recent public scans across devices — the Scans tab shows everything
   /// for now (same feed as the Makon3D web gallery / Telegram bot).
-  static Future<List<MakonScan>> listAllScans({
-    CancelToken? cancelToken,
-  }) {
+  static Future<List<MakonScan>> listAllScans({CancelToken? cancelToken}) {
     return _listScans(cancelToken: cancelToken);
   }
 
@@ -117,6 +115,13 @@ class ScanUploadService {
         receiveTimeout: const Duration(seconds: 30),
       ),
     );
+  }
+
+  static Future<MakonScan> getScan(int scanId) async {
+    final response = await _dio.get<Map<String, dynamic>>(
+      "/makon3d/scans/$scanId",
+    );
+    return MakonScan.fromJson(response.data ?? const <String, dynamic>{});
   }
 
   static Future<List<MakonScan>> _listScans({

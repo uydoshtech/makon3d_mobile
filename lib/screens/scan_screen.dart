@@ -45,9 +45,8 @@ class _ScanScreenState extends State<ScanScreen>
   bool _uploading = false;
   bool _starting = false;
   PhotogrammetryUploadProgress? _photogrammetryProgress;
-  bool _standardUploadComplete = false;
-  bool _photogrammetryFinished = false;
   bool _photogrammetryEnabled = false;
+  Completer<int>? _photogrammetryTarget;
 
   /// Null until [RoomPlanCapability.isSupportedOnDevice] resolves on iOS.
   bool? _roomPlanSupported;
@@ -105,18 +104,21 @@ class _ScanScreenState extends State<ScanScreen>
 
   Future<void> _uploadPhotogrammetryPackage(String path) async {
     try {
+      final scanId =
+          await (_photogrammetryTarget?.future ??
+                  Future<int>.error(StateError('Missing scan target')))
+              .timeout(const Duration(minutes: 8));
       await PhotogrammetryUpload.instance.submit(
         packagePath: path,
         apiBaseUrl: ScanUploadService.basePath,
+        targetType: 'makon3d_scan',
+        targetId: scanId,
         onProgress: (progress) {
           if (mounted) setState(() => _photogrammetryProgress = progress);
         },
       );
     } catch (error) {
       debugPrint('Photogrammetry upload failed: $error');
-    } finally {
-      _photogrammetryFinished = true;
-      if (mounted && _standardUploadComplete) widget.onScanUploaded?.call();
     }
   }
 
@@ -129,7 +131,6 @@ class _ScanScreenState extends State<ScanScreen>
   }
 
   void _registerRoomCaptureCallback() {
-    if (_registeredRoomCaptureCallback) return;
     _registeredRoomCaptureCallback = true;
     _roomPlan.onRoomCaptureFinished(() {
       unawaited(_handleCaptureFinished());
@@ -137,7 +138,9 @@ class _ScanScreenState extends State<ScanScreen>
   }
 
   Future<void> _handleCaptureFinished() async {
+    debugPrint('[RoomScan] Native completion callback received');
     final path = await _roomPlan.getUsdzFilePath();
+    debugPrint('[RoomScan] Completed USDZ path: $path');
     if (!mounted) return;
     if (path == null || path.isEmpty) {
       // RoomPlan invokes onRoomCaptureFinished on Cancel too, with no USDZ.
@@ -146,6 +149,7 @@ class _ScanScreenState extends State<ScanScreen>
     }
     setState(() => _uploading = true);
     try {
+      debugPrint('[RoomScan] Starting standard model upload');
       var metrics = await RoomScanBoundsService.computeFromUsdPath(path);
       RoomScanMetrics? uploadedMetrics = metrics;
       final result = await ScanUploadService.uploadScan(
@@ -157,6 +161,9 @@ class _ScanScreenState extends State<ScanScreen>
       metrics ??= await RoomScanBoundsService.computeFromUsdPath(path);
       uploadedMetrics ??= metrics;
       debugPrint("Scan uploaded: id=${result.id} glb=${result.glbUrl}");
+      if (!(_photogrammetryTarget?.isCompleted ?? true)) {
+        _photogrammetryTarget!.complete(result.id);
+      }
       ScansRefreshNotifier.instance.notifyScansChanged();
       if (!mounted) return;
       setState(() {
@@ -168,9 +175,10 @@ class _ScanScreenState extends State<ScanScreen>
       });
       Toasts.showSuccess(context, L10n.get("room_scan_success"));
       // Hand off to the Scans list — user opens the model from there.
-      _standardUploadComplete = true;
-      if (_photogrammetryFinished) widget.onScanUploaded?.call();
+      widget.onScanUploaded?.call();
+      debugPrint('[RoomScan] Standard upload complete; leaving scan screen');
     } catch (e) {
+      debugPrint('[RoomScan] Standard upload failed: $e');
       if (!mounted) return;
       setState(() => _uploading = false);
       final msg = e.toString();
@@ -207,9 +215,8 @@ class _ScanScreenState extends State<ScanScreen>
     if (!isIOSDevice) return;
     setState(() {
       _starting = true;
-      _standardUploadComplete = false;
-      _photogrammetryFinished = !_photogrammetryEnabled;
       _photogrammetryProgress = null;
+      _photogrammetryTarget = _photogrammetryEnabled ? Completer<int>() : null;
     });
     try {
       // Best-effort: re-apply `AppleLanguages` right before touching RoomPlan
@@ -236,6 +243,10 @@ class _ScanScreenState extends State<ScanScreen>
       }
       if (!mounted) return;
 
+      // flutter_roomplan owns a single global completion handler. Re-arm it
+      // immediately before presenting RoomPlan so another scan screen's
+      // lifecycle cannot leave this capture wired to a stale/empty callback.
+      _registerRoomCaptureCallback();
       await _roomplanChannel.invokeMethod<void>("startScan", <String, dynamic>{
         // Single-room only: hide the post-scan "Scan Other Rooms" button.
         "enableMultiRoom": false,
@@ -414,8 +425,8 @@ class _ScanScreenState extends State<ScanScreen>
           else ...[
             SwitchListTile.adaptive(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Photogrammetry'),
-              subtitle: const Text('Create a textured 3D model after scanning'),
+              title: Text(L10n.get('room_scan_photogrammetry_title')),
+              subtitle: Text(L10n.get('room_scan_photogrammetry_subtitle')),
               value: _photogrammetryEnabled,
               onChanged: loading
                   ? null

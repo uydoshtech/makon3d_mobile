@@ -16,10 +16,10 @@ class WallpaperPrefs {
   final double repeatCm;
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'rollWidthM': rollWidthM,
-        'rollLengthM': rollLengthM,
-        'repeatCm': repeatCm,
-      };
+    'rollWidthM': rollWidthM,
+    'rollLengthM': rollLengthM,
+    'repeatCm': repeatCm,
+  };
 
   /// Lenient parse for optional persisted prefs; null when absent/invalid.
   static WallpaperPrefs? tryFromJson(Object? json) {

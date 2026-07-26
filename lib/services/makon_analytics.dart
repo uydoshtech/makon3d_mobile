@@ -7,10 +7,7 @@ import 'package:room_scan_kit/scan_flow/scan_flow.dart';
 class MakonAnalytics {
   MakonAnalytics._();
 
-  static void log(
-    String event, {
-    Map<String, Object?> properties = const {},
-  }) {
+  static void log(String event, {Map<String, Object?> properties = const {}}) {
     final safe = <String, Object?>{
       for (final e in properties.entries)
         if (!_isSensitive(e.key)) e.key: e.value,

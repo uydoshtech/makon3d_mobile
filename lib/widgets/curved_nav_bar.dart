@@ -79,10 +79,7 @@ class MakonCurvedNavBar extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (selected)
-          _ActiveOrb(child: iconWidget)
-        else
-          iconWidget,
+        if (selected) _ActiveOrb(child: iconWidget) else iconWidget,
         if (!selected) ...[
           const SizedBox(height: 2),
           Text(
@@ -125,9 +122,17 @@ class _ActiveOrb extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Color.lerp(MakonCurvedNavBar._orbColor, Colors.white, 0.18)!,
+                      Color.lerp(
+                        MakonCurvedNavBar._orbColor,
+                        Colors.white,
+                        0.18,
+                      )!,
                       MakonCurvedNavBar._orbColor,
-                      Color.lerp(MakonCurvedNavBar._orbColor, Colors.black, 0.35)!,
+                      Color.lerp(
+                        MakonCurvedNavBar._orbColor,
+                        Colors.black,
+                        0.35,
+                      )!,
                     ],
                     stops: const [0.0, 0.4, 1.0],
                   ),

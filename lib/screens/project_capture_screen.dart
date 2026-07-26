@@ -53,9 +53,8 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
   bool _uploading = false;
   bool _starting = false;
   PhotogrammetryUploadProgress? _photogrammetryProgress;
-  bool _standardUploadComplete = false;
-  bool _photogrammetryFinished = false;
   bool _photogrammetryEnabled = false;
+  Completer<int>? _photogrammetryTarget;
   bool? _roomPlanSupported;
 
   @override
@@ -90,18 +89,21 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
 
   Future<void> _uploadPhotogrammetryPackage(String path) async {
     try {
+      final scanId =
+          await (_photogrammetryTarget?.future ??
+                  Future<int>.error(StateError('Missing scan target')))
+              .timeout(const Duration(minutes: 8));
       await PhotogrammetryUpload.instance.submit(
         packagePath: path,
         apiBaseUrl: ScanUploadService.basePath,
+        targetType: 'makon3d_scan',
+        targetId: scanId,
         onProgress: (progress) {
           if (mounted) setState(() => _photogrammetryProgress = progress);
         },
       );
     } catch (error) {
       debugPrint('Photogrammetry upload failed: $error');
-    } finally {
-      _photogrammetryFinished = true;
-      if (mounted && _standardUploadComplete) Navigator.of(context).pop();
     }
   }
 
@@ -114,7 +116,6 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
   }
 
   void _registerRoomCaptureCallback() {
-    if (_registeredRoomCaptureCallback) return;
     _registeredRoomCaptureCallback = true;
     _roomPlan.onRoomCaptureFinished(() {
       unawaited(_handleCaptureFinished());
@@ -129,7 +130,9 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
   }
 
   Future<void> _handleCaptureFinished() async {
+    debugPrint('[RoomScan] Native completion callback received');
     final path = await _roomPlan.getUsdzFilePath();
+    debugPrint('[RoomScan] Completed USDZ path: $path');
     if (!mounted) return;
     if (path == null || path.isEmpty) {
       Toasts.showInfo(context, L10n.get('room_scan_cancelled'));
@@ -144,11 +147,15 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
 
     setState(() => _uploading = true);
     try {
+      debugPrint('[RoomScan] Starting standard model upload');
       var metrics = await RoomScanBoundsService.computeFromUsdPath(path);
       final upload = await ScanUploadService.uploadScan(
         usdzFilePath: path,
         metrics: metrics,
       );
+      if (!(_photogrammetryTarget?.isCompleted ?? true)) {
+        _photogrammetryTarget!.complete(upload.id);
+      }
       metrics ??= await RoomScanBoundsService.computeFromUsdPath(path);
 
       final housing = HousingScan(
@@ -179,9 +186,10 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
 
       if (!mounted) return;
       Toasts.showSuccess(context, L10n.get('room_scan_success'));
-      _standardUploadComplete = true;
-      if (_photogrammetryFinished) Navigator.of(context).pop();
+      Navigator.of(context).pop();
+      debugPrint('[RoomScan] Standard upload complete; leaving scan screen');
     } catch (e) {
+      debugPrint('[RoomScan] Standard upload failed: $e');
       if (!mounted) return;
       setState(() => _uploading = false);
       final msg = e.toString();
@@ -224,9 +232,8 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
     if (!isIOSDevice) return;
     setState(() {
       _starting = true;
-      _standardUploadComplete = false;
-      _photogrammetryFinished = !_photogrammetryEnabled;
       _photogrammetryProgress = null;
+      _photogrammetryTarget = _photogrammetryEnabled ? Completer<int>() : null;
     });
     try {
       await NativeLanguageService.setPreferredLanguage(
@@ -248,6 +255,9 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
       }
       if (!mounted) return;
 
+      // flutter_roomplan keeps one process-wide completion handler. Ensure the
+      // currently visible capture screen owns it when the scan starts.
+      _registerRoomCaptureCallback();
       await _roomplanChannel.invokeMethod<void>('startScan', <String, dynamic>{
         'enableMultiRoom': false,
         'enablePhotogrammetry': _photogrammetryEnabled,
@@ -367,9 +377,9 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
                   const Spacer(),
                   SwitchListTile.adaptive(
                     contentPadding: EdgeInsets.zero,
-                    title: const Text('Photogrammetry'),
-                    subtitle: const Text(
-                      'Create a textured 3D model after scanning',
+                    title: Text(L10n.get('room_scan_photogrammetry_title')),
+                    subtitle: Text(
+                      L10n.get('room_scan_photogrammetry_subtitle'),
                     ),
                     value: _photogrammetryEnabled,
                     onChanged: loading

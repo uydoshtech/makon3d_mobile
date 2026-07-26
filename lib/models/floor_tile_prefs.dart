@@ -15,10 +15,10 @@ class FloorTilePrefs {
   bool get isSquare => (widthCm - heightCm).abs() < 0.001;
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'widthCm': widthCm,
-        'heightCm': heightCm,
-        'wastePercent': wastePercent,
-      };
+    'widthCm': widthCm,
+    'heightCm': heightCm,
+    'wastePercent': wastePercent,
+  };
 
   /// Lenient parse for optional persisted prefs; null when absent/invalid.
   static FloorTilePrefs? tryFromJson(Object? json) {

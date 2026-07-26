@@ -3,6 +3,8 @@ class MakonScan {
     required this.id,
     this.usdzUrl,
     this.glbUrl,
+    this.texturedGlbUrl,
+    this.photogrammetryStatus,
     this.floorLongM,
     this.floorShortM,
     this.heightM,
@@ -22,6 +24,8 @@ class MakonScan {
   final int id;
   final String? usdzUrl;
   final String? glbUrl;
+  final String? texturedGlbUrl;
+  final String? photogrammetryStatus;
   final double? floorLongM;
   final double? floorShortM;
   final double? heightM;
@@ -44,6 +48,8 @@ class MakonScan {
       id: (json["id"] as num?)?.toInt() ?? 0,
       usdzUrl: json["usdzUrl"] as String?,
       glbUrl: json["glbUrl"] as String?,
+      texturedGlbUrl: json["texturedGlbUrl"] as String?,
+      photogrammetryStatus: json["photogrammetryStatus"] as String?,
       floorLongM: (json["floorLongM"] as num?)?.toDouble(),
       floorShortM: (json["floorShortM"] as num?)?.toDouble(),
       heightM: (json["heightM"] as num?)?.toDouble(),

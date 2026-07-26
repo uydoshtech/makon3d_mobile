@@ -76,10 +76,7 @@ class FloorTileEstimator {
 
   /// Approximate footprint perimeter from the OBB dims: 2 × (long + short).
   /// Door openings are not subtracted.
-  static double? resolvePerimeterM({
-    double? floorLongM,
-    double? floorShortM,
-  }) {
+  static double? resolvePerimeterM({double? floorLongM, double? floorShortM}) {
     if (floorLongM == null ||
         floorShortM == null ||
         floorLongM <= 0 ||

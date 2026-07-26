@@ -33,7 +33,8 @@ class _ScanModeSelectionScreenState extends State<ScanModeSelectionScreen> {
       forProduct: kMakonScanEntry.product,
     );
     // Default to entire housing; user can still pick room-by-room.
-    _selected = widget.initialMode ??
+    _selected =
+        widget.initialMode ??
         (modes.contains(ScanMode.entireHousing)
             ? ScanMode.entireHousing
             : modes.first);
@@ -71,9 +72,7 @@ class _ScanModeSelectionScreenState extends State<ScanModeSelectionScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(L10n.get('scan_mode_choose_title')),
-      ),
+      appBar: AppBar(title: Text(L10n.get('scan_mode_choose_title'))),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
@@ -123,8 +122,8 @@ class _ScanModeSelectionScreenState extends State<ScanModeSelectionScreen> {
                                             L10n.get(mode.titleKey),
                                             style: theme.textTheme.titleMedium
                                                 ?.copyWith(
-                                              fontWeight: FontWeight.w700,
-                                            ),
+                                                  fontWeight: FontWeight.w700,
+                                                ),
                                           ),
                                         ),
                                         if (selected)
@@ -148,8 +147,9 @@ class _ScanModeSelectionScreenState extends State<ScanModeSelectionScreen> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: theme.colorScheme.secondary,
-                                          borderRadius:
-                                              BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                         child: Text(
                                           L10n.get(
@@ -157,10 +157,11 @@ class _ScanModeSelectionScreenState extends State<ScanModeSelectionScreen> {
                                           ),
                                           style: theme.textTheme.labelMedium
                                               ?.copyWith(
-                                            color:
-                                                theme.colorScheme.onSecondary,
-                                            fontWeight: FontWeight.w700,
-                                          ),
+                                                color: theme
+                                                    .colorScheme
+                                                    .onSecondary,
+                                                fontWeight: FontWeight.w700,
+                                              ),
                                         ),
                                       ),
                                     ],

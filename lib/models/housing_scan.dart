@@ -44,22 +44,22 @@ class HousingScan {
       (glbUrl != null && glbUrl!.isNotEmpty);
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'id': id,
-        'localUsdzPath': localUsdzPath,
-        'remoteScanId': remoteScanId,
-        'usdzUrl': usdzUrl,
-        'glbUrl': glbUrl,
-        'floorLongM': floorLongM,
-        'floorShortM': floorShortM,
-        'heightM': heightM,
-        'floorAreaM2': floorAreaM2,
-        'wallPerimeterM': wallPerimeterM,
-        'doorwayWidthM': doorwayWidthM,
-        'doorwayAreaM2': doorwayAreaM2,
-        'windowAreaM2': windowAreaM2,
-        'worldPlusXBearingDeg': worldPlusXBearingDeg,
-        'capturedAt': capturedAt?.toIso8601String(),
-      };
+    'id': id,
+    'localUsdzPath': localUsdzPath,
+    'remoteScanId': remoteScanId,
+    'usdzUrl': usdzUrl,
+    'glbUrl': glbUrl,
+    'floorLongM': floorLongM,
+    'floorShortM': floorShortM,
+    'heightM': heightM,
+    'floorAreaM2': floorAreaM2,
+    'wallPerimeterM': wallPerimeterM,
+    'doorwayWidthM': doorwayWidthM,
+    'doorwayAreaM2': doorwayAreaM2,
+    'windowAreaM2': windowAreaM2,
+    'worldPlusXBearingDeg': worldPlusXBearingDeg,
+    'capturedAt': capturedAt?.toIso8601String(),
+  };
 
   factory HousingScan.fromJson(Map<String, dynamic> json) {
     return HousingScan(
@@ -113,8 +113,7 @@ class HousingScan {
       doorwayWidthM: doorwayWidthM ?? this.doorwayWidthM,
       doorwayAreaM2: doorwayAreaM2 ?? this.doorwayAreaM2,
       windowAreaM2: windowAreaM2 ?? this.windowAreaM2,
-      worldPlusXBearingDeg:
-          worldPlusXBearingDeg ?? this.worldPlusXBearingDeg,
+      worldPlusXBearingDeg: worldPlusXBearingDeg ?? this.worldPlusXBearingDeg,
       capturedAt: capturedAt ?? this.capturedAt,
     );
   }

@@ -44,18 +44,18 @@ class MakonProject {
   int get scannedRoomCount => rooms.where((r) => r.isScanned).length;
 
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'id': id,
-        'name': name,
-        'scanMode': scanMode.wireValue,
-        'createdAt': createdAt.toIso8601String(),
-        'address': address,
-        'notes': notes,
-        'entireHousingScan': entireHousingScan?.toJson(),
-        'rooms': rooms.map((r) => r.toJson()).toList(),
-        'mergedStructureLocalPath': mergedStructureLocalPath,
-        'entireHousingFloorTilePrefs': entireHousingFloorTilePrefs?.toJson(),
-        'entireHousingWallpaperPrefs': entireHousingWallpaperPrefs?.toJson(),
-      };
+    'id': id,
+    'name': name,
+    'scanMode': scanMode.wireValue,
+    'createdAt': createdAt.toIso8601String(),
+    'address': address,
+    'notes': notes,
+    'entireHousingScan': entireHousingScan?.toJson(),
+    'rooms': rooms.map((r) => r.toJson()).toList(),
+    'mergedStructureLocalPath': mergedStructureLocalPath,
+    'entireHousingFloorTilePrefs': entireHousingFloorTilePrefs?.toJson(),
+    'entireHousingWallpaperPrefs': entireHousingWallpaperPrefs?.toJson(),
+  };
 
   factory MakonProject.fromJson(Map<String, dynamic> json) {
     final roomsJson = json['rooms'];
@@ -75,11 +75,8 @@ class MakonProject {
             json['entireHousingScan'] as Map<String, dynamic>,
           )
         : null;
-    final scanMode = parsedMode ??
-        migrateScanMode(
-          entireHousingScan: entire,
-          rooms: rooms,
-        );
+    final scanMode =
+        parsedMode ?? migrateScanMode(entireHousingScan: entire, rooms: rooms);
 
     return MakonProject(
       id: json['id'] as String? ?? '',
@@ -97,18 +94,19 @@ class MakonProject {
       mergedStructureLocalPath: json['mergedStructureLocalPath'] as String?,
       entireHousingFloorTilePrefs:
           json['entireHousingFloorTilePrefs'] is Map<String, dynamic>
-              ? FloorTilePrefs.fromJson(
-                  json['entireHousingFloorTilePrefs'] as Map<String, dynamic>,
-                )
-              : json['entireHousingFloorTilePrefs'] is Map
-                  ? FloorTilePrefs.fromJson(
-                      Map<String, dynamic>.from(
-                        json['entireHousingFloorTilePrefs'] as Map,
-                      ),
-                    )
-                  : null,
-      entireHousingWallpaperPrefs:
-          WallpaperPrefs.tryFromJson(json['entireHousingWallpaperPrefs']),
+          ? FloorTilePrefs.fromJson(
+              json['entireHousingFloorTilePrefs'] as Map<String, dynamic>,
+            )
+          : json['entireHousingFloorTilePrefs'] is Map
+          ? FloorTilePrefs.fromJson(
+              Map<String, dynamic>.from(
+                json['entireHousingFloorTilePrefs'] as Map,
+              ),
+            )
+          : null,
+      entireHousingWallpaperPrefs: WallpaperPrefs.tryFromJson(
+        json['entireHousingWallpaperPrefs'],
+      ),
     );
   }
 

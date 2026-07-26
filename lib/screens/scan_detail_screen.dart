@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:makon3d_mobile/l10n/l10n.dart';
 import 'package:makon3d_mobile/models/housing_scan.dart';
 import 'package:makon3d_mobile/screens/room_materials_screen.dart';
+import 'package:makon3d_mobile/screens/textured_glb_viewer_screen.dart';
 import 'package:makon3d_mobile/services/room_usdz_viewer_service.dart';
+import 'package:makon3d_mobile/services/scan_upload_service.dart';
 import 'package:makon3d_mobile/widgets/scan_mini_preview.dart';
 import 'package:makon3d_mobile/widgets/toasts.dart';
 
@@ -46,6 +48,43 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
     if (_openingFullscreen) return;
     setState(() => _openingFullscreen = true);
     try {
+      final remoteId = widget.scan.remoteScanId;
+      if (remoteId != null) {
+        final refreshed = await ScanUploadService.getScan(remoteId);
+        if (!mounted) return;
+        final textured = refreshed.texturedGlbUrl;
+        if (textured != null && textured.isNotEmpty) {
+          final choice = await showModalBottomSheet<String>(
+            context: context,
+            builder: (context) => SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.account_tree_outlined),
+                    title: Text(L10n.get('room_3d_structure')),
+                    onTap: () => Navigator.pop(context, 'structure'),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.texture),
+                    title: Text(L10n.get('room_3d_textured')),
+                    onTap: () => Navigator.pop(context, 'textured'),
+                  ),
+                ],
+              ),
+            ),
+          );
+          if (!mounted || choice == null) return;
+          if (choice == 'textured') {
+            await Navigator.of(context).push<void>(
+              MaterialPageRoute<void>(
+                builder: (_) => TexturedGlbViewerScreen(glbUrl: textured),
+              ),
+            );
+            return;
+          }
+        }
+      }
       final ok = await RoomUsdzViewerService.openUsdz(
         localUsdzPath: widget.scan.localUsdzPath,
         usdzUrl: widget.scan.usdzUrl,

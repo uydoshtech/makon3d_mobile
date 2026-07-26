@@ -62,8 +62,9 @@ class _KeyboardDismissScopeState extends State<KeyboardDismissScope>
 
   void _syncBarVisibility() {
     if (!mounted) return;
-    final rawKeyboardInset =
-        MediaQueryData.fromView(View.of(context)).viewInsets.bottom;
+    final rawKeyboardInset = MediaQueryData.fromView(
+      View.of(context),
+    ).viewInsets.bottom;
     final shouldShow = rawKeyboardInset > 0 && widget.showDoneBar;
     if (shouldShow && !_portalController.isShowing) {
       _portalController.show();

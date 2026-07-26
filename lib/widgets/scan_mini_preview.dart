@@ -9,10 +9,7 @@ import 'package:makon3d_mobile/l10n/l10n.dart';
 import 'package:makon3d_mobile/services/room_usdz_viewer_service.dart';
 
 /// Warm yellow sky gradient aligned with Makon brand colors.
-const List<Color> _roomScanSkyGradient = [
-  Color(0xFFFFF6D6),
-  Color(0xFFFFCC00),
-];
+const List<Color> _roomScanSkyGradient = [Color(0xFFFFF6D6), Color(0xFFFFCC00)];
 
 /// Mini preview height — same as UyDosh / web `.roomscan-viewer-wrap`.
 const double kScanMiniPreviewHeight = 280;
@@ -45,7 +42,9 @@ class ScanMiniPreview extends StatefulWidget {
 
 class _ScanMiniPreviewState extends State<ScanMiniPreview>
     with AutomaticKeepAliveClientMixin {
-  final GlobalKey _previewViewKey = GlobalKey(debugLabel: 'makonScanMiniPreview');
+  final GlobalKey _previewViewKey = GlobalKey(
+    debugLabel: 'makonScanMiniPreview',
+  );
 
   String? _localPath;
   Object? _error;
@@ -184,9 +183,7 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
               if (_suspendViewer || _loading)
                 const ColoredBox(
                   color: Colors.transparent,
-                  child: Center(
-                    child: CircularProgressIndicator.adaptive(),
-                  ),
+                  child: Center(child: CircularProgressIndicator.adaptive()),
                 ),
               if (!_suspendViewer && _error != null)
                 ColoredBox(

@@ -189,8 +189,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                           : IconButton(
                               tooltip: L10n.get('use_current_location'),
                               icon: const Icon(Icons.my_location),
-                              onPressed: () =>
-                                  unawaited(_useCurrentLocation()),
+                              onPressed: () => unawaited(_useCurrentLocation()),
                             ),
                     ),
                     const SizedBox(height: 16),

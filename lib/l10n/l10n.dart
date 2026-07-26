@@ -235,6 +235,12 @@ class L10n {
       "room_scan_start": "Start scan",
       "room_scan_finish": "Finish",
       "room_scan_scan_other_rooms": "Scan Other Rooms",
+      "room_scan_photogrammetry_title": "Photogrammetry",
+      "room_scan_photogrammetry_subtitle":
+          "Create a textured 3D model after scanning",
+      "room_3d_structure": "Structure",
+      "room_3d_textured": "Textured",
+      "room_3d_textured_processing": "Textured model processing",
       "project_room_delete_confirm_title": "Remove room?",
       "project_room_delete_confirm_message":
           "\"{name}\" and its scan will be deleted. This cannot be undone.",
@@ -593,6 +599,12 @@ class L10n {
       "room_scan_start": "Начать сканирование",
       "room_scan_finish": "Завершить",
       "room_scan_scan_other_rooms": "Сканировать другие комнаты",
+      "room_scan_photogrammetry_title": "Фотограмметрия",
+      "room_scan_photogrammetry_subtitle":
+          "Создать текстурированную 3D-модель после сканирования",
+      "room_3d_structure": "Геометрия",
+      "room_3d_textured": "С текстурами",
+      "room_3d_textured_processing": "Обработка текстурированной модели",
       "project_room_delete_confirm_title": "Удалить комнату?",
       "project_room_delete_confirm_message":
           "Комната «{name}» и её скан будут удалены. Это действие нельзя отменить.",
@@ -956,6 +968,12 @@ class L10n {
       "room_scan_start": "Skanlashni boshlash",
       "room_scan_finish": "Yakunlash",
       "room_scan_scan_other_rooms": "Boshqa xonalarni skanerlash",
+      "room_scan_photogrammetry_title": "Fotogrammetriya",
+      "room_scan_photogrammetry_subtitle":
+          "Skanlashdan so‘ng teksturali 3D model yarating",
+      "room_3d_structure": "Geometriya",
+      "room_3d_textured": "Teksturali",
+      "room_3d_textured_processing": "Teksturali model qayta ishlanmoqda",
       "project_room_delete_confirm_title": "Xona olib tashlansinmi?",
       "project_room_delete_confirm_message":
           "\"{name}\" xonasi va uning skani o'chiriladi. Buni ortga qaytarib bo'lmaydi.",

@@ -8,6 +8,7 @@ import "package:makon3d_mobile/models/makon_scan.dart";
 import "package:makon3d_mobile/services/room_usdz_viewer_service.dart";
 import "package:makon3d_mobile/services/scan_upload_service.dart";
 import "package:makon3d_mobile/services/scans_refresh_notifier.dart";
+import "package:makon3d_mobile/screens/textured_glb_viewer_screen.dart";
 import "package:makon3d_mobile/widgets/toasts.dart";
 
 /// Lists all recent public scans (everyone's, for now — same feed as the
@@ -71,9 +72,7 @@ class _ScansListScreenState extends State<ScansListScreen> {
       _error = null;
     });
     try {
-      final scans = await ScanUploadService.listAllScans(
-        cancelToken: token,
-      );
+      final scans = await ScanUploadService.listAllScans(cancelToken: token);
       if (!mounted || token.isCancelled) return;
       setState(() {
         _scans = scans;
@@ -95,7 +94,41 @@ class _ScansListScreenState extends State<ScansListScreen> {
   }
 
   Future<void> _openScan(MakonScan scan) async {
-    final url = scan.usdzUrl;
+    final refreshed = await ScanUploadService.getScan(scan.id);
+    if (!mounted) return;
+    final textured = refreshed.texturedGlbUrl;
+    if (textured != null && textured.isNotEmpty) {
+      final choice = await showModalBottomSheet<String>(
+        context: context,
+        builder: (context) => SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.account_tree_outlined),
+                title: Text(L10n.get("room_3d_structure")),
+                onTap: () => Navigator.pop(context, "structure"),
+              ),
+              ListTile(
+                leading: const Icon(Icons.texture),
+                title: Text(L10n.get("room_3d_textured")),
+                onTap: () => Navigator.pop(context, "textured"),
+              ),
+            ],
+          ),
+        ),
+      );
+      if (!mounted || choice == null) return;
+      if (choice == "textured") {
+        await Navigator.of(context).push<void>(
+          MaterialPageRoute<void>(
+            builder: (_) => TexturedGlbViewerScreen(glbUrl: textured),
+          ),
+        );
+        return;
+      }
+    }
+    final url = refreshed.usdzUrl;
     if (url == null || url.isEmpty) {
       Toasts.showError(context, L10n.get("scans_open_error"));
       return;
@@ -106,7 +139,7 @@ class _ScansListScreenState extends State<ScansListScreen> {
         url,
         scanId: scan.id,
         languageCode: LanguageState().currentLanguage,
-        worldPlusXBearingDeg: scan.worldPlusXBearingDeg,
+        worldPlusXBearingDeg: refreshed.worldPlusXBearingDeg,
         shareScanId: scan.id,
       );
     } catch (_) {
@@ -125,8 +158,9 @@ class _ScansListScreenState extends State<ScansListScreen> {
         return AlertDialog(
           title: Text(L10n.get("scan_delete_confirm_title")),
           content: Text(
-            L10n.get("scan_delete_confirm_message")
-                .replaceAll("{id}", scan.id.toString()),
+            L10n.get(
+              "scan_delete_confirm_message",
+            ).replaceAll("{id}", scan.id.toString()),
           ),
           actions: [
             TextButton(
@@ -160,8 +194,9 @@ class _ScansListScreenState extends State<ScansListScreen> {
       // 404 = already gone — that's the outcome we wanted.
       if (e.response?.statusCode == 404) {
         setState(() {
-          _scans =
-              _scans?.where((s) => s.id != scan.id).toList(growable: false);
+          _scans = _scans
+              ?.where((s) => s.id != scan.id)
+              .toList(growable: false);
           _deletingId = null;
         });
         return;
@@ -188,6 +223,11 @@ class _ScansListScreenState extends State<ScansListScreen> {
     }
     if (scan.glbUrl != null && scan.glbUrl!.isNotEmpty) {
       parts.add("GLB");
+    }
+    if (scan.photogrammetryStatus == "processing") {
+      parts.add(L10n.get("room_3d_textured_processing"));
+    } else if (scan.texturedGlbUrl?.isNotEmpty == true) {
+      parts.add(L10n.get("room_3d_textured"));
     }
     final created = scan.createdAt?.toLocal();
     if (created != null) {
@@ -232,10 +272,7 @@ class _ScansListScreenState extends State<ScansListScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                L10n.get("scans_load_error"),
-                textAlign: TextAlign.center,
-              ),
+              Text(L10n.get("scans_load_error"), textAlign: TextAlign.center),
               const SizedBox(height: 16),
               FilledButton(
                 onPressed: () => unawaited(_load()),
