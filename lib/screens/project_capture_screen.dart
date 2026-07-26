@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_roomplan/flutter_roomplan.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:room_scan_kit/scan_flow/scan_flow.dart';
+import 'package:room_scan_kit/photogrammetry_upload.dart';
 
 import 'package:makon3d_mobile/base/ios_device.dart';
 import 'package:makon3d_mobile/l10n/l10n.dart';
@@ -44,12 +45,16 @@ class ProjectCaptureScreen extends StatefulWidget {
 
 class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
   final _roomPlan = FlutterRoomplan();
-  static const MethodChannel _roomplanChannel =
-      MethodChannel('rkg/flutter_roomplan');
+  static const MethodChannel _roomplanChannel = MethodChannel(
+    'rkg/flutter_roomplan',
+  );
 
   bool _registeredRoomCaptureCallback = false;
   bool _uploading = false;
   bool _starting = false;
+  PhotogrammetryUploadProgress? _photogrammetryProgress;
+  bool _standardUploadComplete = false;
+  bool _photogrammetryFinished = false;
   bool? _roomPlanSupported;
 
   @override
@@ -60,6 +65,7 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
       return;
     }
     unawaited(_resolveSupportAndRegisterCapture());
+    PhotogrammetryUpload.instance.listen(_uploadPhotogrammetryPackage);
   }
 
   @override
@@ -67,7 +73,25 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
     if (_registeredRoomCaptureCallback) {
       _roomPlan.onRoomCaptureFinished(() {});
     }
+    PhotogrammetryUpload.instance.stopListening();
     super.dispose();
+  }
+
+  Future<void> _uploadPhotogrammetryPackage(String path) async {
+    try {
+      await PhotogrammetryUpload.instance.submit(
+        packagePath: path,
+        apiBaseUrl: ScanUploadService.basePath,
+        onProgress: (progress) {
+          if (mounted) setState(() => _photogrammetryProgress = progress);
+        },
+      );
+    } catch (error) {
+      debugPrint('Photogrammetry upload failed: $error');
+    } finally {
+      _photogrammetryFinished = true;
+      if (mounted && _standardUploadComplete) Navigator.of(context).pop();
+    }
   }
 
   Future<void> _resolveSupportAndRegisterCapture() async {
@@ -144,12 +168,14 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
 
       if (!mounted) return;
       Toasts.showSuccess(context, L10n.get('room_scan_success'));
-      Navigator.of(context).pop();
+      _standardUploadComplete = true;
+      if (_photogrammetryFinished) Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
       setState(() => _uploading = false);
       final msg = e.toString();
-      final isTooLarge = msg.contains('File too large') ||
+      final isTooLarge =
+          msg.contains('File too large') ||
           msg.contains('413') ||
           msg.contains('Payload Too Large');
       Toasts.showError(
@@ -185,7 +211,12 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
 
   Future<void> _startScan() async {
     if (!isIOSDevice) return;
-    setState(() => _starting = true);
+    setState(() {
+      _starting = true;
+      _standardUploadComplete = false;
+      _photogrammetryFinished = false;
+      _photogrammetryProgress = null;
+    });
     try {
       await NativeLanguageService.setPreferredLanguage(
         LanguageState().currentLanguage,
@@ -224,16 +255,18 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
           'roomplan_stats_bed': L10n.get('room_scan_stats_bed'),
           'roomplan_stats_table': L10n.get('room_scan_stats_table'),
           'roomplan_stats_chair': L10n.get('room_scan_stats_chair'),
-          'roomplan_stats_refrigerator':
-              L10n.get('room_scan_stats_refrigerator'),
+          'roomplan_stats_refrigerator': L10n.get(
+            'room_scan_stats_refrigerator',
+          ),
           'roomplan_stats_sink': L10n.get('room_scan_stats_sink'),
           'roomplan_stats_toilet': L10n.get('room_scan_stats_toilet'),
           'roomplan_stats_bathtub': L10n.get('room_scan_stats_bathtub'),
           'roomplan_stats_oven': L10n.get('room_scan_stats_oven'),
           'roomplan_stats_stove': L10n.get('room_scan_stats_stove'),
           'roomplan_stats_dishwasher': L10n.get('room_scan_stats_dishwasher'),
-          'roomplan_stats_washer_dryer':
-              L10n.get('room_scan_stats_washer_dryer'),
+          'roomplan_stats_washer_dryer': L10n.get(
+            'room_scan_stats_washer_dryer',
+          ),
           'roomplan_stats_fireplace': L10n.get('room_scan_stats_fireplace'),
           'roomplan_stats_stairs': L10n.get('room_scan_stats_stairs'),
           'roomplan_stats_object': L10n.get('room_scan_stats_object'),
@@ -246,28 +279,33 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
           'roomplan_detected_sofa': L10n.get('room_scan_detected_sofa'),
           'roomplan_detected_table': L10n.get('room_scan_detected_table'),
           'roomplan_detected_chair': L10n.get('room_scan_detected_chair'),
-          'roomplan_detected_television':
-              L10n.get('room_scan_detected_television'),
-          'roomplan_detected_refrigerator':
-              L10n.get('room_scan_detected_refrigerator'),
+          'roomplan_detected_television': L10n.get(
+            'room_scan_detected_television',
+          ),
+          'roomplan_detected_refrigerator': L10n.get(
+            'room_scan_detected_refrigerator',
+          ),
           'roomplan_detected_sink': L10n.get('room_scan_detected_sink'),
           'roomplan_detected_toilet': L10n.get('room_scan_detected_toilet'),
           'roomplan_detected_bathtub': L10n.get('room_scan_detected_bathtub'),
           'roomplan_detected_oven': L10n.get('room_scan_detected_oven'),
           'roomplan_detected_stove': L10n.get('room_scan_detected_stove'),
-          'roomplan_detected_dishwasher':
-              L10n.get('room_scan_detected_dishwasher'),
-          'roomplan_detected_washer_dryer':
-              L10n.get('room_scan_detected_washer_dryer'),
-          'roomplan_detected_fireplace':
-              L10n.get('room_scan_detected_fireplace'),
+          'roomplan_detected_dishwasher': L10n.get(
+            'room_scan_detected_dishwasher',
+          ),
+          'roomplan_detected_washer_dryer': L10n.get(
+            'room_scan_detected_washer_dryer',
+          ),
+          'roomplan_detected_fireplace': L10n.get(
+            'room_scan_detected_fireplace',
+          ),
           'roomplan_detected_stairs': L10n.get('room_scan_detected_stairs'),
           'roomplan_detected_object': L10n.get('room_scan_detected_object'),
           // Post-scan results card (grey model screen).
-          'roomplan_results_perimeter':
-              L10n.get('room_scan_results_perimeter'),
-          'roomplan_results_floor_area':
-              L10n.get('room_scan_results_floor_area'),
+          'roomplan_results_perimeter': L10n.get('room_scan_results_perimeter'),
+          'roomplan_results_floor_area': L10n.get(
+            'room_scan_results_floor_area',
+          ),
           'roomplan_results_wall_area': L10n.get('room_scan_results_wall_area'),
           'roomplan_results_windows': L10n.get('room_scan_results_windows'),
           'roomplan_results_doors': L10n.get('room_scan_results_doors'),
@@ -292,59 +330,75 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
   Widget build(BuildContext context) {
     final loading = _uploading || _starting;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(L10n.get('room_scan_title')),
-      ),
+      appBar: AppBar(title: Text(L10n.get('room_scan_title'))),
       body: _roomPlanSupported == null
           ? const Center(child: CircularProgressIndicator())
           : _roomPlanSupported == false
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Text(
-                      L10n.get('room_scan_not_supported'),
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  L10n.get('room_scan_not_supported'),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            )
+          : Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    L10n.get('room_scan_instructions'),
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const Spacer(),
+                  if (_photogrammetryProgress case final progress?) ...[
+                    LinearProgressIndicator(
+                      value:
+                          progress.phase == PhotogrammetryUploadPhase.uploading
+                          ? progress.fraction
+                          : progress.phase == PhotogrammetryUploadPhase.complete
+                          ? 1
+                          : null,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      progress.phase == PhotogrammetryUploadPhase.complete
+                          ? 'Textured model ready'
+                          : progress.phase == PhotogrammetryUploadPhase.failed
+                          ? 'Textured model processing failed'
+                          : 'Preparing textured model…',
                       textAlign: TextAlign.center,
                     ),
-                  ),
-                )
-              : Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        L10n.get('room_scan_instructions'),
-                        style: Theme.of(context).textTheme.bodyLarge,
+                    const SizedBox(height: 16),
+                  ],
+                  if (_uploading)
+                    Column(
+                      children: [
+                        const CircularProgressIndicator(),
+                        const SizedBox(height: 16),
+                        Text(L10n.get('room_scan_uploading')),
+                      ],
+                    )
+                  else
+                    FilledButton.icon(
+                      onPressed: loading ? null : _startScan,
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
-                      const Spacer(),
-                      if (_uploading)
-                        Column(
-                          children: [
-                            const CircularProgressIndicator(),
-                            const SizedBox(height: 16),
-                            Text(L10n.get('room_scan_uploading')),
-                          ],
-                        )
-                      else
-                        FilledButton.icon(
-                          onPressed: loading ? null : _startScan,
-                          style: FilledButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                          ),
-                          icon: _starting
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(Icons.view_in_ar),
-                          label: Text(L10n.get('room_scan_start')),
-                        ),
-                    ],
-                  ),
-                ),
+                      icon: _starting
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.view_in_ar),
+                      label: Text(L10n.get('room_scan_start')),
+                    ),
+                ],
+              ),
+            ),
     );
   }
 }
