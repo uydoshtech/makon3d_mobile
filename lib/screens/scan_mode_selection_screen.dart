@@ -88,7 +88,7 @@ class _ScanModeSelectionScreenState extends State<ScanModeSelectionScreen> {
               Expanded(
                 child: ListView.separated(
                   itemCount: modes.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final mode = modes[index];
                     final selected = _selected == mode;
@@ -147,8 +147,7 @@ class _ScanModeSelectionScreenState extends State<ScanModeSelectionScreen> {
                                           vertical: 4,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: theme.colorScheme.secondary
-                                              .withValues(alpha: 0.15),
+                                          color: theme.colorScheme.secondary,
                                           borderRadius:
                                               BorderRadius.circular(8),
                                         ),
@@ -158,8 +157,9 @@ class _ScanModeSelectionScreenState extends State<ScanModeSelectionScreen> {
                                           ),
                                           style: theme.textTheme.labelMedium
                                               ?.copyWith(
-                                            color: theme.colorScheme.secondary,
-                                            fontWeight: FontWeight.w600,
+                                            color:
+                                                theme.colorScheme.onSecondary,
+                                            fontWeight: FontWeight.w700,
                                           ),
                                         ),
                                       ),

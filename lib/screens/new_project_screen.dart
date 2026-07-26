@@ -12,6 +12,7 @@ import 'package:makon3d_mobile/screens/scan_mode_selection_screen.dart';
 import 'package:makon3d_mobile/services/geocode_service.dart';
 import 'package:makon3d_mobile/services/makon_analytics.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
+import 'package:makon3d_mobile/widgets/address_suggest_field.dart';
 import 'package:makon3d_mobile/widgets/keyboard_dismiss_scope.dart';
 import 'package:makon3d_mobile/widgets/toasts.dart';
 
@@ -54,9 +55,8 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
 
     final mode = await Navigator.of(context).push<ScanMode>(
       MaterialPageRoute<ScanMode>(
-        builder: (_) => const ScanModeSelectionScreen(
-          entryPoint: 'new_project',
-        ),
+        builder: (_) =>
+            const ScanModeSelectionScreen(entryPoint: 'new_project'),
       ),
     );
     if (mode == null || !mounted) return;
@@ -134,10 +134,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
       );
       if (!mounted) return;
       if (address == null) {
-        Toasts.showError(
-          context,
-          L10n.get('current_location_address_failed'),
-        );
+        Toasts.showError(context, L10n.get('current_location_address_failed'));
         return;
       }
       _addressController.text = address;
@@ -155,79 +152,84 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(L10n.get('project_new_title')),
-      ),
+      appBar: AppBar(title: Text(L10n.get('project_new_title'))),
       body: SafeArea(
         child: KeyboardDismissScope(
-          child: ListView(
-            keyboardDismissBehavior: KeyboardDismissScope.scrollBehavior,
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+          child: Column(
             children: [
-              TextField(
-                controller: _nameController,
-                autofocus: true,
-                textCapitalization: TextCapitalization.sentences,
-                textInputAction: TextInputAction.next,
-                decoration: InputDecoration(
-                  labelText: L10n.get('project_name_label'),
-                  border: const OutlineInputBorder(),
+              Expanded(
+                child: ListView(
+                  keyboardDismissBehavior: KeyboardDismissScope.scrollBehavior,
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+                  children: [
+                    TextField(
+                      controller: _nameController,
+                      autofocus: true,
+                      textCapitalization: TextCapitalization.sentences,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        labelText: L10n.get('project_name_label'),
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    AddressSuggestField(
+                      controller: _addressController,
+                      suffixIcon: _locating
+                          ? const Padding(
+                              padding: EdgeInsets.all(14),
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            )
+                          : IconButton(
+                              tooltip: L10n.get('use_current_location'),
+                              icon: const Icon(Icons.my_location),
+                              onPressed: () =>
+                                  unawaited(_useCurrentLocation()),
+                            ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _notesController,
+                      textCapitalization: TextCapitalization.sentences,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        labelText: L10n.get('project_notes_label'),
+                        helperText: L10n.get('project_notes_optional_hint'),
+                        border: const OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _addressController,
-                textCapitalization: TextCapitalization.sentences,
-                textInputAction: TextInputAction.next,
-                decoration: InputDecoration(
-                  labelText: L10n.get('project_address_label'),
-                  helperText: L10n.get('project_address_optional_hint'),
-                  border: const OutlineInputBorder(),
-                  suffixIcon: _locating
-                      ? const Padding(
-                          padding: EdgeInsets.all(14),
-                          child: SizedBox(
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: _saving
+                        ? null
+                        : () {
+                            KeyboardDismissScope.dismiss();
+                            _continueToMode();
+                          },
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: _saving
+                        ? const SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        )
-                      : IconButton(
-                          tooltip: L10n.get('use_current_location'),
-                          icon: const Icon(Icons.my_location),
-                          onPressed: () => unawaited(_useCurrentLocation()),
-                        ),
+                          )
+                        : Text(L10n.get('project_continue_to_mode')),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _notesController,
-                textCapitalization: TextCapitalization.sentences,
-                maxLines: 3,
-                decoration: InputDecoration(
-                  labelText: L10n.get('project_notes_label'),
-                  helperText: L10n.get('project_notes_optional_hint'),
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 28),
-              FilledButton(
-                onPressed: _saving
-                    ? null
-                    : () {
-                        KeyboardDismissScope.dismiss();
-                        _continueToMode();
-                      },
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: _saving
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(L10n.get('project_continue_to_mode')),
               ),
             ],
           ),

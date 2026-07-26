@@ -7,6 +7,7 @@ import "package:makon3d_mobile/services/auth/firebase_bootstrap.dart";
 import "package:makon3d_mobile/services/auth/sign_in_flow.dart";
 import "package:makon3d_mobile/services/auth/telegram_native_login_service.dart";
 import "package:makon3d_mobile/theme/makon_colors.dart";
+import "package:makon3d_mobile/widgets/google_sign_in_branded_button.dart";
 
 /// Bottom sheet with the available sign-in providers. Pops with `true`
 /// after a successful sign-in ([AuthState] listeners drive the rest of the
@@ -32,7 +33,8 @@ class _SignInSheetState extends State<SignInSheet> {
   String? _errorText;
 
   bool get _firebaseProvidersAvailable => FirebaseBootstrap.isReady;
-  bool get _telegramAvailable => TelegramNativeLoginService.instance.isSupported;
+  bool get _telegramAvailable =>
+      TelegramNativeLoginService.instance.isSupported;
 
   Future<void> _run(Future<bool> Function() flow) async {
     if (_busy) return;
@@ -60,7 +62,8 @@ class _SignInSheetState extends State<SignInSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final showApple = _firebaseProvidersAvailable && AppleAuthService.isAvailable;
+    final showApple =
+        _firebaseProvidersAvailable && AppleAuthService.isAvailable;
     final showGoogle = _firebaseProvidersAvailable;
     final showTelegram = _telegramAvailable;
     final nothingAvailable = !showApple && !showGoogle && !showTelegram;
@@ -80,9 +83,9 @@ class _SignInSheetState extends State<SignInSheet> {
             Text(
               L10n.get("sign_in_sheet_title"),
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 20),
             if (nothingAvailable)
@@ -107,10 +110,11 @@ class _SignInSheetState extends State<SignInSheet> {
               const SizedBox(height: 12),
             ],
             if (showGoogle) ...[
-              _providerButton(
+              GoogleSignInBrandedButton(
                 label: L10n.get("sign_in_with_google"),
-                icon: Icons.g_mobiledata_rounded,
-                onPressed: () => _run(SignInFlow.signInWithGoogle),
+                onPressed: _busy
+                    ? null
+                    : () => _run(SignInFlow.signInWithGoogle),
               ),
               const SizedBox(height: 12),
             ],

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:room_scan_kit/scan_flow/scan_flow.dart';
@@ -10,9 +9,9 @@ import 'package:makon3d_mobile/models/makon_project.dart';
 import 'package:makon3d_mobile/models/project_room.dart';
 import 'package:makon3d_mobile/scan_flow/makon_entire_housing_coordinator.dart';
 import 'package:makon3d_mobile/scan_flow/makon_room_by_room_coordinator.dart';
+import 'package:makon3d_mobile/screens/edit_project_screen.dart';
 import 'package:makon3d_mobile/screens/room_materials_screen.dart';
 import 'package:makon3d_mobile/screens/scan_detail_screen.dart';
-import 'package:makon3d_mobile/services/housing_assemble_service.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
 import 'package:makon3d_mobile/services/room_usdz_viewer_service.dart';
 import 'package:makon3d_mobile/widgets/project_delete_dialog.dart';
@@ -31,7 +30,6 @@ class ProjectDashboardScreen extends StatefulWidget {
 
 class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
   bool _openingFullscreen = false;
-  bool _assembling = false;
 
   @override
   void initState() {
@@ -115,6 +113,14 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
     if (deleted && mounted) Navigator.of(context).pop();
   }
 
+  Future<void> _editProject(MakonProject project) async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => EditProjectScreen(project: project),
+      ),
+    );
+  }
+
   Future<void> _openRoomDetail(ProjectRoom room) async {
     final scan = room.scan;
     if (scan == null) return;
@@ -141,69 +147,9 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
   Future<void> _openEntireHousingMaterials() async {
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
-        builder: (_) => RoomMaterialsScreen(
-          projectId: widget.projectId,
-        ),
+        builder: (_) => RoomMaterialsScreen(projectId: widget.projectId),
       ),
     );
-  }
-
-  Future<void> _openCombinedModel() async {
-    final path = _project?.mergedStructureLocalPath;
-    if (path == null || path.isEmpty) return;
-    if (_openingFullscreen) return;
-    setState(() => _openingFullscreen = true);
-    try {
-      final file = File(path);
-      if (!file.existsSync() || file.lengthSync() == 0) {
-        if (!mounted) return;
-        Toasts.showError(context, L10n.get('scans_open_error'));
-        return;
-      }
-      await RoomUsdzViewerService.presentLocalFile(
-        path,
-        scanId: widget.projectId.hashCode,
-        languageCode: LanguageState().currentLanguage,
-      );
-    } catch (_) {
-      if (!mounted) return;
-      Toasts.showError(context, L10n.get('scans_open_error'));
-    } finally {
-      if (mounted) setState(() => _openingFullscreen = false);
-    }
-  }
-
-  Future<void> _assembleCombined() async {
-    final project = _project;
-    if (project == null || _assembling) return;
-    final scanned = project.rooms.where((r) => r.isScanned).length;
-    if (scanned < 2) {
-      Toasts.showInfo(context, L10n.get('project_combined_need_two_rooms'));
-      return;
-    }
-
-    setState(() => _assembling = true);
-    try {
-      final path = await HousingAssembleService.assembleCombinedUsdz(project);
-      if (!mounted) return;
-      Toasts.showSuccess(context, L10n.get('project_combined_success'));
-      await RoomUsdzViewerService.presentLocalFile(
-        path,
-        scanId: widget.projectId.hashCode,
-        languageCode: LanguageState().currentLanguage,
-      );
-    } catch (e) {
-      if (!mounted) return;
-      final msg = e.toString();
-      Toasts.showError(
-        context,
-        msg.contains('Need at least two')
-            ? L10n.get('project_combined_need_two_rooms')
-            : L10n.get('project_combined_failed'),
-      );
-    } finally {
-      if (mounted) setState(() => _assembling = false);
-    }
   }
 
   @override
@@ -220,6 +166,11 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
       appBar: AppBar(
         title: Text(project.name),
         actions: [
+          IconButton(
+            tooltip: L10n.get('project_edit'),
+            icon: const Icon(Icons.edit_outlined),
+            onPressed: () => unawaited(_editProject(project)),
+          ),
           IconButton(
             tooltip: L10n.get('project_delete'),
             icon: Icon(
@@ -240,12 +191,9 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
             )
           : _RoomByRoomBody(
               project: project,
-              assembling: _assembling,
               onAddRoom: _addRoom,
               onOpenRoom: (room) => unawaited(_openRoomDetail(room)),
               onRescanRoom: _rescanRoom,
-              onAssembleCombined: () => unawaited(_assembleCombined()),
-              onOpenCombined: () => unawaited(_openCombinedModel()),
             ),
     );
   }
@@ -311,8 +259,9 @@ class _EntireHousingBody extends StatelessWidget {
               project.entireHousingScan?.floorAreaM2 != null
                   ? L10n.get('room_3d_dimensions_line2_template').replaceAll(
                       '{floorArea}',
-                      project.entireHousingScan!.floorAreaM2!
-                          .toStringAsFixed(1),
+                      project.entireHousingScan!.floorAreaM2!.toStringAsFixed(
+                        1,
+                      ),
                     )
                   : L10n.get('scans_no_metrics'),
             ),
@@ -354,122 +303,201 @@ class _EntireHousingBody extends StatelessWidget {
 class _RoomByRoomBody extends StatelessWidget {
   const _RoomByRoomBody({
     required this.project,
-    required this.assembling,
     required this.onAddRoom,
     required this.onOpenRoom,
     required this.onRescanRoom,
-    required this.onAssembleCombined,
-    required this.onOpenCombined,
   });
 
   final MakonProject project;
-  final bool assembling;
   final VoidCallback onAddRoom;
   final ValueChanged<ProjectRoom> onOpenRoom;
   final ValueChanged<ProjectRoom> onRescanRoom;
-  final VoidCallback onAssembleCombined;
-  final VoidCallback onOpenCombined;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final rooms = project.rooms;
-    final scannedCount = rooms.where((r) => r.isScanned).length;
-    final hasCombined = project.mergedStructureLocalPath != null &&
-        project.mergedStructureLocalPath!.isNotEmpty;
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
-      children: [
-        Text(
-          L10n.get('project_scan_mode_label'),
-          style: theme.textTheme.labelLarge,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          L10n.get(ScanMode.roomByRoom.titleKey),
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
+    return SafeArea(
+      top: false,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+              children: [
+                _DashboardInfoCard(
+                  icon: Icons.grid_view_rounded,
+                  label: L10n.get('project_scan_mode_label'),
+                  title: L10n.get(ScanMode.roomByRoom.titleKey),
+                  description: L10n.get(ScanMode.roomByRoom.subtitleKey),
+                ),
+                const SizedBox(height: 28),
+                Text(
+                  L10n.get('project_rooms_heading'),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                if (rooms.isEmpty)
+                  _EmptyRoomsCard(message: L10n.get('project_rooms_empty'))
+                else
+                  ...rooms.map((room) {
+                    final title = room.name?.isNotEmpty == true
+                        ? room.name!
+                        : L10n.get(room.roomType.titleKey);
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Icon(
+                        room.roomType.icon,
+                        color: room.isScanned
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.outline,
+                      ),
+                      title: Text(title),
+                      subtitle: Text(
+                        room.isScanned
+                            ? L10n.get('project_room_scanned')
+                            : L10n.get('project_room_pending'),
+                      ),
+                      trailing: room.isScanned
+                          ? IconButton(
+                              icon: const Icon(Icons.view_in_ar),
+                              onPressed: () => onOpenRoom(room),
+                            )
+                          : TextButton(
+                              onPressed: () => onRescanRoom(room),
+                              child: Text(L10n.get('room_scan_start')),
+                            ),
+                      onTap: room.isScanned
+                          ? () => onOpenRoom(room)
+                          : () => onRescanRoom(room),
+                    );
+                  }),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: 20),
-        Text(
-          L10n.get('project_rooms_heading'),
-          style: theme.textTheme.titleSmall,
-        ),
-        const SizedBox(height: 8),
-        if (rooms.isEmpty)
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Text(L10n.get('project_rooms_empty')),
-          )
-        else
-          ...rooms.map((room) {
-            final title = room.name?.isNotEmpty == true
-                ? room.name!
-                : L10n.get(room.roomType.titleKey);
-            return ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Icon(
-                room.roomType.icon,
-                color: room.isScanned
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.outline,
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            child: FilledButton.icon(
+              onPressed: onAddRoom,
+              icon: const Icon(Icons.add),
+              label: Text(L10n.get('project_add_room')),
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              title: Text(title),
-              subtitle: Text(
-                room.isScanned
-                    ? L10n.get('project_room_scanned')
-                    : L10n.get('project_room_pending'),
-              ),
-              trailing: room.isScanned
-                  ? IconButton(
-                      icon: const Icon(Icons.view_in_ar),
-                      onPressed: () => onOpenRoom(room),
-                    )
-                  : TextButton(
-                      onPressed: () => onRescanRoom(room),
-                      child: Text(L10n.get('room_scan_start')),
-                    ),
-              onTap: room.isScanned
-                  ? () => onOpenRoom(room)
-                  : () => onRescanRoom(room),
-            );
-          }),
-        const SizedBox(height: 16),
-        FilledButton.icon(
-          onPressed: assembling ? null : onAddRoom,
-          icon: const Icon(Icons.add),
-          label: Text(L10n.get('project_add_room')),
-          style: FilledButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 14),
-          ),
-        ),
-        const SizedBox(height: 10),
-        FilledButton.tonalIcon(
-          onPressed: assembling || scannedCount < 2 ? null : onAssembleCombined,
-          icon: assembling
-              ? const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.apartment_outlined),
-          label: Text(
-            assembling
-                ? L10n.get('project_combined_assembling')
-                : L10n.get('project_generate_combined'),
-          ),
-        ),
-        if (hasCombined) ...[
-          const SizedBox(height: 10),
-          OutlinedButton.icon(
-            onPressed: assembling ? null : onOpenCombined,
-            icon: const Icon(Icons.view_in_ar),
-            label: Text(L10n.get('project_open_combined')),
+            ),
           ),
         ],
-      ],
+      ),
+    );
+  }
+}
+
+class _DashboardInfoCard extends StatelessWidget {
+  const _DashboardInfoCard({
+    required this.icon,
+    required this.label,
+    required this.title,
+    required this.description,
+  });
+
+  final IconData icon;
+  final String label;
+  final String title;
+  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return Material(
+      color: scheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(18),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: scheme.primaryContainer,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(icon, color: scheme.onPrimaryContainer),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    title,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    description,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyRoomsCard extends StatelessWidget {
+  const _EmptyRoomsCard({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: scheme.primaryContainer.withValues(alpha: 0.45),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Row(
+          children: [
+            Icon(Icons.meeting_room_outlined, color: scheme.onPrimaryContainer),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

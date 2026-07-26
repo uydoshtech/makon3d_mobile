@@ -79,19 +79,18 @@ class SettingsScreen extends StatelessWidget {
     final subtitle =
         auth.displayName?.trim().isNotEmpty == true ? auth.email : null;
 
-    return Column(
-      children: [
-        ListTile(
-          leading: const Icon(Icons.person, color: MakonColors.yellow),
-          title: Text(title),
-          subtitle: subtitle == null ? null : Text(subtitle),
+    return ListTile(
+      leading: const Icon(Icons.person, color: MakonColors.yellow),
+      title: Text(title),
+      subtitle: subtitle == null ? null : Text(subtitle),
+      trailing: IconButton(
+        onPressed: () => unawaited(_confirmSignOut(context)),
+        tooltip: L10n.get("settings_sign_out"),
+        icon: Icon(
+          Icons.logout,
+          color: Theme.of(context).colorScheme.error,
         ),
-        ListTile(
-          leading: const Icon(Icons.logout, color: MakonColors.inkMuted),
-          title: Text(L10n.get("settings_sign_out")),
-          onTap: () => unawaited(_confirmSignOut(context)),
-        ),
-      ],
+      ),
     );
   }
 

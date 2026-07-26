@@ -140,14 +140,16 @@ class MakonProject {
     FloorTilePrefs? entireHousingFloorTilePrefs,
     WallpaperPrefs? entireHousingWallpaperPrefs,
     bool clearEntireHousingScan = false,
+    bool clearAddress = false,
+    bool clearNotes = false,
   }) {
     return MakonProject(
       id: id,
       name: name ?? this.name,
       scanMode: scanMode,
       createdAt: createdAt,
-      address: address ?? this.address,
-      notes: notes ?? this.notes,
+      address: clearAddress ? null : (address ?? this.address),
+      notes: clearNotes ? null : (notes ?? this.notes),
       entireHousingScan: clearEntireHousingScan
           ? null
           : (entireHousingScan ?? this.entireHousingScan),

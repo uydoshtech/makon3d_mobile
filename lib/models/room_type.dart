@@ -7,6 +7,8 @@ enum RoomType {
   kitchen,
   bathroom,
   hallway,
+  balcony,
+  garage,
   other;
 
   String get wireValue => name;
@@ -20,6 +22,8 @@ enum RoomType {
         RoomType.kitchen => Icons.kitchen_outlined,
         RoomType.bathroom => Icons.bathtub_outlined,
         RoomType.hallway => Icons.door_front_door_outlined,
+        RoomType.balcony => Icons.balcony_outlined,
+        RoomType.garage => Icons.garage_outlined,
         RoomType.other => Icons.meeting_room_outlined,
       };
 

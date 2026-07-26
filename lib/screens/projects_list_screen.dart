@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:room_scan_kit/scan_flow/scan_flow.dart';
 
 import 'package:makon3d_mobile/l10n/l10n.dart';
 import 'package:makon3d_mobile/models/makon_project.dart';
@@ -56,15 +57,6 @@ class _ProjectsListScreenState extends State<ProjectsListScreen> {
     );
   }
 
-  String _subtitle(MakonProject project) {
-    final mode = L10n.get(project.scanMode.titleKey);
-    final address = project.address?.trim();
-    if (address != null && address.isNotEmpty) {
-      return '$mode · $address';
-    }
-    return mode;
-  }
-
   @override
   Widget build(BuildContext context) {
     final store = MakonProjectStore.instance;
@@ -111,15 +103,8 @@ class _ProjectsListScreenState extends State<ProjectsListScreen> {
                   separatorBuilder: (_, _) => const SizedBox(height: 8),
                   itemBuilder: (context, index) {
                     final project = projects[index];
-                    return ListTile(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      tileColor:
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
-                      title: Text(project.name),
-                      subtitle: Text(_subtitle(project)),
-                      trailing: const Icon(Icons.chevron_right),
+                    return _ProjectCard(
+                      project: project,
                       onTap: () => unawaited(_openProject(project)),
                       onLongPress: () => unawaited(
                         confirmAndDeleteProject(context, project),
@@ -127,6 +112,130 @@ class _ProjectsListScreenState extends State<ProjectsListScreen> {
                     );
                   },
                 ),
+    );
+  }
+}
+
+class _ProjectCard extends StatelessWidget {
+  const _ProjectCard({
+    required this.project,
+    required this.onTap,
+    required this.onLongPress,
+  });
+
+  final MakonProject project;
+  final VoidCallback onTap;
+  final VoidCallback onLongPress;
+
+  IconData get _modeIcon => switch (project.scanMode) {
+        ScanMode.entireHousing => Icons.home_outlined,
+        ScanMode.roomByRoom => Icons.grid_view_rounded,
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final address = project.address?.trim();
+    final notes = project.notes?.trim();
+    final hasAddress = address != null && address.isNotEmpty;
+    final hasNotes = notes != null && notes.isNotEmpty;
+
+    return Material(
+      color: theme.colorScheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(18),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.secondary,
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: Icon(
+                  _modeIcon,
+                  color: theme.colorScheme.onSecondary,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      project.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    _MetadataLine(
+                      icon: _modeIcon,
+                      text: L10n.get(project.scanMode.titleKey),
+                    ),
+                    if (hasAddress) ...[
+                      const SizedBox(height: 4),
+                      _MetadataLine(
+                        icon: Icons.location_on_outlined,
+                        text: address,
+                      ),
+                    ],
+                    if (hasNotes) ...[
+                      const SizedBox(height: 4),
+                      _MetadataLine(
+                        icon: Icons.notes_outlined,
+                        text: notes,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 4),
+              Icon(
+                Icons.chevron_right,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MetadataLine extends StatelessWidget {
+  const _MetadataLine({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      children: [
+        Icon(icon, size: 17, color: theme.colorScheme.onSurfaceVariant),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

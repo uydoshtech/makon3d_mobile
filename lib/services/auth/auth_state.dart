@@ -31,12 +31,33 @@ class AuthState extends ChangeNotifier {
   static Future<void> initialize() async {
     final session = await SessionManager.getSession();
     if (session == null) return;
+    // Existing sessions created before avatar persistence was introduced do
+    // not have an image in Keychain. Firebase retains Google/Apple identity
+    // across launches, so use it to hydrate the image without forcing the
+    // user to sign out and back in.
+    final firebasePhoto = FirebaseBootstrap.isReady
+        ? FirebaseAuth.instance.currentUser?.photoURL
+        : null;
+    final avatarUrl = session.avatarUrl?.trim().isNotEmpty == true
+        ? session.avatarUrl
+        : firebasePhoto;
     _instance
       .._signedIn = true
       .._email = session.email
       .._displayName = session.displayName
-      .._avatarUrl = session.avatarUrl
+      .._avatarUrl = avatarUrl
       .._method = session.method;
+
+    if (avatarUrl != null && avatarUrl.trim().isNotEmpty) {
+      await SessionManager.saveSession(
+        token: session.token,
+        userId: session.userId,
+        email: session.email,
+        displayName: session.displayName,
+        avatarUrl: avatarUrl,
+        method: session.method,
+      );
+    }
   }
 
   /// Persist a freshly minted backend session and flip to signed-in.

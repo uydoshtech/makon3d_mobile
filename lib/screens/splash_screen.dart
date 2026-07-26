@@ -1,5 +1,4 @@
 import "package:flutter/material.dart";
-import "package:flutter_svg/flutter_svg.dart";
 
 import "package:makon3d_mobile/screens/main_shell.dart";
 import "package:makon3d_mobile/services/makon_project_migration.dart";
@@ -8,9 +7,8 @@ import "package:makon3d_mobile/theme/makon_colors.dart";
 
 /// Brief branded splash before the main tab shell.
 ///
-/// Full-screen Makon yellow with the black brand mark centered — matches the
-/// native iOS launch screen so the handoff from LaunchScreen.storyboard
-/// feels continuous.
+/// Full-screen Makon yellow with the black brand mark and wordmark centered —
+/// matching the native iOS launch screen for a continuous handoff.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -18,26 +16,16 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen> {
   static const _holdMs = 1200;
-
-  late final AnimationController _fadeController;
-  late final Animation<double> _fade;
 
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 450),
-    );
-    _fade = CurvedAnimation(parent: _fadeController, curve: Curves.easeOut);
     _run();
   }
 
   Future<void> _run() async {
-    await _fadeController.forward();
     await Future.wait<void>([
       Future<void>.delayed(const Duration(milliseconds: _holdMs)),
       MakonProjectStore.instance.ensureLoaded(),
@@ -56,26 +44,17 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   @override
-  void dispose() {
-    _fadeController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    final markWidth = (size.shortestSide * 0.42).clamp(140.0, 220.0);
-
     return Scaffold(
       backgroundColor: MakonColors.yellow,
-      body: FadeTransition(
-        opacity: _fade,
-        child: Center(
-          child: SvgPicture.asset(
-            "assets/branding/makon3d_mark.svg",
-            fit: BoxFit.contain,
-            width: markWidth,
-          ),
+      body: Center(
+        child: Image.asset(
+          "assets/branding/makon_splash_logo.png",
+          fit: BoxFit.contain,
+          // Native LaunchScreen.storyboard renders this same artwork at
+          // 220pt wide. Keeping those bounds identical prevents a visual
+          // jump when Flutter draws its first frame.
+          width: 220,
         ),
       ),
     );
