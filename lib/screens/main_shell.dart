@@ -23,6 +23,7 @@ class _MainShellState extends State<MainShell> {
 
   static const int _projectsTab = 0;
   static const int _scansListTab = 1;
+  static const int _settingsTab = 2;
 
   void _goToTab(int index) {
     if (index == _index) return;
@@ -47,6 +48,7 @@ class _MainShellState extends State<MainShell> {
           ProjectsListScreen(
             isActive: onProjects,
             onCreateProject: () => unawaited(_openNewProject()),
+            onOpenAccount: () => _goToTab(_settingsTab),
           ),
           ScansListScreen(isActive: _index == _scansListTab),
           const SettingsScreen(),

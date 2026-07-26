@@ -11,12 +11,14 @@ class BackendSession {
     required this.userId,
     this.email,
     this.displayName,
+    this.avatarUrl,
   });
 
   final String sessionToken;
   final int userId;
   final String? email;
   final String? displayName;
+  final String? avatarUrl;
 
   factory BackendSession.fromJson(Map<String, dynamic> json) {
     final token = json["sessionToken"];
@@ -34,6 +36,7 @@ class BackendSession {
       userId: (userMap["id"] as num?)?.toInt() ?? 0,
       email: userMap["email"] as String?,
       displayName: profileMap["full_name"] as String?,
+      avatarUrl: profileMap["avatar_url"] as String?,
     );
   }
 }

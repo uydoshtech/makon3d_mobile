@@ -6,6 +6,7 @@ import 'package:makon3d_mobile/l10n/l10n.dart';
 import 'package:makon3d_mobile/models/makon_project.dart';
 import 'package:makon3d_mobile/screens/project_dashboard_screen.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
+import 'package:makon3d_mobile/widgets/app_bar_account_avatar.dart';
 import 'package:makon3d_mobile/widgets/project_delete_dialog.dart';
 
 /// Device-local Makon projects. Opening a project never re-asks for scan mode.
@@ -14,12 +15,16 @@ class ProjectsListScreen extends StatefulWidget {
     super.key,
     this.isActive = false,
     this.onCreateProject,
+    this.onOpenAccount,
   });
 
   final bool isActive;
 
   /// Hosted by [MainShell] so the + FAB sits above the curved tab bar.
   final VoidCallback? onCreateProject;
+
+  /// Opens the Account section in the shell's Settings tab.
+  final VoidCallback? onOpenAccount;
 
   @override
   State<ProjectsListScreen> createState() => _ProjectsListScreenState();
@@ -70,12 +75,8 @@ class _ProjectsListScreenState extends State<ProjectsListScreen> {
       appBar: AppBar(
         title: Text(L10n.get('projects_list_title')),
         actions: [
-          if (onCreate != null)
-            IconButton(
-              tooltip: L10n.get('project_new_title'),
-              onPressed: onCreate,
-              icon: const Icon(Icons.add),
-            ),
+          if (widget.onOpenAccount case final onOpenAccount?)
+            AppBarAccountAvatar(onTap: onOpenAccount),
         ],
       ),
       body: !store.isLoaded

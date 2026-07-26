@@ -65,6 +65,7 @@ abstract final class SignInFlow {
     await AuthState().onSignedIn(
       session: session,
       displayName: user.displayName,
+      avatarUrl: user.photoURL,
       method: method,
     );
   }

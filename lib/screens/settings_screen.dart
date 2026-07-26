@@ -21,6 +21,12 @@ class SettingsScreen extends StatelessWidget {
     "en": "English",
   };
 
+  static const Map<String, String> _flags = {
+    "uz": "🇺🇿",
+    "ru": "🇷🇺",
+    "en": "🇬🇧",
+  };
+
   @override
   Widget build(BuildContext context) {
     final current = LanguageState().currentLanguage;
@@ -35,11 +41,7 @@ class SettingsScreen extends StatelessWidget {
             builder: (context, _) => _accountSection(context),
           ),
           _sectionHeader(context, L10n.get("settings_language_title")),
-          for (final locale in supportedLocales)
-            _languageTile(
-              code: locale.languageCode,
-              selected: locale.languageCode == current,
-            ),
+          _languageDropdown(context, current),
         ],
       ),
     );
@@ -116,18 +118,35 @@ class SettingsScreen extends StatelessWidget {
     }
   }
 
-  Widget _languageTile({required String code, required bool selected}) {
-    return ListTile(
-      leading: Icon(
-        Icons.language,
-        color: selected ? MakonColors.yellow : MakonColors.inkMuted,
+  Widget _languageDropdown(BuildContext context, String current) {
+    return PopupMenuButton<String>(
+      tooltip: L10n.get("settings_language_title"),
+      initialValue: current,
+      onSelected: (code) => unawaited(LanguageState().setLanguage(code)),
+      itemBuilder: (context) => [
+        for (final locale in supportedLocales)
+          PopupMenuItem(
+            value: locale.languageCode,
+            child: Row(
+              children: [
+                Text(
+                  _flags[locale.languageCode] ?? "🌐",
+                  style: const TextStyle(fontSize: 24),
+                ),
+                const SizedBox(width: 12),
+                Text(_nativeNames[locale.languageCode] ?? locale.languageCode),
+              ],
+            ),
+          ),
+      ],
+      child: ListTile(
+        leading: Text(
+          _flags[current] ?? "🌐",
+          style: const TextStyle(fontSize: 28),
+        ),
+        title: Text(_nativeNames[current] ?? current),
+        trailing: const Icon(Icons.keyboard_arrow_down_rounded),
       ),
-      title: Text(_nativeNames[code] ?? code),
-      trailing: selected
-          ? const Icon(Icons.check_rounded, color: MakonColors.yellow)
-          : null,
-      selected: selected,
-      onTap: () => unawaited(LanguageState().setLanguage(code)),
     );
   }
 }

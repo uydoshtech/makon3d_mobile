@@ -18,11 +18,13 @@ class AuthState extends ChangeNotifier {
   bool _signedIn = false;
   String? _email;
   String? _displayName;
+  String? _avatarUrl;
   String? _method;
 
   bool get isSignedIn => _signedIn;
   String? get email => _email;
   String? get displayName => _displayName;
+  String? get avatarUrl => _avatarUrl;
   String? get method => _method;
 
   /// Restore the persisted session at app launch (before runApp).
@@ -33,6 +35,7 @@ class AuthState extends ChangeNotifier {
       .._signedIn = true
       .._email = session.email
       .._displayName = session.displayName
+      .._avatarUrl = session.avatarUrl
       .._method = session.method;
   }
 
@@ -40,19 +43,23 @@ class AuthState extends ChangeNotifier {
   Future<void> onSignedIn({
     required BackendSession session,
     String? displayName,
+    String? avatarUrl,
     String? method,
   }) async {
     final name = displayName ?? session.displayName;
+    final photo = avatarUrl ?? session.avatarUrl;
     await SessionManager.saveSession(
       token: session.sessionToken,
       userId: session.userId,
       email: session.email,
       displayName: name,
+      avatarUrl: photo,
       method: method,
     );
     _signedIn = true;
     _email = session.email;
     _displayName = name;
+    _avatarUrl = photo;
     _method = method;
     notifyListeners();
   }
@@ -77,6 +84,7 @@ class AuthState extends ChangeNotifier {
     _signedIn = false;
     _email = null;
     _displayName = null;
+    _avatarUrl = null;
     _method = null;
     notifyListeners();
   }

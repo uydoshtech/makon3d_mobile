@@ -23,37 +23,45 @@ class MakonCurvedNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = <Widget>[
-      _navItem(
-        icon: Icons.folder_outlined,
-        labelKey: "nav_projects",
-        selected: currentIndex == 0,
-      ),
-      _navItem(
-        icon: Icons.view_list_rounded,
-        labelKey: "nav_scans",
-        selected: currentIndex == 1,
-      ),
-      _navItem(
-        icon: Icons.settings_outlined,
-        labelKey: "nav_settings",
-        selected: currentIndex == 2,
-      ),
-    ];
+    return ListenableBuilder(
+      listenable: LanguageState(),
+      builder: (context, _) {
+        final items = <Widget>[
+          _navItem(
+            icon: Icons.folder_outlined,
+            labelKey: "nav_projects",
+            selected: currentIndex == 0,
+          ),
+          _navItem(
+            icon: Icons.view_list_rounded,
+            labelKey: "nav_scans",
+            selected: currentIndex == 1,
+          ),
+          _navItem(
+            icon: Icons.settings_outlined,
+            labelKey: "nav_settings",
+            selected: currentIndex == 2,
+          ),
+        ];
 
-    return SizedBox(
-      height: 70,
-      child: CurvedNavigationBar(
-        index: currentIndex.clamp(0, items.length - 1),
-        height: 70,
-        color: _barColor,
-        buttonBackgroundColor: Colors.transparent,
-        backgroundColor: _notchColor,
-        animationCurve: Curves.easeInOut,
-        animationDuration: const Duration(milliseconds: 300),
-        onTap: onTap,
-        items: items,
-      ),
+        // The package caches its `items` in State, so a locale-specific key
+        // is required to discard the English labels it mounted with.
+        return SizedBox(
+          height: 70,
+          child: CurvedNavigationBar(
+            key: ValueKey(LanguageState().currentLanguage),
+            index: currentIndex.clamp(0, items.length - 1),
+            height: 70,
+            color: _barColor,
+            buttonBackgroundColor: Colors.transparent,
+            backgroundColor: _notchColor,
+            animationCurve: Curves.easeInOut,
+            animationDuration: const Duration(milliseconds: 300),
+            onTap: onTap,
+            items: items,
+          ),
+        );
+      },
     );
   }
 

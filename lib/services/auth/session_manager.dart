@@ -7,6 +7,7 @@ class StoredSession {
     required this.userId,
     this.email,
     this.displayName,
+    this.avatarUrl,
     this.method,
   });
 
@@ -14,6 +15,7 @@ class StoredSession {
   final int userId;
   final String? email;
   final String? displayName;
+  final String? avatarUrl;
 
   /// "apple" | "google" | "telegram" — informational only.
   final String? method;
@@ -31,6 +33,7 @@ abstract final class SessionManager {
   static const _userIdKey = "makon3d_session_user_id";
   static const _emailKey = "makon3d_session_email";
   static const _nameKey = "makon3d_session_name";
+  static const _avatarUrlKey = "makon3d_session_avatar_url";
   static const _methodKey = "makon3d_session_method";
 
   static String? _cachedToken;
@@ -41,12 +44,14 @@ abstract final class SessionManager {
     required int userId,
     String? email,
     String? displayName,
+    String? avatarUrl,
     String? method,
   }) async {
     await _storage.write(key: _tokenKey, value: token);
     await _storage.write(key: _userIdKey, value: userId.toString());
     await _writeOrDelete(_emailKey, email);
     await _writeOrDelete(_nameKey, displayName);
+    await _writeOrDelete(_avatarUrlKey, avatarUrl);
     await _writeOrDelete(_methodKey, method);
     _cachedToken = token;
     _tokenLoaded = true;
@@ -70,11 +75,13 @@ abstract final class SessionManager {
     String? userIdRaw;
     String? email;
     String? name;
+    String? avatarUrl;
     String? method;
     try {
       userIdRaw = await _storage.read(key: _userIdKey);
       email = await _storage.read(key: _emailKey);
       name = await _storage.read(key: _nameKey);
+      avatarUrl = await _storage.read(key: _avatarUrlKey);
       method = await _storage.read(key: _methodKey);
     } catch (_) {
       // Keychain hiccup — token alone is still a valid session.
@@ -84,6 +91,7 @@ abstract final class SessionManager {
       userId: int.tryParse(userIdRaw ?? "") ?? 0,
       email: email,
       displayName: name,
+      avatarUrl: avatarUrl,
       method: method,
     );
   }
@@ -91,7 +99,14 @@ abstract final class SessionManager {
   static Future<void> clearSession() async {
     _cachedToken = null;
     _tokenLoaded = true;
-    for (final key in [_tokenKey, _userIdKey, _emailKey, _nameKey, _methodKey]) {
+    for (final key in [
+      _tokenKey,
+      _userIdKey,
+      _emailKey,
+      _nameKey,
+      _avatarUrlKey,
+      _methodKey,
+    ]) {
       try {
         await _storage.delete(key: key);
       } catch (_) {
