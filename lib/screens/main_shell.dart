@@ -8,7 +8,9 @@ import 'package:makon3d_mobile/screens/new_project_screen.dart';
 import 'package:makon3d_mobile/screens/projects_list_screen.dart';
 import 'package:makon3d_mobile/screens/scans_list_screen.dart';
 import 'package:makon3d_mobile/screens/settings_screen.dart';
+import 'package:makon3d_mobile/services/auth/auth_state.dart';
 import 'package:makon3d_mobile/widgets/curved_nav_bar.dart';
+import 'package:makon3d_mobile/widgets/sign_in_sheet.dart';
 
 /// Three-tab shell: Projects + legacy device scans list + settings.
 class MainShell extends StatefulWidget {
@@ -25,6 +27,22 @@ class _MainShellState extends State<MainShell> {
   static const int _scansListTab = 1;
   static const int _settingsTab = 2;
 
+  @override
+  void initState() {
+    super.initState();
+    AuthState().addListener(_onAuthChanged);
+  }
+
+  @override
+  void dispose() {
+    AuthState().removeListener(_onAuthChanged);
+    super.dispose();
+  }
+
+  void _onAuthChanged() {
+    if (mounted) setState(() {});
+  }
+
   void _goToTab(int index) {
     if (index == _index) return;
     HapticFeedback.selectionClick();
@@ -32,6 +50,10 @@ class _MainShellState extends State<MainShell> {
   }
 
   Future<void> _openNewProject() async {
+    if (!AuthState().isSignedIn) {
+      await SignInSheet.show(context);
+      return;
+    }
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(builder: (_) => const NewProjectScreen()),
     );
@@ -54,7 +76,7 @@ class _MainShellState extends State<MainShell> {
           const SettingsScreen(),
         ],
       ),
-      floatingActionButton: onProjects
+      floatingActionButton: onProjects && AuthState().isSignedIn
           ? FloatingActionButton(
               onPressed: () => unawaited(_openNewProject()),
               tooltip: L10n.get('project_new_title'),

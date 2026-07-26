@@ -6,9 +6,11 @@ import 'package:room_scan_kit/scan_flow/scan_flow.dart';
 import 'package:makon3d_mobile/l10n/l10n.dart';
 import 'package:makon3d_mobile/models/makon_project.dart';
 import 'package:makon3d_mobile/screens/project_dashboard_screen.dart';
+import 'package:makon3d_mobile/services/auth/auth_state.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
 import 'package:makon3d_mobile/widgets/app_bar_account_avatar.dart';
 import 'package:makon3d_mobile/widgets/project_delete_dialog.dart';
+import 'package:makon3d_mobile/widgets/sign_in_sheet.dart';
 
 /// Device-local Makon projects. Opening a project never re-asks for scan mode.
 class ProjectsListScreen extends StatefulWidget {
@@ -36,12 +38,14 @@ class _ProjectsListScreenState extends State<ProjectsListScreen> {
   void initState() {
     super.initState();
     MakonProjectStore.instance.addListener(_onChanged);
+    AuthState().addListener(_onChanged);
     unawaited(MakonProjectStore.instance.ensureLoaded());
   }
 
   @override
   void dispose() {
     MakonProjectStore.instance.removeListener(_onChanged);
+    AuthState().removeListener(_onChanged);
     super.dispose();
   }
 
@@ -50,6 +54,10 @@ class _ProjectsListScreenState extends State<ProjectsListScreen> {
   }
 
   Future<void> _openProject(MakonProject project) async {
+    if (!AuthState().isSignedIn) {
+      await SignInSheet.show(context);
+      return;
+    }
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (_) => ProjectDashboardScreen(projectId: project.id),
@@ -62,6 +70,7 @@ class _ProjectsListScreenState extends State<ProjectsListScreen> {
     final store = MakonProjectStore.instance;
     final projects = store.projects;
     final onCreate = widget.onCreateProject;
+    final isSignedIn = AuthState().isSignedIn;
 
     return Scaffold(
       appBar: AppBar(
@@ -71,47 +80,69 @@ class _ProjectsListScreenState extends State<ProjectsListScreen> {
             AppBarAccountAvatar(onTap: onOpenAccount),
         ],
       ),
-      body: !store.isLoaded
+      body: !isSignedIn
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(32, 32, 32, 120),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      L10n.get('projects_sign_in_required'),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                    const SizedBox(height: 20),
+                    FilledButton(
+                      onPressed: () {
+                        SignInSheet.show(context);
+                      },
+                      child: Text(L10n.get('settings_sign_in')),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : !store.isLoaded
           ? const Center(child: CircularProgressIndicator())
           : projects.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(32, 32, 32, 120),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          L10n.get('projects_empty'),
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                        if (onCreate != null) ...[
-                          const SizedBox(height: 20),
-                          FilledButton.icon(
-                            onPressed: onCreate,
-                            icon: const Icon(Icons.add),
-                            label: Text(L10n.get('project_new_title')),
-                          ),
-                        ],
-                      ],
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(32, 32, 32, 120),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      L10n.get('projects_empty'),
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
-                  ),
-                )
-              : ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
-                  itemCount: projects.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 8),
-                  itemBuilder: (context, index) {
-                    final project = projects[index];
-                    return _ProjectCard(
-                      project: project,
-                      onTap: () => unawaited(_openProject(project)),
-                      onLongPress: () => unawaited(
-                        confirmAndDeleteProject(context, project),
+                    if (onCreate != null) ...[
+                      const SizedBox(height: 20),
+                      FilledButton.icon(
+                        onPressed: onCreate,
+                        icon: const Icon(Icons.add),
+                        label: Text(L10n.get('project_new_title')),
                       ),
-                    );
-                  },
+                    ],
+                  ],
                 ),
+              ),
+            )
+          : ListView.separated(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
+              itemCount: projects.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                final project = projects[index];
+                return _ProjectCard(
+                  project: project,
+                  onTap: () => unawaited(_openProject(project)),
+                  onLongPress: () =>
+                      unawaited(confirmAndDeleteProject(context, project)),
+                );
+              },
+            ),
     );
   }
 }
@@ -128,9 +159,9 @@ class _ProjectCard extends StatelessWidget {
   final VoidCallback onLongPress;
 
   IconData get _modeIcon => switch (project.scanMode) {
-        ScanMode.entireHousing => Icons.home_outlined,
-        ScanMode.roomByRoom => Icons.grid_view_rounded,
-      };
+    ScanMode.entireHousing => Icons.home_outlined,
+    ScanMode.roomByRoom => Icons.grid_view_rounded,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -159,10 +190,7 @@ class _ProjectCard extends StatelessWidget {
                   color: theme.colorScheme.secondary,
                   borderRadius: BorderRadius.circular(13),
                 ),
-                child: Icon(
-                  _modeIcon,
-                  color: theme.colorScheme.onSecondary,
-                ),
+                child: Icon(_modeIcon, color: theme.colorScheme.onSecondary),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -191,10 +219,7 @@ class _ProjectCard extends StatelessWidget {
                     ],
                     if (hasNotes) ...[
                       const SizedBox(height: 4),
-                      _MetadataLine(
-                        icon: Icons.notes_outlined,
-                        text: notes,
-                      ),
+                      _MetadataLine(icon: Icons.notes_outlined, text: notes),
                     ],
                   ],
                 ),

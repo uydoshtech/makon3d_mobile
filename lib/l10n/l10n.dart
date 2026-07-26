@@ -26,7 +26,8 @@ class LanguageState extends ChangeNotifier {
   static Future<void> initialize() async {
     final prefs = await SharedPreferences.getInstance();
     final stored = prefs.getString(_prefsKey);
-    if (stored != null && supportedLocales.any((l) => l.languageCode == stored)) {
+    if (stored != null &&
+        supportedLocales.any((l) => l.languageCode == stored)) {
       _instance._currentLanguage = stored;
       return;
     }
@@ -61,7 +62,11 @@ class L10n {
   static String get(String key, {String? fallback}) =>
       getForLanguage(key, currentLanguage, fallback: fallback);
 
-  static String getForLanguage(String key, String language, {String? fallback}) {
+  static String getForLanguage(
+    String key,
+    String language, {
+    String? fallback,
+  }) {
     final map = _strings[language] ?? _strings["en"]!;
     return map[key] ?? _strings["en"]![key] ?? fallback ?? key;
   }
@@ -98,6 +103,7 @@ class L10n {
       "projects_list_title": "Projects",
       "projects_empty":
           "No projects yet.\nCreate a project to choose how you want to scan.",
+      "projects_sign_in_required": "Sign in to view and manage your projects.",
       "project_new_title": "New Project",
       "project_name_label": "Project name",
       "project_address_label": "Property address",
@@ -139,16 +145,14 @@ class L10n {
       "materials_floor_title": "Floor tiles",
       "materials_floor_surface": "Floor",
       "materials_floor_area_template": "Measured area: ~{area} m²",
-      "materials_floor_area_approx":
-          "Using room length × width (approximate).",
+      "materials_floor_area_approx": "Using room length × width (approximate).",
       "materials_floor_no_area":
           "No floor area yet. Scan this room to estimate tiles.",
       "materials_wallpaper_title": "Wallpaper",
       "materials_walls_surface": "Walls",
       "materials_perimeter_height_template":
           "Perimeter: ~{perimeter} m · Height: ~{height} m",
-      "materials_openings_note":
-          "Door and window openings are not subtracted.",
+      "materials_openings_note": "Door and window openings are not subtracted.",
       "materials_wall_net_area_template":
           "Wall area: ~{net} m² (openings ~{openings} m² subtracted).",
       "materials_wall_no_openings_template":
@@ -281,7 +285,8 @@ class L10n {
       "room_scan_detected_fireplace": "✓ Fireplace detected",
       "room_scan_detected_stairs": "✓ Stairs detected",
       "room_scan_detected_object": "✓ Object detected",
-      "room_scan_uploading": "Uploading & converting…\nThis can take a few minutes.",
+      "room_scan_uploading":
+          "Uploading & converting…\nThis can take a few minutes.",
       "room_scan_success": "3D scan saved",
       "room_scan_cancelled": "No scan was captured. Tap Start to try again.",
       "room_scan_error": "Could not save scan. Try again.",
@@ -450,6 +455,8 @@ class L10n {
       "projects_list_title": "Проекты",
       "projects_empty":
           "Пока нет проектов.\nСоздайте проект и выберите способ сканирования.",
+      "projects_sign_in_required":
+          "Войдите, чтобы просматривать проекты и управлять ими.",
       "project_new_title": "Новый проект",
       "project_name_label": "Название проекта",
       "project_address_label": "Адрес объекта",
@@ -499,14 +506,12 @@ class L10n {
       "materials_walls_surface": "Стены",
       "materials_perimeter_height_template":
           "Периметр: ~{perimeter} м · Высота: ~{height} м",
-      "materials_openings_note":
-          "Без вычета дверных и оконных проёмов.",
+      "materials_openings_note": "Без вычета дверных и оконных проёмов.",
       "materials_wall_net_area_template":
           "Площадь стен: ~{net} м² (проёмы ~{openings} м² вычтены).",
       "materials_wall_no_openings_template":
           "Площадь стен: ~{net} м²; проёмы не обнаружены.",
-      "materials_walls_no_area":
-          "Замеров стен пока нет. Отсканируйте комнату.",
+      "materials_walls_no_area": "Замеров стен пока нет. Отсканируйте комнату.",
       "materials_roll_size_m": "Размер рулона (м)",
       "materials_pattern_repeat_cm": "Раппорт",
       "materials_result_rolls_template": "{count} рулонов",
@@ -552,8 +557,7 @@ class L10n {
       "scan_mode_choose_subtitle": "Как вы хотите сканировать?",
       "scan_mode_continue": "Продолжить",
       "scan_mode_entire_housing_title": "Сканировать всё жильё",
-      "scan_mode_entire_housing_subtitle":
-          "Создать один полный скан объекта",
+      "scan_mode_entire_housing_subtitle": "Создать один полный скан объекта",
       "scan_mode_entire_housing_detail":
           "Лучше всего для быстрого полного 3D-модели объекта.",
       "scan_mode_room_by_room_title": "Сканировать комнаты по отдельности",
@@ -635,7 +639,8 @@ class L10n {
       "room_scan_detected_fireplace": "✓ Обнаружен камин",
       "room_scan_detected_stairs": "✓ Обнаружена лестница",
       "room_scan_detected_object": "✓ Обнаружен объект",
-      "room_scan_uploading": "Загрузка и конвертация…\nЭто может занять несколько минут.",
+      "room_scan_uploading":
+          "Загрузка и конвертация…\nЭто может занять несколько минут.",
       "room_scan_success": "3D-скан сохранён",
       "room_scan_cancelled":
           "Скан не был сделан. Нажмите «Начать», чтобы попробовать снова.",
@@ -805,6 +810,8 @@ class L10n {
       "projects_list_title": "Loyihalar",
       "projects_empty":
           "Hali loyiha yo'q.\nSkanlash usulini tanlash uchun loyiha yarating.",
+      "projects_sign_in_required":
+          "Loyihalaringizni ko‘rish va boshqarish uchun kiring.",
       "project_new_title": "Yangi loyiha",
       "project_name_label": "Loyiha nomi",
       "project_address_label": "Mulk manzili",
@@ -837,7 +844,8 @@ class L10n {
       "scan_delete_confirm_message":
           "Skan #{id} o'chiriladi. Buni ortga qaytarib bo'lmaydi.",
       "scan_deleted": "Skan o'chirildi",
-      "scan_delete_failed": "Skanni o'chirib bo'lmadi. Keyinroq urinib ko'ring.",
+      "scan_delete_failed":
+          "Skanni o'chirib bo'lmadi. Keyinroq urinib ko'ring.",
       "project_scan_mode_label": "Skanlash rejimi",
       "project_action_3d_model": "3D model",
       "project_action_measurements": "O'lchamlar",
@@ -854,8 +862,7 @@ class L10n {
       "materials_walls_surface": "Devorlar",
       "materials_perimeter_height_template":
           "Perimetr: ~{perimeter} m · Balandlik: ~{height} m",
-      "materials_openings_note":
-          "Eshik va deraza o'rinlari chegirilmagan.",
+      "materials_openings_note": "Eshik va deraza o'rinlari chegirilmagan.",
       "materials_wall_net_area_template":
           "Devor maydoni: ~{net} m² (o'rinlar ~{openings} m² chegirilgan).",
       "materials_wall_no_openings_template":
@@ -991,7 +998,8 @@ class L10n {
       "room_scan_detected_fireplace": "✓ Kamin aniqlandi",
       "room_scan_detected_stairs": "✓ Zinapoya aniqlandi",
       "room_scan_detected_object": "✓ Obyekt aniqlandi",
-      "room_scan_uploading": "Yuklash va konvertatsiya…\nBu bir necha daqiqa olishi mumkin.",
+      "room_scan_uploading":
+          "Yuklash va konvertatsiya…\nBu bir necha daqiqa olishi mumkin.",
       "room_scan_success": "3D skan saqlandi",
       "room_scan_cancelled":
           "Skan qilinmadi. Qayta urinish uchun «Boshlash»ni bosing.",
@@ -1094,7 +1102,8 @@ class L10n {
       "room_3d_floor_plan_furniture_color_default": "Standart rang",
       "room_3d_floor_plan_furniture_color_accessibility": "Rang %d",
       "room_3d_floor_plan_delete_furniture": "O'chirish",
-      "room_3d_floor_plan_delete_furniture_confirm_title": "Mebelni olib tashlash?",
+      "room_3d_floor_plan_delete_furniture_confirm_title":
+          "Mebelni olib tashlash?",
       "room_3d_floor_plan_delete_furniture_confirm_message":
           "Bu buyum 3D ko'rinish va qavat rejasidan yashiriladi.",
       "room_3d_floor_plan_delete_furniture_updated": "Mebel olib tashlandi",

@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:makon3d_mobile/models/housing_scan.dart';
 import 'package:makon3d_mobile/models/makon_project.dart';
+import 'package:makon3d_mobile/services/auth/auth_state.dart';
 import 'package:makon3d_mobile/services/project_sync_service.dart';
 
 /// Local persistence for Makon projects (device-scoped SharedPreferences
@@ -14,7 +15,9 @@ import 'package:makon3d_mobile/services/project_sync_service.dart';
 /// survive app deletion + reinstall: every change is pushed best-effort, and
 /// the first load after a (re)install pulls this device's backups back.
 class MakonProjectStore extends ChangeNotifier {
-  MakonProjectStore._();
+  MakonProjectStore._() {
+    AuthState().addListener(_handleAuthChanged);
+  }
 
   static final MakonProjectStore instance = MakonProjectStore._();
 
@@ -29,6 +32,10 @@ class MakonProjectStore extends ChangeNotifier {
   bool get isLoaded => _loaded;
 
   Future<void> ensureLoaded() async {
+    if (!AuthState().isSignedIn) {
+      _setGuestState();
+      return;
+    }
     if (_loaded) {
       _startBackendSync();
       return;
@@ -50,9 +57,7 @@ class MakonProjectStore extends ChangeNotifier {
           if (item is Map<String, dynamic>) {
             list.add(MakonProject.fromJson(item));
           } else if (item is Map) {
-            list.add(
-              MakonProject.fromJson(Map<String, dynamic>.from(item)),
-            );
+            list.add(MakonProject.fromJson(Map<String, dynamic>.from(item)));
           }
         }
       }
@@ -85,6 +90,7 @@ class MakonProjectStore extends ChangeNotifier {
 
   Future<void> upsert(MakonProject project) async {
     await ensureLoaded();
+    if (!AuthState().isSignedIn) return;
     final next = [..._projects];
     final index = next.indexWhere((p) => p.id == project.id);
     if (index >= 0) {
@@ -100,6 +106,7 @@ class MakonProjectStore extends ChangeNotifier {
 
   Future<void> delete(String id) async {
     await ensureLoaded();
+    if (!AuthState().isSignedIn) return;
     final project = getById(id);
     _projects = _projects.where((p) => p.id != id).toList();
     await _persist();
@@ -145,6 +152,7 @@ class MakonProjectStore extends ChangeNotifier {
   }
 
   Future<void> replaceAll(List<MakonProject> projects) async {
+    if (!AuthState().isSignedIn) return;
     _projects = List.of(projects);
     _loaded = true;
     await _persist();
@@ -154,8 +162,9 @@ class MakonProjectStore extends ChangeNotifier {
 
   Future<void> _persist() async {
     final prefs = await SharedPreferences.getInstance();
-    final encoded =
-        jsonEncode(_projects.map((p) => p.toJson()).toList(growable: false));
+    final encoded = jsonEncode(
+      _projects.map((p) => p.toJson()).toList(growable: false),
+    );
     await prefs.setString(_prefsKey, encoded);
   }
 
@@ -165,17 +174,20 @@ class MakonProjectStore extends ChangeNotifier {
   /// Local always wins for projects present on both sides — this device is
   /// the only writer of its own backups.
   void _startBackendSync() {
-    if (_backendSyncStarted) return;
+    if (!AuthState().isSignedIn || _backendSyncStarted) return;
     _backendSyncStarted = true;
     unawaited(_syncWithBackend());
   }
 
   Future<void> _syncWithBackend() async {
+    if (!AuthState().isSignedIn) return;
     try {
       final remote = await ProjectSyncService.fetchRemoteProjects();
+      if (!AuthState().isSignedIn) return;
       final localIds = _projects.map((p) => p.id).toSet();
-      final restored =
-          remote.where((p) => !localIds.contains(p.id)).toList(growable: false);
+      final restored = remote
+          .where((p) => !localIds.contains(p.id))
+          .toList(growable: false);
       if (restored.isNotEmpty) {
         final merged = [..._projects, ...restored]
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -187,5 +199,27 @@ class MakonProjectStore extends ChangeNotifier {
     } catch (e) {
       debugPrint('MakonProjectStore backend sync failed: $e');
     }
+  }
+
+  void _handleAuthChanged() {
+    if (AuthState().isSignedIn) {
+      // Guest mode intentionally never reads local projects. Start a fresh
+      // authenticated load once a session becomes available.
+      _loaded = false;
+      _backendSyncStarted = false;
+      unawaited(ensureLoaded());
+      return;
+    }
+    _setGuestState();
+  }
+
+  /// Removes projects from memory without deleting the local backup. This
+  /// prevents project data from appearing after sign-out or in guest mode.
+  void _setGuestState() {
+    final didChange = _projects.isNotEmpty || !_loaded || _backendSyncStarted;
+    _projects = const [];
+    _loaded = true;
+    _backendSyncStarted = false;
+    if (didChange) notifyListeners();
   }
 }
