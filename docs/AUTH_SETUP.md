@@ -41,15 +41,16 @@ the corresponding sign-in buttons are simply hidden.
 ## 4. Telegram (native login)
 
 1. @BotFather → Bot Settings → Login Widget → **Native Login** → register
-   the iOS app `com.makon3d.app`. BotFather assigns an App URL like
-   `https://appXXXXXXXXXX-login.tg.dev`.
+   the iOS app `com.makon3d.app` with the Apple Developer Team ID
+   `D5THR62Q33`. BotFather assigns an App URL:
+   `https://app1229616832-login.tg.dev`.
 2. Add that host to `ios/Runner/Runner.entitlements` Associated Domains:
-   `applinks:appXXXXXXXXXX-login.tg.dev` and
-   `webcredentials:appXXXXXXXXXX-login.tg.dev`.
+   `applinks:app1229616832-login.tg.dev` and
+   `webcredentials:app1229616832-login.tg.dev`.
 3. Build with:
 
    ```
-   --dart-define=TELEGRAM_NATIVE_REDIRECT_URI_IOS=https://appXXXXXXXXXX-login.tg.dev
+   --dart-define=TELEGRAM_NATIVE_REDIRECT_URI_IOS=https://app1229616832-login.tg.dev
    ```
 
    Makon3D defaults to its `@makon3d_bot` client id (`8923824061`). Pass

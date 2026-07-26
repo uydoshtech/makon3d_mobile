@@ -8,6 +8,7 @@ import "package:makon3d_mobile/services/auth/sign_in_flow.dart";
 import "package:makon3d_mobile/services/auth/telegram_native_login_service.dart";
 import "package:makon3d_mobile/theme/makon_colors.dart";
 import "package:makon3d_mobile/widgets/google_sign_in_branded_button.dart";
+import "package:makon3d_mobile/widgets/telegram_sign_in_branded_button.dart";
 
 /// Bottom sheet with the available sign-in providers. Pops with `true`
 /// after a successful sign-in ([AuthState] listeners drive the rest of the
@@ -119,10 +120,11 @@ class _SignInSheetState extends State<SignInSheet> {
               const SizedBox(height: 12),
             ],
             if (showTelegram) ...[
-              _providerButton(
+              TelegramSignInBrandedButton(
                 label: L10n.get("sign_in_with_telegram"),
-                icon: Icons.send_rounded,
-                onPressed: () => _run(SignInFlow.signInWithTelegram),
+                onPressed: _busy
+                    ? null
+                    : () => _run(SignInFlow.signInWithTelegram),
               ),
               const SizedBox(height: 12),
             ],
@@ -147,26 +149,6 @@ class _SignInSheetState extends State<SignInSheet> {
                 ),
               ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _providerButton({
-    required String label,
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return SizedBox(
-      height: 48,
-      child: OutlinedButton.icon(
-        onPressed: _busy ? null : onPressed,
-        icon: Icon(icon, size: 24),
-        label: Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: MakonColors.ink,
-          side: const BorderSide(color: Color(0xFFDDDDDD)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
     );

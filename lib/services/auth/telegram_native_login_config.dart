@@ -2,7 +2,7 @@
 ///
 /// The BotFather registration is **per app**: register `com.makon3d.app` in
 /// @BotFather → Bot Settings → Login Widget → Native Login, which assigns a
-/// Makon3D-specific App URL (`https://appXXXXXXXXXX-login.tg.dev`). The
+/// Makon3D-specific App URL (`https://app1229616832-login.tg.dev`). The
 /// UyDosh values cannot be reused — they are bound to `com.uydosh.app`.
 ///
 /// Until that registration exists the iOS redirect URI remains empty,
@@ -10,7 +10,7 @@
 /// build with:
 ///
 /// ```
-/// --dart-define=TELEGRAM_NATIVE_REDIRECT_URI_IOS=https://appXXXXXXXXXX-login.tg.dev
+/// --dart-define=TELEGRAM_NATIVE_REDIRECT_URI_IOS=https://app1229616832-login.tg.dev
 /// ```
 ///
 /// and add that host to Runner's Associated Domains (`applinks:` +
@@ -25,7 +25,7 @@ abstract final class TelegramNativeLoginConfig {
   /// iOS native login redirect URI (App URL from BotFather's iOS entry).
   static const redirectUri = String.fromEnvironment(
     "TELEGRAM_NATIVE_REDIRECT_URI_IOS",
-    defaultValue: "",
+    defaultValue: "https://app1229616832-login.tg.dev",
   );
 
   /// OAuth scopes requested from Telegram (openid is implicit in native SDK).

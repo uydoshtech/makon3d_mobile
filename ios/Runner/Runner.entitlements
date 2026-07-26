@@ -10,5 +10,10 @@
 	<array>
 		<string>$(AppIdentifierPrefix)com.makon3d.app.Clip</string>
 	</array>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:app1229616832-login.tg.dev</string>
+		<string>webcredentials:app1229616832-login.tg.dev</string>
+	</array>
 </dict>
 </plist>
