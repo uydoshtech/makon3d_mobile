@@ -16,12 +16,14 @@ class AuthState extends ChangeNotifier {
   factory AuthState() => _instance;
 
   bool _signedIn = false;
+  int? _userId;
   String? _email;
   String? _displayName;
   String? _avatarUrl;
   String? _method;
 
   bool get isSignedIn => _signedIn;
+  int? get userId => _userId;
   String? get email => _email;
   String? get displayName => _displayName;
   String? get avatarUrl => _avatarUrl;
@@ -43,6 +45,7 @@ class AuthState extends ChangeNotifier {
         : firebasePhoto;
     _instance
       .._signedIn = true
+      .._userId = session.userId
       .._email = session.email
       .._displayName = session.displayName
       .._avatarUrl = avatarUrl
@@ -78,6 +81,7 @@ class AuthState extends ChangeNotifier {
       method: method,
     );
     _signedIn = true;
+    _userId = session.userId;
     _email = session.email;
     _displayName = name;
     _avatarUrl = photo;
@@ -103,6 +107,7 @@ class AuthState extends ChangeNotifier {
     }
     await SessionManager.clearSession();
     _signedIn = false;
+    _userId = null;
     _email = null;
     _displayName = null;
     _avatarUrl = null;

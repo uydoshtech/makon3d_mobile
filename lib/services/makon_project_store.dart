@@ -10,10 +10,8 @@ import 'package:makon3d_mobile/models/makon_project.dart';
 import 'package:makon3d_mobile/services/auth/auth_state.dart';
 import 'package:makon3d_mobile/services/project_sync_service.dart';
 
-/// Local persistence for Makon projects (device-scoped SharedPreferences
-/// JSON), mirrored to the backend via [ProjectSyncService] so projects
-/// survive app deletion + reinstall: every change is pushed best-effort, and
-/// the first load after a (re)install pulls this device's backups back.
+/// Local persistence for Makon projects, partitioned by signed-in account and
+/// mirrored to the backend via [ProjectSyncService].
 class MakonProjectStore extends ChangeNotifier {
   MakonProjectStore._() {
     AuthState().addListener(_handleAuthChanged);
@@ -21,8 +19,8 @@ class MakonProjectStore extends ChangeNotifier {
 
   static final MakonProjectStore instance = MakonProjectStore._();
 
-  static const _prefsKey = 'makon_projects_v1';
-  static const _migratedKey = 'makon_projects_migrated_from_scans_v1';
+  static const _legacyPrefsKey = 'makon_projects_v1';
+  static const _legacyMigratedKey = 'makon_projects_migrated_from_scans_v1';
 
   List<MakonProject> _projects = const [];
   bool _loaded = false;
@@ -30,6 +28,18 @@ class MakonProjectStore extends ChangeNotifier {
 
   List<MakonProject> get projects => List.unmodifiable(_projects);
   bool get isLoaded => _loaded;
+
+  String get _userKeySuffix {
+    final userId = AuthState().userId;
+    if (userId == null || userId <= 0) {
+      throw StateError('A signed-in user is required for project storage.');
+    }
+    return userId.toString();
+  }
+
+  String get _prefsKey => 'makon_projects_v2_user_$_userKeySuffix';
+  String get _migratedKey =>
+      'makon_projects_migrated_from_scans_v1_user_$_userKeySuffix';
 
   Future<void> ensureLoaded() async {
     if (!AuthState().isSignedIn) {
@@ -41,7 +51,16 @@ class MakonProjectStore extends ChangeNotifier {
       return;
     }
     final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_prefsKey);
+    var raw = prefs.getString(_prefsKey);
+    // The former device-wide cache belongs to the first account that claims
+    // this device's legacy backups. Move it once, then never expose it to a
+    // different account on this device.
+    if ((raw == null || raw.isEmpty) &&
+        (prefs.getString(_legacyPrefsKey)?.isNotEmpty ?? false)) {
+      raw = prefs.getString(_legacyPrefsKey);
+      await prefs.setString(_prefsKey, raw!);
+      await prefs.remove(_legacyPrefsKey);
+    }
     if (raw == null || raw.isEmpty) {
       _projects = const [];
       _loaded = true;
@@ -73,7 +92,15 @@ class MakonProjectStore extends ChangeNotifier {
 
   Future<bool> get hasCompletedScanMigration async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_migratedKey) ?? false;
+    if (prefs.getBool(_migratedKey) == true) return true;
+    // Preserve a completed legacy migration for the first account that owns
+    // the device cache, then move the marker into its account namespace.
+    if (prefs.getBool(_legacyMigratedKey) == true) {
+      await prefs.setBool(_migratedKey, true);
+      await prefs.remove(_legacyMigratedKey);
+      return true;
+    }
+    return false;
   }
 
   Future<void> markScanMigrationCompleted() async {
@@ -169,6 +196,7 @@ class MakonProjectStore extends ChangeNotifier {
   }
 
   /// One-shot background reconcile with the backend backups:
+  /// - legacy device backups are claimed by this account;
   /// - remote projects unknown locally are restored (the reinstall case);
   /// - every local project is (re-)pushed, healing failed past pushes.
   /// Local always wins for projects present on both sides — this device is
@@ -182,6 +210,8 @@ class MakonProjectStore extends ChangeNotifier {
   Future<void> _syncWithBackend() async {
     if (!AuthState().isSignedIn) return;
     try {
+      await ProjectSyncService.claimDeviceProjects();
+      if (!AuthState().isSignedIn) return;
       final remote = await ProjectSyncService.fetchRemoteProjects();
       if (!AuthState().isSignedIn) return;
       final localIds = _projects.map((p) => p.id).toSet();

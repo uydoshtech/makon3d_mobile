@@ -2,12 +2,12 @@ import "package:dio/dio.dart";
 import "package:flutter/foundation.dart";
 
 import "package:makon3d_mobile/models/makon_project.dart";
+import "package:makon3d_mobile/services/auth/session_manager.dart";
 import "package:makon3d_mobile/services/device_identity.dart";
 import "package:makon3d_mobile/services/scan_upload_service.dart";
 
 /// Best-effort backup/restore of the local project store against the backend
-/// (`/makon3d/projects`), keyed by the Keychain-persisted device id — so
-/// deleting and reinstalling the app no longer loses projects.
+/// (`/makon3d/projects`), authenticated by the signed-in user session.
 ///
 /// Every local change is pushed; a fresh install pulls the remote set back
 /// (see [MakonProjectStore]). All methods swallow errors: sync must never
@@ -16,14 +16,41 @@ import "package:makon3d_mobile/services/scan_upload_service.dart";
 class ProjectSyncService {
   ProjectSyncService._();
 
-  static final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: ScanUploadService.basePath,
-      connectTimeout: const Duration(seconds: 20),
-      sendTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-    ),
-  );
+  static final Dio _dio =
+      Dio(
+          BaseOptions(
+            baseUrl: ScanUploadService.basePath,
+            connectTimeout: const Duration(seconds: 20),
+            sendTimeout: const Duration(seconds: 30),
+            receiveTimeout: const Duration(seconds: 30),
+          ),
+        )
+        ..interceptors.add(
+          InterceptorsWrapper(
+            onRequest: (options, handler) async {
+              final token = await SessionManager.getToken();
+              if (token != null && token.isNotEmpty) {
+                options.headers["Authorization"] = "Bearer $token";
+              }
+              handler.next(options);
+            },
+          ),
+        );
+
+  /// Claims anonymous device backups created before account-scoped project
+  /// sync. The server makes this idempotent for the current account.
+  static Future<void> claimDeviceProjects() async {
+    try {
+      final deviceId = await DeviceIdentity.get();
+      await _dio.post<void>(
+        "/makon3d/projects/claim-device",
+        data: <String, dynamic>{"device_id": deviceId},
+      );
+    } catch (e) {
+      debugPrint("ProjectSyncService device claim failed: $e");
+      rethrow;
+    }
+  }
 
   static Future<void> pushProject(MakonProject project) async {
     if (project.id.isEmpty) return;
@@ -50,10 +77,8 @@ class ProjectSyncService {
   static Future<void> deleteProject(String projectId) async {
     if (projectId.isEmpty) return;
     try {
-      final deviceId = await DeviceIdentity.get();
       await _dio.delete<void>(
         "/makon3d/projects/${Uri.encodeComponent(projectId)}",
-        queryParameters: <String, dynamic>{"device_id": deviceId},
       );
     } catch (e) {
       debugPrint("ProjectSyncService delete failed ($projectId): $e");
@@ -71,16 +96,14 @@ class ProjectSyncService {
     }
   }
 
-  /// Remote backups for this device (empty on any failure). Local file paths
+  /// Remote backups for the signed-in user (empty on any failure). Local file paths
   /// are stripped: they point into the previous install's sandbox, and a
   /// never-uploaded scan is unrecoverable anyway — better to show the room as
   /// not scanned than to reference a dead file.
   static Future<List<MakonProject>> fetchRemoteProjects() async {
     try {
-      final deviceId = await DeviceIdentity.get();
       final response = await _dio.get<Map<String, dynamic>>(
         "/makon3d/projects",
-        queryParameters: <String, dynamic>{"device_id": deviceId},
       );
       final raw = response.data?["projects"];
       if (raw is! List) return const [];

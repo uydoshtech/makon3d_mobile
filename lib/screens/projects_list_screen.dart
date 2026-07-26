@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:room_scan_kit/scan_flow/scan_flow.dart';
 
 import 'package:makon3d_mobile/l10n/l10n.dart';
 import 'package:makon3d_mobile/models/makon_project.dart';
@@ -158,11 +157,6 @@ class _ProjectCard extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onLongPress;
 
-  IconData get _modeIcon => switch (project.scanMode) {
-    ScanMode.entireHousing => Icons.home_outlined,
-    ScanMode.roomByRoom => Icons.grid_view_rounded,
-  };
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -170,6 +164,9 @@ class _ProjectCard extends StatelessWidget {
     final notes = project.notes?.trim();
     final hasAddress = address != null && address.isNotEmpty;
     final hasNotes = notes != null && notes.isNotEmpty;
+    final scannedRooms = project.rooms
+        .where((room) => room.isScanned)
+        .toList(growable: false);
 
     return Material(
       color: theme.colorScheme.surfaceContainerHighest,
@@ -190,7 +187,10 @@ class _ProjectCard extends StatelessWidget {
                   color: theme.colorScheme.secondary,
                   borderRadius: BorderRadius.circular(13),
                 ),
-                child: Icon(_modeIcon, color: theme.colorScheme.onSecondary),
+                child: Icon(
+                  Icons.folder_copy_outlined,
+                  color: theme.colorScheme.onSecondary,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -205,11 +205,21 @@ class _ProjectCard extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    _MetadataLine(
-                      icon: _modeIcon,
-                      text: L10n.get(project.scanMode.titleKey),
-                    ),
+                    if (scannedRooms.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      ...scannedRooms.map((room) {
+                        final name = room.name?.trim();
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: _MetadataLine(
+                            icon: room.roomType.icon,
+                            text: name != null && name.isNotEmpty
+                                ? name
+                                : L10n.get(room.roomType.titleKey),
+                          ),
+                        );
+                      }),
+                    ],
                     if (hasAddress) ...[
                       const SizedBox(height: 4),
                       _MetadataLine(
