@@ -739,7 +739,7 @@ packages:
       path: "../room_scan_kit"
       relative: true
     source: path
-    version: "0.6.15"
+    version: "0.6.16"
   share_plus:
     dependency: "direct main"
     description:
