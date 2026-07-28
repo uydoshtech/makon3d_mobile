@@ -140,7 +140,12 @@ class _ScanScreenState extends State<ScanScreen>
 
   void _handlePhotogrammetryPackageFailure(String error) {
     debugPrint('Photogrammetry package failed: $error');
-    // No zip was produced — nothing to keep for retry.
+    if (mounted) {
+      Toasts.showError(
+        context,
+        '${L10n.get('room_scan_photogrammetry_retry_missing')}: $error',
+      );
+    }
     _photogrammetryQueued = true;
     _finishFlowIfReady();
   }

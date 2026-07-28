@@ -75,12 +75,16 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
       if (mounted) setState(() => _hasLocalPhotogrammetry = false);
       return;
     }
-    final stored = await PhotogrammetryLocalPackageStore.instance.findByTarget(
+    final store = PhotogrammetryLocalPackageStore.instance;
+    final stored = await store.findByTarget(
       targetType: 'makon3d_scan',
       targetId: remoteId,
     );
+    final latest = stored == null ? await store.latestPath() : null;
     if (!mounted) return;
-    setState(() => _hasLocalPhotogrammetry = stored != null);
+    // Show retry when we have a zip for this scan, or any recent orphan zip
+    // (so the button appears even if target association failed).
+    setState(() => _hasLocalPhotogrammetry = stored != null || latest != null);
   }
 
   Future<void> _retryPhotogrammetry() async {
@@ -337,7 +341,7 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
               label: Text(L10n.get('project_rescan')),
             ),
           ],
-          if (_hasLocalPhotogrammetry && _scan.remoteScanId != null) ...[
+          if (_scan.remoteScanId != null) ...[
             const SizedBox(height: 12),
             OutlinedButton.icon(
               onPressed: _retryingPhotogrammetry
@@ -352,6 +356,14 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
                   : const Icon(Icons.cloud_upload_outlined),
               label: Text(L10n.get('room_scan_photogrammetry_retry')),
             ),
+            if (!_hasLocalPhotogrammetry)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  L10n.get('room_scan_photogrammetry_retry_missing'),
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
           ],
         ],
       ),

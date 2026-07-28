@@ -1,6 +1,7 @@
 import "dart:async";
 
 import "package:flutter/material.dart";
+import "package:package_info_plus/package_info_plus.dart";
 
 import "package:makon3d_mobile/l10n/l10n.dart";
 import "package:makon3d_mobile/services/auth/auth_state.dart";
@@ -27,22 +28,61 @@ class SettingsScreen extends StatelessWidget {
     "en": "🇬🇧",
   };
 
+  static Future<PackageInfo>? _packageInfoFuture;
+
+  static Future<PackageInfo> _loadPackageInfo() {
+    return _packageInfoFuture ??= PackageInfo.fromPlatform();
+  }
+
   @override
   Widget build(BuildContext context) {
     final current = LanguageState().currentLanguage;
     return Scaffold(
       appBar: AppBar(title: Text(L10n.get("settings_title"))),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(0, 8, 0, 120),
+      body: Column(
         children: [
-          _sectionHeader(context, L10n.get("settings_account_title")),
-          ListenableBuilder(
-            listenable: AuthState(),
-            builder: (context, _) => _accountSection(context),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+              children: [
+                _sectionHeader(context, L10n.get("settings_account_title")),
+                ListenableBuilder(
+                  listenable: AuthState(),
+                  builder: (context, _) => _accountSection(context),
+                ),
+                _sectionHeader(context, L10n.get("settings_language_title")),
+                _languageDropdown(context, current),
+              ],
+            ),
           ),
-          _sectionHeader(context, L10n.get("settings_language_title")),
-          _languageDropdown(context, current),
+          _appVersionFooter(context),
         ],
+      ),
+    );
+  }
+
+  Widget _appVersionFooter(BuildContext context) {
+    return Padding(
+      // Leave room for the curved bottom nav in [MainShell].
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+      child: FutureBuilder<PackageInfo>(
+        future: _loadPackageInfo(),
+        builder: (context, snapshot) {
+          final info = snapshot.data;
+          if (info == null) {
+            return const SizedBox.shrink();
+          }
+          final version = info.version;
+          final build = info.buildNumber;
+          final display = build.isEmpty ? version : "$version.$build";
+          return Text(
+            L10n.get("settings_app_version").replaceAll("{version}", display),
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: MakonColors.inkMuted,
+            ),
+          );
+        },
       ),
     );
   }
