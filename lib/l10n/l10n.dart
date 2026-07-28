@@ -238,6 +238,10 @@ class L10n {
       "room_scan_photogrammetry_title": "Photogrammetry",
       "room_scan_photogrammetry_subtitle":
           "Create a textured 3D model after scanning",
+      "room_scan_photogrammetry_upload":
+          "Uploading photogrammetry archive: {percent}%",
+      "room_scan_quality_overlay": "Scan Quality Overlay",
+      "room_scan_scan_quality": "Scan Quality: %d%%",
       "room_3d_structure": "Structure",
       "room_3d_textured": "Textured",
       "room_3d_textured_processing": "Textured model processing",
@@ -602,6 +606,10 @@ class L10n {
       "room_scan_photogrammetry_title": "Фотограмметрия",
       "room_scan_photogrammetry_subtitle":
           "Создать текстурированную 3D-модель после сканирования",
+      "room_scan_photogrammetry_upload":
+          "Загрузка архива фотограмметрии: {percent}%",
+      "room_scan_quality_overlay": "Карта качества скана",
+      "room_scan_scan_quality": "Качество скана: %d%%",
       "room_3d_structure": "Геометрия",
       "room_3d_textured": "С текстурами",
       "room_3d_textured_processing": "Обработка текстурированной модели",
@@ -971,6 +979,10 @@ class L10n {
       "room_scan_photogrammetry_title": "Fotogrammetriya",
       "room_scan_photogrammetry_subtitle":
           "Skanlashdan so‘ng teksturali 3D model yarating",
+      "room_scan_photogrammetry_upload":
+          "Fotogrammetriya arxivi yuklanmoqda: {percent}%",
+      "room_scan_quality_overlay": "Skan sifati xaritasi",
+      "room_scan_scan_quality": "Skan sifati: %d%%",
       "room_3d_structure": "Geometriya",
       "room_3d_textured": "Teksturali",
       "room_3d_textured_processing": "Teksturali model qayta ishlanmoqda",

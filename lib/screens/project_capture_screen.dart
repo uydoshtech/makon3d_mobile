@@ -55,6 +55,9 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
   PhotogrammetryUploadProgress? _photogrammetryProgress;
   bool _photogrammetryEnabled = false;
   Completer<int>? _photogrammetryTarget;
+  bool _standardUploadComplete = false;
+  bool _photogrammetryQueued = false;
+  bool _didFinishFlow = false;
   bool? _roomPlanSupported;
 
   @override
@@ -65,7 +68,10 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
       return;
     }
     unawaited(_resolveSupportAndRegisterCapture());
-    PhotogrammetryUpload.instance.listen(_uploadPhotogrammetryPackage);
+    PhotogrammetryUpload.instance.listen(
+      _uploadPhotogrammetryPackage,
+      onPackageFailed: _handlePhotogrammetryPackageFailure,
+    );
     unawaited(
       PhotogrammetryPreference.load().then((value) {
         if (mounted) setState(() => _photogrammetryEnabled = value);
@@ -102,9 +108,30 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
           if (mounted) setState(() => _photogrammetryProgress = progress);
         },
       );
+      _photogrammetryQueued = true;
+      _finishFlowIfReady();
     } catch (error) {
       debugPrint('Photogrammetry upload failed: $error');
+      _photogrammetryQueued = true;
+      _finishFlowIfReady();
     }
+  }
+
+  void _handlePhotogrammetryPackageFailure(String error) {
+    debugPrint('Photogrammetry package failed: $error');
+    _photogrammetryQueued = true;
+    _finishFlowIfReady();
+  }
+
+  void _finishFlowIfReady() {
+    if (_didFinishFlow ||
+        !_standardUploadComplete ||
+        !_photogrammetryQueued ||
+        !mounted) {
+      return;
+    }
+    _didFinishFlow = true;
+    Navigator.of(context).pop();
   }
 
   Future<void> _resolveSupportAndRegisterCapture() async {
@@ -186,8 +213,11 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
 
       if (!mounted) return;
       Toasts.showSuccess(context, L10n.get('room_scan_success'));
-      Navigator.of(context).pop();
-      debugPrint('[RoomScan] Standard upload complete; leaving scan screen');
+      _standardUploadComplete = true;
+      _finishFlowIfReady();
+      debugPrint(
+        '[RoomScan] Standard upload complete; waiting for package queue',
+      );
     } catch (e) {
       debugPrint('[RoomScan] Standard upload failed: $e');
       if (!mounted) return;
@@ -234,6 +264,9 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
       _starting = true;
       _photogrammetryProgress = null;
       _photogrammetryTarget = _photogrammetryEnabled ? Completer<int>() : null;
+      _standardUploadComplete = false;
+      _photogrammetryQueued = !_photogrammetryEnabled;
+      _didFinishFlow = false;
     });
     try {
       await NativeLanguageService.setPreferredLanguage(
@@ -332,6 +365,8 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
           'roomplan_results_windows': L10n.get('room_scan_results_windows'),
           'roomplan_results_doors': L10n.get('room_scan_results_doors'),
           'roomplan_results_height': L10n.get('room_scan_results_height'),
+          'roomplan_quality_overlay': L10n.get('room_scan_quality_overlay'),
+          'roomplan_scan_quality': L10n.get('room_scan_scan_quality'),
         },
       });
     } on MissingPluginException {
@@ -404,6 +439,11 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
                           ? L10n.get("room_scan_success")
                           : progress.phase == PhotogrammetryUploadPhase.failed
                           ? L10n.get("room_scan_error")
+                          : progress.phase ==
+                                PhotogrammetryUploadPhase.uploading
+                          ? L10n.get(
+                              'room_scan_photogrammetry_upload',
+                            ).replaceAll('{percent}', '${progress.percentage}')
                           : L10n.get("room_scan_uploading"),
                       textAlign: TextAlign.center,
                     ),

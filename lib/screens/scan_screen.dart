@@ -47,6 +47,9 @@ class _ScanScreenState extends State<ScanScreen>
   PhotogrammetryUploadProgress? _photogrammetryProgress;
   bool _photogrammetryEnabled = false;
   Completer<int>? _photogrammetryTarget;
+  bool _standardUploadComplete = false;
+  bool _photogrammetryQueued = false;
+  bool _didFinishFlow = false;
 
   /// Null until [RoomPlanCapability.isSupportedOnDevice] resolves on iOS.
   bool? _roomPlanSupported;
@@ -79,7 +82,10 @@ class _ScanScreenState extends State<ScanScreen>
       return;
     }
     unawaited(_resolveSupportAndRegisterCapture());
-    PhotogrammetryUpload.instance.listen(_uploadPhotogrammetryPackage);
+    PhotogrammetryUpload.instance.listen(
+      _uploadPhotogrammetryPackage,
+      onPackageFailed: _handlePhotogrammetryPackageFailure,
+    );
     unawaited(
       PhotogrammetryPreference.load().then((value) {
         if (mounted) setState(() => _photogrammetryEnabled = value);
@@ -117,9 +123,27 @@ class _ScanScreenState extends State<ScanScreen>
           if (mounted) setState(() => _photogrammetryProgress = progress);
         },
       );
+      _photogrammetryQueued = true;
+      _finishFlowIfReady();
     } catch (error) {
       debugPrint('Photogrammetry upload failed: $error');
+      _photogrammetryQueued = true;
+      _finishFlowIfReady();
     }
+  }
+
+  void _handlePhotogrammetryPackageFailure(String error) {
+    debugPrint('Photogrammetry package failed: $error');
+    _photogrammetryQueued = true;
+    _finishFlowIfReady();
+  }
+
+  void _finishFlowIfReady() {
+    if (_didFinishFlow || !_standardUploadComplete || !_photogrammetryQueued) {
+      return;
+    }
+    _didFinishFlow = true;
+    widget.onScanUploaded?.call();
   }
 
   Future<void> _resolveSupportAndRegisterCapture() async {
@@ -175,8 +199,11 @@ class _ScanScreenState extends State<ScanScreen>
       });
       Toasts.showSuccess(context, L10n.get("room_scan_success"));
       // Hand off to the Scans list — user opens the model from there.
-      widget.onScanUploaded?.call();
-      debugPrint('[RoomScan] Standard upload complete; leaving scan screen');
+      _standardUploadComplete = true;
+      _finishFlowIfReady();
+      debugPrint(
+        '[RoomScan] Standard upload complete; waiting for package queue',
+      );
     } catch (e) {
       debugPrint('[RoomScan] Standard upload failed: $e');
       if (!mounted) return;
@@ -217,6 +244,9 @@ class _ScanScreenState extends State<ScanScreen>
       _starting = true;
       _photogrammetryProgress = null;
       _photogrammetryTarget = _photogrammetryEnabled ? Completer<int>() : null;
+      _standardUploadComplete = false;
+      _photogrammetryQueued = !_photogrammetryEnabled;
+      _didFinishFlow = false;
     });
     try {
       // Best-effort: re-apply `AppleLanguages` right before touching RoomPlan
@@ -323,6 +353,8 @@ class _ScanScreenState extends State<ScanScreen>
           "roomplan_results_windows": L10n.get("room_scan_results_windows"),
           "roomplan_results_doors": L10n.get("room_scan_results_doors"),
           "roomplan_results_height": L10n.get("room_scan_results_height"),
+          "roomplan_quality_overlay": L10n.get("room_scan_quality_overlay"),
+          "roomplan_scan_quality": L10n.get("room_scan_scan_quality"),
         },
       });
     } on MissingPluginException {
@@ -417,9 +449,23 @@ class _ScanScreenState extends State<ScanScreen>
           if (_uploading)
             Column(
               children: [
-                const CircularProgressIndicator(),
+                if (_photogrammetryProgress case final progress?
+                    when progress.phase ==
+                        PhotogrammetryUploadPhase.uploading) ...[
+                  LinearProgressIndicator(value: progress.fraction),
+                  const SizedBox(height: 8),
+                  Text(
+                    L10n.get(
+                      'room_scan_photogrammetry_upload',
+                    ).replaceAll('{percent}', '${progress.percentage}'),
+                    textAlign: TextAlign.center,
+                  ),
+                ] else ...[
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Center(child: Text(L10n.get("room_scan_uploading"))),
+                ],
                 const SizedBox(height: 16),
-                Center(child: Text(L10n.get("room_scan_uploading"))),
               ],
             )
           else ...[
@@ -451,6 +497,10 @@ class _ScanScreenState extends State<ScanScreen>
                       ? L10n.get("room_scan_success")
                       : progress.phase == PhotogrammetryUploadPhase.failed
                       ? L10n.get("room_scan_error")
+                      : progress.phase == PhotogrammetryUploadPhase.uploading
+                      ? L10n.get(
+                          'room_scan_photogrammetry_upload',
+                        ).replaceAll('{percent}', '${progress.percentage}')
                       : L10n.get("room_scan_uploading"),
                 ),
               ),
