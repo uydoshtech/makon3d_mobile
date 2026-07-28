@@ -112,6 +112,12 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
       _finishFlowIfReady();
     } catch (error) {
       debugPrint('Photogrammetry upload failed: $error');
+      if (mounted) {
+        Toasts.showError(
+          context,
+          L10n.get('room_scan_photogrammetry_retry_failed'),
+        );
+      }
       _photogrammetryQueued = true;
       _finishFlowIfReady();
     }
@@ -119,6 +125,7 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
 
   void _handlePhotogrammetryPackageFailure(String error) {
     debugPrint('Photogrammetry package failed: $error');
+    // No zip was produced — nothing to keep for retry.
     _photogrammetryQueued = true;
     _finishFlowIfReady();
   }
@@ -182,6 +189,19 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
       );
       if (!(_photogrammetryTarget?.isCompleted ?? true)) {
         _photogrammetryTarget!.complete(upload.id);
+      }
+      final latestPackage =
+          await PhotogrammetryLocalPackageStore.instance.latestPath();
+      if (latestPackage != null) {
+        await PhotogrammetryLocalPackageStore.instance.save(
+          PhotogrammetryLocalPackage(
+            packagePath: latestPackage,
+            targetType: 'makon3d_scan',
+            targetId: upload.id,
+            savedAt: DateTime.now().toUtc(),
+            state: 'pending',
+          ),
+        );
       }
       metrics ??= await RoomScanBoundsService.computeFromUsdPath(path);
 

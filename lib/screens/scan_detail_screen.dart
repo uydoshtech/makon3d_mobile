@@ -12,6 +12,7 @@ import 'package:makon3d_mobile/services/room_usdz_viewer_service.dart';
 import 'package:makon3d_mobile/services/scan_upload_service.dart';
 import 'package:makon3d_mobile/widgets/scan_mini_preview.dart';
 import 'package:makon3d_mobile/widgets/toasts.dart';
+import 'package:room_scan_kit/photogrammetry_upload.dart';
 
 /// Project / room scan details with an embedded mini 3D preview (UyDosh-style).
 class ScanDetailScreen extends StatefulWidget {
@@ -43,6 +44,8 @@ class ScanDetailScreen extends StatefulWidget {
 
 class _ScanDetailScreenState extends State<ScanDetailScreen> {
   bool _openingFullscreen = false;
+  bool _retryingPhotogrammetry = false;
+  bool _hasLocalPhotogrammetry = false;
   late HousingScan _scan = widget.scan;
 
   int get _cacheScanId => _scan.remoteScanId ?? _scan.id.hashCode;
@@ -51,6 +54,7 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
   void initState() {
     super.initState();
     unawaited(_refreshMedia());
+    unawaited(_refreshLocalPhotogrammetry());
   }
 
   @override
@@ -61,6 +65,54 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
         oldWidget.scan.usdzUrl != widget.scan.usdzUrl) {
       _scan = widget.scan;
       unawaited(_refreshMedia());
+      unawaited(_refreshLocalPhotogrammetry());
+    }
+  }
+
+  Future<void> _refreshLocalPhotogrammetry() async {
+    final remoteId = _scan.remoteScanId;
+    if (remoteId == null) {
+      if (mounted) setState(() => _hasLocalPhotogrammetry = false);
+      return;
+    }
+    final stored = await PhotogrammetryLocalPackageStore.instance.findByTarget(
+      targetType: 'makon3d_scan',
+      targetId: remoteId,
+    );
+    if (!mounted) return;
+    setState(() => _hasLocalPhotogrammetry = stored != null);
+  }
+
+  Future<void> _retryPhotogrammetry() async {
+    final remoteId = _scan.remoteScanId;
+    if (remoteId == null || _retryingPhotogrammetry) return;
+    setState(() => _retryingPhotogrammetry = true);
+    try {
+      await PhotogrammetryUpload.instance.retryLocal(
+        apiBaseUrl: ScanUploadService.basePath,
+        targetType: 'makon3d_scan',
+        targetId: remoteId,
+        onProgress: (_) {},
+      );
+      if (!mounted) return;
+      Toasts.showSuccess(context, L10n.get('room_scan_photogrammetry_retry_ok'));
+      await _refreshLocalPhotogrammetry();
+    } on StateError {
+      if (!mounted) return;
+      Toasts.showError(
+        context,
+        L10n.get('room_scan_photogrammetry_retry_missing'),
+      );
+    } catch (error) {
+      debugPrint('Photogrammetry retry failed: $error');
+      if (!mounted) return;
+      Toasts.showError(
+        context,
+        L10n.get('room_scan_photogrammetry_retry_failed'),
+      );
+      await _refreshLocalPhotogrammetry();
+    } finally {
+      if (mounted) setState(() => _retryingPhotogrammetry = false);
     }
   }
 
@@ -283,6 +335,22 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
               onPressed: widget.onRescan,
               icon: const Icon(Icons.refresh),
               label: Text(L10n.get('project_rescan')),
+            ),
+          ],
+          if (_hasLocalPhotogrammetry && _scan.remoteScanId != null) ...[
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: _retryingPhotogrammetry
+                  ? null
+                  : () => unawaited(_retryPhotogrammetry()),
+              icon: _retryingPhotogrammetry
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.cloud_upload_outlined),
+              label: Text(L10n.get('room_scan_photogrammetry_retry')),
             ),
           ],
         ],

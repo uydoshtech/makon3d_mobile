@@ -127,6 +127,12 @@ class _ScanScreenState extends State<ScanScreen>
       _finishFlowIfReady();
     } catch (error) {
       debugPrint('Photogrammetry upload failed: $error');
+      if (mounted) {
+        Toasts.showError(
+          context,
+          L10n.get('room_scan_photogrammetry_retry_failed'),
+        );
+      }
       _photogrammetryQueued = true;
       _finishFlowIfReady();
     }
@@ -134,6 +140,7 @@ class _ScanScreenState extends State<ScanScreen>
 
   void _handlePhotogrammetryPackageFailure(String error) {
     debugPrint('Photogrammetry package failed: $error');
+    // No zip was produced — nothing to keep for retry.
     _photogrammetryQueued = true;
     _finishFlowIfReady();
   }
@@ -187,6 +194,19 @@ class _ScanScreenState extends State<ScanScreen>
       debugPrint("Scan uploaded: id=${result.id} glb=${result.glbUrl}");
       if (!(_photogrammetryTarget?.isCompleted ?? true)) {
         _photogrammetryTarget!.complete(result.id);
+      }
+      final latestPackage =
+          await PhotogrammetryLocalPackageStore.instance.latestPath();
+      if (latestPackage != null) {
+        await PhotogrammetryLocalPackageStore.instance.save(
+          PhotogrammetryLocalPackage(
+            packagePath: latestPackage,
+            targetType: 'makon3d_scan',
+            targetId: result.id,
+            savedAt: DateTime.now().toUtc(),
+            state: 'pending',
+          ),
+        );
       }
       ScansRefreshNotifier.instance.notifyScansChanged();
       if (!mounted) return;
