@@ -369,6 +369,13 @@ class MakonProjectStore extends ChangeNotifier {
     unawaited(_syncWithBackend());
   }
 
+  /// Re-run backend reconcile (pull-to-refresh). Safe to call repeatedly.
+  Future<void> refreshFromRemote() async {
+    if (!AuthState().isSignedIn) return;
+    await ensureLoaded();
+    await _syncWithBackend();
+  }
+
   Future<void> _syncWithBackend() async {
     if (!AuthState().isSignedIn) return;
     try {

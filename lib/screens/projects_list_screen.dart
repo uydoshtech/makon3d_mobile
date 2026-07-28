@@ -52,6 +52,8 @@ class _ProjectsListScreenState extends State<ProjectsListScreen> {
     if (mounted) setState(() {});
   }
 
+  Future<void> _onRefresh() => MakonProjectStore.instance.refreshFromRemote();
+
   Future<void> _openProject(MakonProject project) async {
     if (!AuthState().isSignedIn) {
       await SignInSheet.show(context);
@@ -104,63 +106,90 @@ class _ProjectsListScreenState extends State<ProjectsListScreen> {
             )
           : !store.isLoaded
           ? const Center(child: CircularProgressIndicator())
-          : projects.isEmpty
-          ? Center(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(32, 32, 32, 120),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      L10n.get('projects_empty'),
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyLarge,
+          : RefreshIndicator(
+              onRefresh: _onRefresh,
+              child: projects.isEmpty
+                  ? LayoutBuilder(
+                      builder: (context, constraints) {
+                        return SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: constraints.maxHeight,
+                            ),
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                  32,
+                                  32,
+                                  32,
+                                  120,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      L10n.get('projects_empty'),
+                                      textAlign: TextAlign.center,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyLarge,
+                                    ),
+                                    if (onCreate != null) ...[
+                                      const SizedBox(height: 20),
+                                      FilledButton.icon(
+                                        onPressed: onCreate,
+                                        icon: const Icon(Icons.add),
+                                        label: Text(
+                                          L10n.get('project_new_title'),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  : ListView.separated(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
+                      itemCount: projects.length,
+                      separatorBuilder: (_, _) => const SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final project = projects[index];
+                        final theme = Theme.of(context);
+                        return Dismissible(
+                          key: ValueKey(project.id),
+                          direction: DismissDirection.endToStart,
+                          confirmDismiss: (_) =>
+                              confirmDeleteProject(context, project),
+                          onDismissed: (_) =>
+                              unawaited(deleteProject(context, project)),
+                          background: Container(
+                            alignment: Alignment.centerRight,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.error,
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                            padding: const EdgeInsets.only(right: 20),
+                            child: Icon(
+                              Icons.delete_outline,
+                              color: theme.colorScheme.onError,
+                            ),
+                          ),
+                          child: _ProjectCard(
+                            project: project,
+                            onTap: () => unawaited(_openProject(project)),
+                            onLongPress: () => unawaited(
+                              confirmAndDeleteProject(context, project),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                    if (onCreate != null) ...[
-                      const SizedBox(height: 20),
-                      FilledButton.icon(
-                        onPressed: onCreate,
-                        icon: const Icon(Icons.add),
-                        label: Text(L10n.get('project_new_title')),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            )
-          : ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
-              itemCount: projects.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 8),
-              itemBuilder: (context, index) {
-                final project = projects[index];
-                final theme = Theme.of(context);
-                return Dismissible(
-                  key: ValueKey(project.id),
-                  direction: DismissDirection.endToStart,
-                  confirmDismiss: (_) => confirmDeleteProject(context, project),
-                  onDismissed: (_) =>
-                      unawaited(deleteProject(context, project)),
-                  background: Container(
-                    alignment: Alignment.centerRight,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.error,
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    padding: const EdgeInsets.only(right: 20),
-                    child: Icon(
-                      Icons.delete_outline,
-                      color: theme.colorScheme.onError,
-                    ),
-                  ),
-                  child: _ProjectCard(
-                    project: project,
-                    onTap: () => unawaited(_openProject(project)),
-                    onLongPress: () =>
-                        unawaited(confirmAndDeleteProject(context, project)),
-                  ),
-                );
-              },
             ),
     );
   }
