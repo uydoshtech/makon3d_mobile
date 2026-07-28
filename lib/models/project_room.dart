@@ -36,7 +36,8 @@ class ProjectRoom {
   /// Last wallpaper estimate settings for this room (local only).
   final WallpaperPrefs? wallpaperPrefs;
 
-  bool get isScanned => scan?.hasModel == true;
+  bool get isScanned =>
+      scan != null && (scan!.hasModel || scan!.hasMeasurements);
 
   bool get hasExplicitLayout =>
       layoutOffsetXM != null && layoutOffsetZM != null;

@@ -5,6 +5,7 @@ import "package:flutter/material.dart";
 
 import "package:makon3d_mobile/l10n/l10n.dart";
 import "package:makon3d_mobile/models/makon_scan.dart";
+import "package:makon3d_mobile/services/makon_project_store.dart";
 import "package:makon3d_mobile/services/room_usdz_viewer_service.dart";
 import "package:makon3d_mobile/services/scan_upload_service.dart";
 import "package:makon3d_mobile/services/scans_refresh_notifier.dart";
@@ -183,6 +184,7 @@ class _ScansListScreenState extends State<ScansListScreen> {
     setState(() => _deletingId = scan.id);
     try {
       await ScanUploadService.deleteScan(scan.id);
+      await MakonProjectStore.instance.detachRemoteScan(scan.id);
       if (!mounted) return;
       setState(() {
         _scans = _scans?.where((s) => s.id != scan.id).toList(growable: false);
@@ -193,6 +195,8 @@ class _ScansListScreenState extends State<ScansListScreen> {
       if (!mounted) return;
       // 404 = already gone — that's the outcome we wanted.
       if (e.response?.statusCode == 404) {
+        await MakonProjectStore.instance.detachRemoteScan(scan.id);
+        if (!mounted) return;
         setState(() {
           _scans = _scans
               ?.where((s) => s.id != scan.id)

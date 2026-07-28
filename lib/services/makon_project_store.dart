@@ -2,13 +2,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:makon3d_mobile/models/housing_scan.dart';
 import 'package:makon3d_mobile/models/makon_project.dart';
+import 'package:makon3d_mobile/models/project_room.dart';
 import 'package:makon3d_mobile/services/auth/auth_state.dart';
 import 'package:makon3d_mobile/services/project_sync_service.dart';
+import 'package:makon3d_mobile/services/scan_upload_service.dart';
 
 /// Local persistence for Makon projects, partitioned by signed-in account and
 /// mirrored to the backend via [ProjectSyncService].
@@ -142,6 +145,130 @@ class MakonProjectStore extends ChangeNotifier {
     if (project != null) {
       unawaited(_cleanupDeletedProject(project));
     }
+  }
+
+  /// Clears model media on every project room / entire-housing scan that still
+  /// points at [remoteScanId]. Used when the gallery deletes a scan so project
+  /// cards stop trying to load a 404 USDZ while keeping measurements.
+  Future<void> detachRemoteScan(int remoteScanId) async {
+    if (remoteScanId <= 0) return;
+    await ensureLoaded();
+    if (!AuthState().isSignedIn) return;
+    var changed = false;
+    final next = <MakonProject>[];
+    for (final project in _projects) {
+      var projectChanged = false;
+      HousingScan? entire = project.entireHousingScan;
+      if (entire?.remoteScanId == remoteScanId) {
+        entire = entire!.withoutModelMedia();
+        projectChanged = true;
+      }
+      final rooms = <ProjectRoom>[];
+      for (final room in project.rooms) {
+        final scan = room.scan;
+        if (scan?.remoteScanId == remoteScanId) {
+          rooms.add(room.copyWith(scan: scan!.withoutModelMedia()));
+          projectChanged = true;
+        } else {
+          rooms.add(room);
+        }
+      }
+      if (projectChanged) {
+        changed = true;
+        final updated = project.copyWith(
+          entireHousingScan: entire,
+          rooms: rooms,
+        );
+        next.add(updated);
+        unawaited(ProjectSyncService.pushProject(updated));
+      } else {
+        next.add(project);
+      }
+    }
+    if (!changed) return;
+    _projects = next;
+    await _persist();
+    notifyListeners();
+  }
+
+  /// Refresh [scan]'s usdz/glb URLs from the backend. Returns an updated scan
+  /// when the remote row still exists; clears model media when it was deleted.
+  Future<HousingScan> refreshScanMedia(HousingScan scan) async {
+    final remoteId = scan.remoteScanId;
+    if (remoteId == null || remoteId <= 0) return scan;
+    try {
+      final remote = await ScanUploadService.getScan(remoteId);
+      final usdz = remote.usdzUrl?.trim();
+      final glb = remote.glbUrl?.trim();
+      if ((usdz == null || usdz.isEmpty) && (glb == null || glb.isEmpty)) {
+        return scan.withoutModelMedia();
+      }
+      return scan.withRemoteMedia(
+        remoteScanId: remoteId,
+        usdzUrl: usdz,
+        glbUrl: glb,
+      );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        return scan.withoutModelMedia();
+      }
+      rethrow;
+    }
+  }
+
+  /// Persist [updated] in place of [previous] wherever it appears in projects.
+  Future<void> replaceScanMedia({
+    required HousingScan previous,
+    required HousingScan updated,
+  }) async {
+    final same =
+        previous.remoteScanId == updated.remoteScanId &&
+        previous.usdzUrl == updated.usdzUrl &&
+        previous.glbUrl == updated.glbUrl &&
+        previous.localUsdzPath == updated.localUsdzPath;
+    if (same) return;
+    await ensureLoaded();
+    if (!AuthState().isSignedIn) return;
+    var changed = false;
+    final next = <MakonProject>[];
+    for (final project in _projects) {
+      var projectChanged = false;
+      HousingScan? entire = project.entireHousingScan;
+      if (entire?.id == previous.id ||
+          (previous.remoteScanId != null &&
+              entire?.remoteScanId == previous.remoteScanId)) {
+        entire = updated;
+        projectChanged = true;
+      }
+      final rooms = <ProjectRoom>[];
+      for (final room in project.rooms) {
+        final scan = room.scan;
+        if (scan != null &&
+            (scan.id == previous.id ||
+                (previous.remoteScanId != null &&
+                    scan.remoteScanId == previous.remoteScanId))) {
+          rooms.add(room.copyWith(scan: updated));
+          projectChanged = true;
+        } else {
+          rooms.add(room);
+        }
+      }
+      if (projectChanged) {
+        changed = true;
+        final updatedProject = project.copyWith(
+          entireHousingScan: entire,
+          rooms: rooms,
+        );
+        next.add(updatedProject);
+        unawaited(ProjectSyncService.pushProject(updatedProject));
+      } else {
+        next.add(project);
+      }
+    }
+    if (!changed) return;
+    _projects = next;
+    await _persist();
+    notifyListeners();
   }
 
   /// Removes a room and its scan from a project.

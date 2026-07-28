@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:makon3d_mobile/l10n/l10n.dart';
 import 'package:makon3d_mobile/models/housing_scan.dart';
 import 'package:makon3d_mobile/screens/room_materials_screen.dart';
 import 'package:makon3d_mobile/screens/textured_glb_viewer_screen.dart';
+import 'package:makon3d_mobile/services/makon_project_store.dart';
 import 'package:makon3d_mobile/services/room_usdz_viewer_service.dart';
 import 'package:makon3d_mobile/services/scan_upload_service.dart';
 import 'package:makon3d_mobile/widgets/scan_mini_preview.dart';
@@ -41,57 +43,117 @@ class ScanDetailScreen extends StatefulWidget {
 
 class _ScanDetailScreenState extends State<ScanDetailScreen> {
   bool _openingFullscreen = false;
+  late HousingScan _scan = widget.scan;
 
-  int get _cacheScanId => widget.scan.remoteScanId ?? widget.scan.id.hashCode;
+  int get _cacheScanId => _scan.remoteScanId ?? _scan.id.hashCode;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_refreshMedia());
+  }
+
+  @override
+  void didUpdateWidget(covariant ScanDetailScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.scan.id != widget.scan.id ||
+        oldWidget.scan.remoteScanId != widget.scan.remoteScanId ||
+        oldWidget.scan.usdzUrl != widget.scan.usdzUrl) {
+      _scan = widget.scan;
+      unawaited(_refreshMedia());
+    }
+  }
+
+  /// Re-fetch usdz/glb from the API; clear dead remoteScanId when the row
+  /// was deleted from the gallery (404) so Retry / Rescan stay coherent.
+  Future<void> _refreshMedia() async {
+    final previous = _scan;
+    if (previous.remoteScanId == null) return;
+    try {
+      final updated = await MakonProjectStore.instance.refreshScanMedia(
+        previous,
+      );
+      if (!mounted) return;
+      if (updated.remoteScanId == previous.remoteScanId &&
+          updated.usdzUrl == previous.usdzUrl &&
+          updated.glbUrl == previous.glbUrl) {
+        return;
+      }
+      await MakonProjectStore.instance.replaceScanMedia(
+        previous: previous,
+        updated: updated,
+      );
+      if (!mounted) return;
+      setState(() => _scan = updated);
+    } catch (e) {
+      debugPrint('ScanDetailScreen media refresh failed: $e');
+    }
+  }
 
   Future<void> _openFullscreen() async {
     if (_openingFullscreen) return;
     setState(() => _openingFullscreen = true);
     try {
-      final remoteId = widget.scan.remoteScanId;
+      final remoteId = _scan.remoteScanId;
       if (remoteId != null) {
-        final refreshed = await ScanUploadService.getScan(remoteId);
-        if (!mounted) return;
-        final textured = refreshed.texturedGlbUrl;
-        if (textured != null && textured.isNotEmpty) {
-          final choice = await showModalBottomSheet<String>(
-            context: context,
-            builder: (context) => SafeArea(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.account_tree_outlined),
-                    title: Text(L10n.get('room_3d_structure')),
-                    onTap: () => Navigator.pop(context, 'structure'),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.texture),
-                    title: Text(L10n.get('room_3d_textured')),
-                    onTap: () => Navigator.pop(context, 'textured'),
-                  ),
-                ],
-              ),
-            ),
-          );
-          if (!mounted || choice == null) return;
-          if (choice == 'textured') {
-            await Navigator.of(context).push<void>(
-              MaterialPageRoute<void>(
-                builder: (_) => TexturedGlbViewerScreen(glbUrl: textured),
+        try {
+          final refreshed = await ScanUploadService.getScan(remoteId);
+          if (!mounted) return;
+          final textured = refreshed.texturedGlbUrl;
+          if (textured != null && textured.isNotEmpty) {
+            final choice = await showModalBottomSheet<String>(
+              context: context,
+              builder: (context) => SafeArea(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.account_tree_outlined),
+                      title: Text(L10n.get('room_3d_structure')),
+                      onTap: () => Navigator.pop(context, 'structure'),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.texture),
+                      title: Text(L10n.get('room_3d_textured')),
+                      onTap: () => Navigator.pop(context, 'textured'),
+                    ),
+                  ],
+                ),
               ),
             );
+            if (!mounted || choice == null) return;
+            if (choice == 'textured') {
+              await Navigator.of(context).push<void>(
+                MaterialPageRoute<void>(
+                  builder: (_) => TexturedGlbViewerScreen(glbUrl: textured),
+                ),
+              );
+              return;
+            }
+          }
+        } on DioException catch (e) {
+          if (e.response?.statusCode == 404) {
+            final cleared = _scan.withoutModelMedia();
+            await MakonProjectStore.instance.replaceScanMedia(
+              previous: _scan,
+              updated: cleared,
+            );
+            if (mounted) setState(() => _scan = cleared);
+            if (mounted) {
+              Toasts.showError(context, L10n.get('scans_open_error'));
+            }
             return;
           }
+          rethrow;
         }
       }
       final ok = await RoomUsdzViewerService.openUsdz(
-        localUsdzPath: widget.scan.localUsdzPath,
-        usdzUrl: widget.scan.usdzUrl,
+        localUsdzPath: _scan.localUsdzPath,
+        usdzUrl: _scan.usdzUrl,
         scanId: _cacheScanId,
         languageCode: LanguageState().currentLanguage,
-        worldPlusXBearingDeg: widget.scan.worldPlusXBearingDeg,
-        shareScanId: widget.scan.remoteScanId,
+        worldPlusXBearingDeg: _scan.worldPlusXBearingDeg,
+        shareScanId: _scan.remoteScanId,
       );
       if (!ok && mounted) {
         Toasts.showError(context, L10n.get('scans_open_error'));
@@ -106,7 +168,7 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final scan = widget.scan;
+    final scan = _scan;
     final hasDims =
         scan.floorLongM != null &&
         scan.floorShortM != null &&

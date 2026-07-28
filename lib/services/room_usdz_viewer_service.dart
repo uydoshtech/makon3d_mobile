@@ -96,6 +96,23 @@ class RoomUsdzViewerService {
     };
   }
 
+  /// USDZ is a ZIP (`PK` magic). Reject tiny health-check HTML bodies.
+  static bool looksLikeUsdz(File file) {
+    try {
+      final len = file.lengthSync();
+      if (len < 64) return false;
+      final raf = file.openSync(mode: FileMode.read);
+      try {
+        final magic = raf.readSync(2);
+        return magic.length == 2 && magic[0] == 0x50 && magic[1] == 0x4b; // PK
+      } finally {
+        raf.closeSync();
+      }
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// Downloads USDZ to the per-scan temp cache (for mini preview or fullscreen).
   /// Returns null on non-iOS. [pathOrUrl] may be relative or absolute.
   static Future<File?> downloadUsdToCache(
@@ -106,19 +123,33 @@ class RoomUsdzViewerService {
     final absolute = ScanUploadService.hostedUrl(pathOrUrl);
     final temp = await getTemporaryDirectory();
     final file = File("${temp.path}/makon3d_scan_$scanId.usdz");
-    if (file.existsSync() && file.lengthSync() > 0) {
+    if (file.existsSync() && looksLikeUsdz(file)) {
       return file;
+    }
+    if (file.existsSync()) {
+      // Stale HTML/error body from a prior 200-on-missing-image response.
+      try {
+        await file.delete();
+      } catch (_) {}
     }
     final dio = Dio(
       BaseOptions(
         connectTimeout: const Duration(seconds: 45),
         receiveTimeout: const Duration(minutes: 2),
         responseType: ResponseType.bytes,
+        // Reject HTML health-check / SPA fallbacks that used to return 200.
+        validateStatus: (status) => status != null && status >= 200 && status < 300,
       ),
     );
-    await dio.download(absolute, file.path);
-    if (!file.existsSync() || file.lengthSync() == 0) {
-      throw StateError("Downloaded USDZ is missing or empty");
+    final response = await dio.download(absolute, file.path);
+    final contentType = response.headers.value('content-type') ?? '';
+    if (contentType.contains('text/html') ||
+        !file.existsSync() ||
+        !looksLikeUsdz(file)) {
+      try {
+        if (file.existsSync()) await file.delete();
+      } catch (_) {}
+      throw StateError("Downloaded USDZ is missing, empty, or not a ZIP/USDZ");
     }
     return file;
   }
@@ -160,7 +191,7 @@ class RoomUsdzViewerService {
     final local = localUsdzPath?.trim();
     if (local != null && local.isNotEmpty) {
       final file = File(local);
-      if (file.existsSync() && file.lengthSync() > 0) {
+      if (file.existsSync() && looksLikeUsdz(file)) {
         return presentLocalFile(
           file.path,
           scanId: scanId,

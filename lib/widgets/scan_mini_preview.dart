@@ -49,10 +49,8 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
   String? _localPath;
   Object? _error;
   bool _loading = true;
-  bool _suspendForFullscreen = false;
 
-  bool get _suspendViewer =>
-      _suspendForFullscreen || widget.isLoadingFullscreen;
+  bool get _suspendViewer => widget.isLoadingFullscreen;
 
   @override
   bool get wantKeepAlive => true;
@@ -70,9 +68,6 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
         oldWidget.usdzUrl != widget.usdzUrl ||
         oldWidget.scanId != widget.scanId) {
       unawaited(_load());
-    }
-    if (oldWidget.isLoadingFullscreen && !widget.isLoadingFullscreen) {
-      _suspendForFullscreen = false;
     }
   }
 
@@ -96,7 +91,7 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
       final local = widget.localUsdzPath?.trim();
       if (local != null && local.isNotEmpty) {
         final file = File(local);
-        if (file.existsSync() && file.lengthSync() > 0) {
+        if (file.existsSync() && RoomUsdzViewerService.looksLikeUsdz(file)) {
           if (!mounted) return;
           setState(() {
             _localPath = file.path;
@@ -147,8 +142,9 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
   }
 
   void _onFullscreenTap() {
+    // Keep the mini PlatformView mounted while fullscreen opens — tearing it
+    // down early flashed empty sky until the modal covered the card.
     if (_suspendViewer || widget.onOpenFullscreen == null) return;
-    setState(() => _suspendForFullscreen = true);
     widget.onOpenFullscreen!();
   }
 
@@ -156,7 +152,7 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
   Widget build(BuildContext context) {
     super.build(context);
     final path = _localPath;
-    final showPreview = !_suspendViewer && path != null && _error == null;
+    final showPreview = path != null && _error == null;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
@@ -178,9 +174,9 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
                 RoomUsdzPreview(
                   key: _previewViewKey,
                   filePath: path,
-                  autoRotate: true,
+                  autoRotate: !_suspendViewer,
                 ),
-              if (_suspendViewer || _loading)
+              if (_loading && !showPreview)
                 const ColoredBox(
                   color: Colors.transparent,
                   child: Center(child: CircularProgressIndicator.adaptive()),

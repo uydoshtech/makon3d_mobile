@@ -43,6 +43,44 @@ class HousingScan {
       (usdzUrl != null && usdzUrl!.isNotEmpty) ||
       (glbUrl != null && glbUrl!.isNotEmpty);
 
+  /// Measurements survive even when the USDZ was deleted from the server.
+  bool get hasMeasurements =>
+      floorLongM != null ||
+      floorShortM != null ||
+      heightM != null ||
+      floorAreaM2 != null;
+
+  /// Drop file/URL pointers after the remote scan row (or local USDZ) is gone.
+  /// Keeps dimensions so the room still shows as scanned.
+  HousingScan withoutModelMedia() {
+    return HousingScan(
+      id: id,
+      remoteScanId: null,
+      floorLongM: floorLongM,
+      floorShortM: floorShortM,
+      heightM: heightM,
+      floorAreaM2: floorAreaM2,
+      wallPerimeterM: wallPerimeterM,
+      doorwayWidthM: doorwayWidthM,
+      doorwayAreaM2: doorwayAreaM2,
+      windowAreaM2: windowAreaM2,
+      worldPlusXBearingDeg: worldPlusXBearingDeg,
+      capturedAt: capturedAt,
+    );
+  }
+
+  HousingScan withRemoteMedia({
+    required int remoteScanId,
+    String? usdzUrl,
+    String? glbUrl,
+  }) {
+    return copyWith(
+      remoteScanId: remoteScanId,
+      usdzUrl: usdzUrl,
+      glbUrl: glbUrl,
+    );
+  }
+
   Map<String, dynamic> toJson() => <String, dynamic>{
     'id': id,
     'localUsdzPath': localUsdzPath,
