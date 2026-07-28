@@ -379,7 +379,7 @@ class _RoomByRoomBody extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
               children: [
                 _DashboardInfoCard(
-                  icon: Icons.grid_view_rounded,
+                  icon: Icons.view_in_ar,
                   label: L10n.get('project_scan_mode_label'),
                   title: L10n.get(ScanMode.roomByRoom.titleKey),
                   description: L10n.get(ScanMode.roomByRoom.subtitleKey),
@@ -486,7 +486,7 @@ class _DashboardInfoCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
               width: 44,

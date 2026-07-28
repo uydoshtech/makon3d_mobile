@@ -47,7 +47,7 @@ class _ScanModeSelectionScreenState extends State<ScanModeSelectionScreen> {
   IconData _iconFor(ScanMode mode) {
     return switch (mode) {
       ScanMode.entireHousing => Icons.home_outlined,
-      ScanMode.roomByRoom => Icons.grid_view_rounded,
+      ScanMode.roomByRoom => Icons.view_in_ar,
     };
   }
 
@@ -103,7 +103,7 @@ class _ScanModeSelectionScreenState extends State<ScanModeSelectionScreen> {
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Icon(
                                 _iconFor(mode),
