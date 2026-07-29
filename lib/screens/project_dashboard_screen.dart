@@ -14,6 +14,7 @@ import 'package:makon3d_mobile/screens/room_materials_screen.dart';
 import 'package:makon3d_mobile/screens/scan_detail_screen.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
 import 'package:makon3d_mobile/services/room_usdz_viewer_service.dart';
+import 'package:makon3d_mobile/widgets/photogrammetry_package_actions.dart';
 import 'package:makon3d_mobile/widgets/project_delete_dialog.dart';
 import 'package:makon3d_mobile/widgets/scan_mini_preview.dart';
 import 'package:makon3d_mobile/widgets/toasts.dart';
@@ -327,6 +328,10 @@ class _EntireHousingBody extends StatelessWidget {
             icon: const Icon(Icons.refresh),
             label: Text(L10n.get('project_rescan')),
           ),
+          if (scan.remoteScanId != null) ...[
+            const SizedBox(height: 12),
+            PhotogrammetryPackageActions(scan: scan),
+          ],
         ] else ...[
           Text(
             L10n.get(ScanMode.entireHousing.subtitleKey),

@@ -201,6 +201,38 @@ class ScanShareService {
     }
   }
 
+  /// Opens the iOS/Android share sheet for a local photogrammetry ZIP
+  /// (Save to Files / AirDrop / etc.).
+  static Future<void> sharePhotogrammetryPackage(
+    String packagePath, {
+    int? scanId,
+  }) async {
+    final file = File(packagePath);
+    if (!file.existsSync() || file.lengthSync() == 0) {
+      throw StateError("Photogrammetry package missing or empty: $packagePath");
+    }
+    final stem = packagePath.split("/").last;
+    final name = scanId != null
+        ? "makon3d-photogrammetry-$scanId.zip"
+        : stem;
+    MakonAnalytics.log(
+      "photogrammetry_package_share_pressed",
+      properties: {
+        "scanId": ?scanId,
+        "bytes": file.lengthSync(),
+        "platform": Platform.operatingSystem,
+      },
+    );
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [
+          XFile(packagePath, mimeType: "application/zip", name: name),
+        ],
+        subject: name,
+      ),
+    );
+  }
+
   static String _shareMessage(String languageCode, String viewerUrl) {
     final intro = L10n.getForLanguage("share_3d_scan_message", languageCode);
     return "$intro\n\n$viewerUrl";
