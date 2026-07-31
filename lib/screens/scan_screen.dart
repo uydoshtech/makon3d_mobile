@@ -44,12 +44,8 @@ class _ScanScreenState extends State<ScanScreen>
   bool _registeredRoomCaptureCallback = false;
   bool _uploading = false;
   bool _starting = false;
-  PhotogrammetryUploadProgress? _photogrammetryProgress;
   bool _photogrammetryEnabled = false;
   Completer<int>? _photogrammetryTarget;
-  bool _standardUploadComplete = false;
-  bool _photogrammetryQueued = false;
-  bool _didFinishFlow = false;
 
   /// Null until [RoomPlanCapability.isSupportedOnDevice] resolves on iOS.
   bool? _roomPlanSupported;
@@ -83,18 +79,13 @@ class _ScanScreenState extends State<ScanScreen>
     }
     unawaited(_resolveSupportAndRegisterCapture());
     PhotogrammetryUpload.instance.listen(
-      _uploadPhotogrammetryPackage,
+      _keepPhotogrammetryPackageLocal,
       onPackageFailed: _handlePhotogrammetryPackageFailure,
     );
     unawaited(
       PhotogrammetryPreference.load().then((value) {
         if (mounted) setState(() => _photogrammetryEnabled = value);
       }),
-    );
-    unawaited(
-      PhotogrammetryUpload.instance.resumePendingMonitors(
-        apiBaseUrl: ScanUploadService.basePath,
-      ),
     );
   }
 
@@ -108,33 +99,33 @@ class _ScanScreenState extends State<ScanScreen>
     super.dispose();
   }
 
-  Future<void> _uploadPhotogrammetryPackage(String path) async {
+  Future<void> _keepPhotogrammetryPackageLocal(String path) async {
+    debugPrint(
+      '[Photogrammetry] Automatic server upload disabled; '
+      'keeping local archive: $path',
+    );
     try {
       final scanId =
           await (_photogrammetryTarget?.future ??
                   Future<int>.error(StateError('Missing scan target')))
               .timeout(const Duration(minutes: 8));
-      await PhotogrammetryUpload.instance.submit(
-        packagePath: path,
-        apiBaseUrl: ScanUploadService.basePath,
-        targetType: 'makon3d_scan',
-        targetId: scanId,
-        onProgress: (progress) {
-          if (mounted) setState(() => _photogrammetryProgress = progress);
-        },
+      await PhotogrammetryLocalPackageStore.instance.save(
+        PhotogrammetryLocalPackage(
+          packagePath: path,
+          targetType: 'makon3d_scan',
+          targetId: scanId,
+          savedAt: DateTime.now().toUtc(),
+          state: 'pending',
+        ),
       );
-      _photogrammetryQueued = true;
-      _finishFlowIfReady();
+      debugPrint(
+        '[Photogrammetry] Local archive associated with scanId=$scanId; '
+        'server upload skipped',
+      );
     } catch (error) {
-      debugPrint('Photogrammetry upload failed: $error');
-      if (mounted) {
-        Toasts.showError(
-          context,
-          L10n.get('room_scan_photogrammetry_retry_failed'),
-        );
-      }
-      _photogrammetryQueued = true;
-      _finishFlowIfReady();
+      debugPrint(
+        '[Photogrammetry] Could not associate local archive yet: $error',
+      );
     }
   }
 
@@ -146,16 +137,6 @@ class _ScanScreenState extends State<ScanScreen>
         '${L10n.get('room_scan_photogrammetry_retry_missing')}: $error',
       );
     }
-    _photogrammetryQueued = true;
-    _finishFlowIfReady();
-  }
-
-  void _finishFlowIfReady() {
-    if (_didFinishFlow || !_standardUploadComplete || !_photogrammetryQueued) {
-      return;
-    }
-    _didFinishFlow = true;
-    widget.onScanUploaded?.call();
   }
 
   Future<void> _resolveSupportAndRegisterCapture() async {
@@ -200,8 +181,8 @@ class _ScanScreenState extends State<ScanScreen>
       if (!(_photogrammetryTarget?.isCompleted ?? true)) {
         _photogrammetryTarget!.complete(result.id);
       }
-      final latestPackage =
-          await PhotogrammetryLocalPackageStore.instance.latestPath();
+      final latestPackage = await PhotogrammetryLocalPackageStore.instance
+          .latestPath();
       if (latestPackage != null) {
         await PhotogrammetryLocalPackageStore.instance.save(
           PhotogrammetryLocalPackage(
@@ -224,10 +205,10 @@ class _ScanScreenState extends State<ScanScreen>
       });
       Toasts.showSuccess(context, L10n.get("room_scan_success"));
       // Hand off to the Scans list — user opens the model from there.
-      _standardUploadComplete = true;
-      _finishFlowIfReady();
+      widget.onScanUploaded?.call();
       debugPrint(
-        '[RoomScan] Standard upload complete; waiting for package queue',
+        '[RoomScan] Standard USDZ upload complete; '
+        'photogrammetry archive stays local',
       );
     } catch (e) {
       debugPrint('[RoomScan] Standard upload failed: $e');
@@ -267,11 +248,7 @@ class _ScanScreenState extends State<ScanScreen>
     if (!isIOSDevice) return;
     setState(() {
       _starting = true;
-      _photogrammetryProgress = null;
       _photogrammetryTarget = _photogrammetryEnabled ? Completer<int>() : null;
-      _standardUploadComplete = false;
-      _photogrammetryQueued = !_photogrammetryEnabled;
-      _didFinishFlow = false;
     });
     try {
       // Best-effort: re-apply `AppleLanguages` right before touching RoomPlan
@@ -474,22 +451,9 @@ class _ScanScreenState extends State<ScanScreen>
           if (_uploading)
             Column(
               children: [
-                if (_photogrammetryProgress case final progress?
-                    when progress.phase ==
-                        PhotogrammetryUploadPhase.uploading) ...[
-                  LinearProgressIndicator(value: progress.fraction),
-                  const SizedBox(height: 8),
-                  Text(
-                    L10n.get(
-                      'room_scan_photogrammetry_upload',
-                    ).replaceAll('{percent}', '${progress.percentage}'),
-                    textAlign: TextAlign.center,
-                  ),
-                ] else ...[
-                  const CircularProgressIndicator(),
-                  const SizedBox(height: 16),
-                  Center(child: Text(L10n.get("room_scan_uploading"))),
-                ],
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Center(child: Text(L10n.get("room_scan_uploading"))),
                 const SizedBox(height: 16),
               ],
             )
@@ -506,31 +470,6 @@ class _ScanScreenState extends State<ScanScreen>
                       unawaited(PhotogrammetryPreference.save(value));
                     },
             ),
-            if (_photogrammetryProgress case final progress?) ...[
-              const SizedBox(height: 12),
-              LinearProgressIndicator(
-                value: progress.phase == PhotogrammetryUploadPhase.uploading
-                    ? progress.fraction
-                    : progress.phase == PhotogrammetryUploadPhase.complete
-                    ? 1
-                    : null,
-              ),
-              const SizedBox(height: 8),
-              Center(
-                child: Text(
-                  progress.phase == PhotogrammetryUploadPhase.complete
-                      ? L10n.get("room_scan_success")
-                      : progress.phase == PhotogrammetryUploadPhase.failed
-                      ? L10n.get("room_scan_error")
-                      : progress.phase == PhotogrammetryUploadPhase.uploading
-                      ? L10n.get(
-                          'room_scan_photogrammetry_upload',
-                        ).replaceAll('{percent}', '${progress.percentage}')
-                      : L10n.get("room_scan_uploading"),
-                ),
-              ),
-              const SizedBox(height: 12),
-            ],
             if (_lastScanPath != null) ...[
               Center(
                 child: TextButton.icon(
