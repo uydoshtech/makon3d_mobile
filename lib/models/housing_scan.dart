@@ -156,10 +156,12 @@ class HousingScan {
     Map<String, int>? objectCounts,
     double? worldPlusXBearingDeg,
     DateTime? capturedAt,
+    bool clearLocalUsdzPath = false,
   }) {
     return HousingScan(
       id: id,
-      localUsdzPath: localUsdzPath ?? this.localUsdzPath,
+      localUsdzPath:
+          clearLocalUsdzPath ? null : (localUsdzPath ?? this.localUsdzPath),
       remoteScanId: remoteScanId ?? this.remoteScanId,
       usdzUrl: usdzUrl ?? this.usdzUrl,
       glbUrl: glbUrl ?? this.glbUrl,

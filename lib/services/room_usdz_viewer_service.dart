@@ -160,10 +160,18 @@ class RoomUsdzViewerService {
     if (file.existsSync() &&
         looksLikeUsdz(file) &&
         cachedUrl == absolute) {
-      return file;
+      // RoomPlan USDZs are ~100–500KB. A multi‑MB cache for a room_scan.usdz URL
+      // is leftover photogrammetry from when that scan id briefly pointed at a
+      // different asset — reopen would show the wrong (often mis-oriented) mesh.
+      final isRoomPlanUrl = absolute.contains('/room_scan.usdz');
+      final looksLikePhotogrammetryLeftover =
+          isRoomPlanUrl && file.lengthSync() > 5 * 1024 * 1024;
+      if (!looksLikePhotogrammetryLeftover) {
+        return file;
+      }
     }
     if (file.existsSync()) {
-      // Stale HTML/error body, or URL changed (new remote asset for this scan).
+      // Stale HTML/error body, URL changed, or RoomPlan cache holding a huge USDZ.
       try {
         await file.delete();
       } catch (_) {}

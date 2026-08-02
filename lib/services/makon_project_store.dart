@@ -216,24 +216,7 @@ class MakonProjectStore extends ChangeNotifier {
       );
       // Prefer the new remote asset over a stale on-device USDZ path.
       if (urlChanged && (updated.localUsdzPath?.isNotEmpty ?? false)) {
-        return HousingScan(
-          id: updated.id,
-          remoteScanId: updated.remoteScanId,
-          usdzUrl: updated.usdzUrl,
-          glbUrl: updated.glbUrl,
-          floorLongM: updated.floorLongM,
-          floorShortM: updated.floorShortM,
-          heightM: updated.heightM,
-          floorAreaM2: updated.floorAreaM2,
-          wallPerimeterM: updated.wallPerimeterM,
-          doorwayWidthM: updated.doorwayWidthM,
-          doorwayAreaM2: updated.doorwayAreaM2,
-          windowAreaM2: updated.windowAreaM2,
-          roomTypes: updated.roomTypes,
-          objectCounts: updated.objectCounts,
-          worldPlusXBearingDeg: updated.worldPlusXBearingDeg,
-          capturedAt: updated.capturedAt,
-        );
+        return updated.copyWith(clearLocalUsdzPath: true);
       }
       return updated;
     } on DioException catch (e) {
@@ -245,6 +228,10 @@ class MakonProjectStore extends ChangeNotifier {
   }
 
   /// Persist [updated] in place of [previous] wherever it appears in projects.
+  ///
+  /// Matches only on the local [HousingScan.id]. Matching by `remoteScanId`
+  /// alone used to rewrite every project that shared an upload id (e.g. Баха
+  /// and a Stage‑7 placeholder both on scan 26) and clobber measurements.
   Future<void> replaceScanMedia({
     required HousingScan previous,
     required HousingScan updated,
@@ -262,19 +249,14 @@ class MakonProjectStore extends ChangeNotifier {
     for (final project in _projects) {
       var projectChanged = false;
       HousingScan? entire = project.entireHousingScan;
-      if (entire?.id == previous.id ||
-          (previous.remoteScanId != null &&
-              entire?.remoteScanId == previous.remoteScanId)) {
+      if (entire?.id == previous.id) {
         entire = updated;
         projectChanged = true;
       }
       final rooms = <ProjectRoom>[];
       for (final room in project.rooms) {
         final scan = room.scan;
-        if (scan != null &&
-            (scan.id == previous.id ||
-                (previous.remoteScanId != null &&
-                    scan.remoteScanId == previous.remoteScanId))) {
+        if (scan != null && scan.id == previous.id) {
           rooms.add(room.copyWith(scan: updated));
           projectChanged = true;
         } else {
@@ -448,16 +430,21 @@ class MakonProjectStore extends ChangeNotifier {
     }
   }
 
-  /// Copies remote housing/room scans onto [local] only where local has no model.
+  /// Heals local scan media from the remote backup when:
+  /// - local has no model but remote does, or
+  /// - remote points at a different uploaded scan / USDZ URL (e.g. after an
+  ///   ops fix that moves photogrammetry off a shared RoomPlan scan id).
+  ///
+  /// Without the URL/id check, [pushAll] after sync re-uploads a stale local
+  /// pointer and undoes server-side media repairs.
   MakonProject _mergeRemoteScanMedia(MakonProject local, MakonProject remote) {
     var changed = false;
 
     HousingScan? entire = local.entireHousingScan;
     final remoteEntire = remote.entireHousingScan;
-    if (remoteEntire != null &&
-        remoteEntire.hasModel &&
-        entire?.hasModel != true) {
-      entire = remoteEntire;
+    final mergedEntire = _mergedScanMedia(local: entire, remote: remoteEntire);
+    if (mergedEntire != entire) {
+      entire = mergedEntire;
       changed = true;
     }
 
@@ -465,11 +452,12 @@ class MakonProjectStore extends ChangeNotifier {
     final rooms = <ProjectRoom>[];
     for (final room in local.rooms) {
       final remoteRoom = remoteRooms[room.id];
-      final remoteScan = remoteRoom?.scan;
-      if (remoteScan != null &&
-          remoteScan.hasModel &&
-          room.scan?.hasModel != true) {
-        rooms.add(room.copyWith(scan: remoteScan));
+      final mergedScan = _mergedScanMedia(
+        local: room.scan,
+        remote: remoteRoom?.scan,
+      );
+      if (mergedScan != room.scan) {
+        rooms.add(room.copyWith(scan: mergedScan));
         changed = true;
       } else {
         rooms.add(room);
@@ -478,6 +466,58 @@ class MakonProjectStore extends ChangeNotifier {
 
     if (!changed) return local;
     return local.copyWith(entireHousingScan: entire, rooms: rooms);
+  }
+
+  /// Prefer remote upload pointers when they differ; keep richer local metrics.
+  HousingScan? _mergedScanMedia({
+    required HousingScan? local,
+    required HousingScan? remote,
+  }) {
+    if (remote == null || !remote.hasModel) return local;
+    if (local == null || !local.hasModel) return remote;
+
+    final remoteId = remote.remoteScanId;
+    final remoteUsdz = remote.usdzUrl?.trim() ?? '';
+    final localId = local.remoteScanId;
+    final localUsdz = local.usdzUrl?.trim() ?? '';
+    final mediaChanged =
+        (remoteId != null && remoteId > 0 && remoteId != localId) ||
+        (remoteUsdz.isNotEmpty && remoteUsdz != localUsdz);
+    // Heal cross-project contamination (e.g. Stage‑7 placeholder id on Баха)
+    // and missing metrics after a shared remoteScanId rewrite.
+    final identityContaminated =
+        remote.id.isNotEmpty &&
+        local.id.isNotEmpty &&
+        remote.id != local.id &&
+        remoteId != null &&
+        remoteId == localId;
+    final metricsMissing = !local.hasMeasurements && remote.hasMeasurements;
+    if (!mediaChanged && !identityContaminated && !metricsMissing) {
+      return local;
+    }
+
+    return HousingScan(
+      id: identityContaminated ? remote.id : local.id,
+      localUsdzPath: mediaChanged ? null : local.localUsdzPath,
+      remoteScanId: remoteId ?? localId,
+      usdzUrl: remoteUsdz.isNotEmpty ? remoteUsdz : local.usdzUrl,
+      glbUrl: remote.glbUrl ?? local.glbUrl,
+      floorLongM: local.floorLongM ?? remote.floorLongM,
+      floorShortM: local.floorShortM ?? remote.floorShortM,
+      heightM: local.heightM ?? remote.heightM,
+      floorAreaM2: local.floorAreaM2 ?? remote.floorAreaM2,
+      wallPerimeterM: local.wallPerimeterM ?? remote.wallPerimeterM,
+      doorwayWidthM: local.doorwayWidthM ?? remote.doorwayWidthM,
+      doorwayAreaM2: local.doorwayAreaM2 ?? remote.doorwayAreaM2,
+      windowAreaM2: local.windowAreaM2 ?? remote.windowAreaM2,
+      roomTypes: local.roomTypes.isNotEmpty ? local.roomTypes : remote.roomTypes,
+      objectCounts: local.objectCounts.isNotEmpty
+          ? local.objectCounts
+          : remote.objectCounts,
+      worldPlusXBearingDeg:
+          local.worldPlusXBearingDeg ?? remote.worldPlusXBearingDeg,
+      capturedAt: local.capturedAt ?? remote.capturedAt,
+    );
   }
 
   void _handleAuthChanged() {
