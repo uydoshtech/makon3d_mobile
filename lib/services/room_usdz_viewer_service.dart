@@ -119,23 +119,60 @@ class RoomUsdzViewerService {
   /// reinstalls (and some restore/update flows) iOS can move the app data to a
   /// new UUID while SharedPreferences still contains the previous absolute
   /// path. The relative path below Library/Application Support remains stable.
-  static Future<File?> resolveLocalUsdz(String? persistedPath) async {
+  static Future<File?> resolveLocalUsdz(
+    String? persistedPath, {
+    String? fallbackPathOrUrl,
+  }) async {
     final raw = persistedPath?.trim();
-    if (raw == null || raw.isEmpty) return null;
-
-    final direct = File(raw);
-    if (direct.existsSync() && looksLikeUsdz(direct)) return direct;
-
-    const marker = '/Library/Application Support/';
-    final markerIndex = raw.indexOf(marker);
-    if (markerIndex < 0) return null;
-
-    final relative = raw.substring(markerIndex + marker.length);
     final support = await getApplicationSupportDirectory();
-    final relocated = File('${support.path}/$relative');
-    if (relocated.existsSync() && looksLikeUsdz(relocated)) {
-      debugPrint('Recovered relocated USDZ: $raw -> ${relocated.path}');
-      return relocated;
+
+    if (raw != null && raw.isNotEmpty) {
+      final direct = File(raw);
+      if (direct.existsSync() && looksLikeUsdz(direct)) return direct;
+
+      const marker = '/Library/Application Support/';
+      final markerIndex = raw.indexOf(marker);
+      if (markerIndex >= 0) {
+        final relative = raw.substring(markerIndex + marker.length);
+        final relocated = File('${support.path}/$relative');
+        if (relocated.existsSync() && looksLikeUsdz(relocated)) {
+          debugPrint('Recovered relocated USDZ: $raw -> ${relocated.path}');
+          return relocated;
+        }
+      }
+    }
+
+    // Project sync intentionally omits device-local paths. Recover a retained
+    // model by the stable filename supplied by the remote URL before starting
+    // another potentially hundreds-of-megabytes download.
+    final fallback = fallbackPathOrUrl?.trim();
+    if (fallback != null && fallback.isNotEmpty) {
+      final uri = Uri.tryParse(fallback);
+      final basename = uri?.pathSegments.isNotEmpty == true
+          ? uri!.pathSegments.last
+          : fallback.split('/').last;
+      if (basename.toLowerCase().endsWith('.usdz')) {
+        final preferred = File('${support.path}/Makon3DTestModels/$basename');
+        if (preferred.existsSync() && looksLikeUsdz(preferred)) {
+          debugPrint('Recovered cached USDZ by filename: ${preferred.path}');
+          return preferred;
+        }
+        try {
+          await for (final entity in support.list(
+            recursive: true,
+            followLinks: false,
+          )) {
+            if (entity is File &&
+                entity.uri.pathSegments.last == basename &&
+                looksLikeUsdz(entity)) {
+              debugPrint('Recovered cached USDZ by filename: ${entity.path}');
+              return entity;
+            }
+          }
+        } catch (_) {
+          // Cache lookup is best-effort; the remote download remains fallback.
+        }
+      }
     }
     return null;
   }
@@ -148,6 +185,7 @@ class RoomUsdzViewerService {
   static Future<File?> downloadUsdToCache(
     String pathOrUrl, {
     required int scanId,
+    void Function(int received, int total)? onReceiveProgress,
   }) async {
     if (!isIOSDevice) return null;
     final absolute = ScanUploadService.hostedUrl(pathOrUrl);
@@ -157,9 +195,7 @@ class RoomUsdzViewerService {
     final cachedUrl = urlSidecar.existsSync()
         ? urlSidecar.readAsStringSync().trim()
         : '';
-    if (file.existsSync() &&
-        looksLikeUsdz(file) &&
-        cachedUrl == absolute) {
+    if (file.existsSync() && looksLikeUsdz(file) && cachedUrl == absolute) {
       // RoomPlan USDZs are ~100–500KB. A multi‑MB cache for a room_scan.usdz URL
       // is leftover photogrammetry from when that scan id briefly pointed at a
       // different asset — reopen would show the wrong (often mis-oriented) mesh.
@@ -190,7 +226,11 @@ class RoomUsdzViewerService {
             status != null && status >= 200 && status < 300,
       ),
     );
-    final response = await dio.download(absolute, file.path);
+    final response = await dio.download(
+      absolute,
+      file.path,
+      onReceiveProgress: onReceiveProgress,
+    );
     final contentType = response.headers.value('content-type') ?? '';
     if (contentType.contains('text/html') ||
         !file.existsSync() ||
@@ -240,7 +280,10 @@ class RoomUsdzViewerService {
   }) async {
     if (!isIOSDevice) return false;
 
-    final file = await resolveLocalUsdz(localUsdzPath);
+    final file = await resolveLocalUsdz(
+      localUsdzPath,
+      fallbackPathOrUrl: usdzUrl,
+    );
     if (file != null) {
       return presentLocalFile(
         file.path,

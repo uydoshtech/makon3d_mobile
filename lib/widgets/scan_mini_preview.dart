@@ -48,6 +48,9 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
   String? _localPath;
   Object? _error;
   bool _loading = true;
+  double? _downloadProgress;
+  int _downloadReceivedBytes = 0;
+  int _downloadTotalBytes = 0;
 
   bool get _suspendViewer => widget.isLoadingFullscreen;
 
@@ -74,6 +77,9 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
     setState(() {
       _loading = true;
       _error = null;
+      _downloadProgress = null;
+      _downloadReceivedBytes = 0;
+      _downloadTotalBytes = 0;
     });
 
     try {
@@ -89,6 +95,7 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
 
       final localFile = await RoomUsdzViewerService.resolveLocalUsdz(
         widget.localUsdzPath,
+        fallbackPathOrUrl: widget.usdzUrl,
       );
       if (localFile != null) {
         if (!mounted) return;
@@ -114,6 +121,22 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
       final file = await RoomUsdzViewerService.downloadUsdToCache(
         url,
         scanId: widget.scanId,
+        onReceiveProgress: (received, total) {
+          if (!mounted || total <= 0) return;
+          final progress = (received / total).clamp(0.0, 1.0);
+          // Avoid rebuilding the native preview for insignificant byte-level
+          // updates while still keeping the percentage responsive.
+          if (_downloadProgress != null &&
+              (progress - _downloadProgress!).abs() < 0.005 &&
+              received < total) {
+            return;
+          }
+          setState(() {
+            _downloadProgress = progress;
+            _downloadReceivedBytes = received;
+            _downloadTotalBytes = total;
+          });
+        },
       );
       if (!mounted) return;
       if (file == null) {
@@ -178,9 +201,17 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
                   framingPadding: 1.14,
                 ),
               if (_loading && !showPreview)
-                const ColoredBox(
+                ColoredBox(
                   color: Colors.transparent,
-                  child: Center(child: CircularProgressIndicator.adaptive()),
+                  child: Center(
+                    child: _downloadProgress == null
+                        ? const CircularProgressIndicator.adaptive()
+                        : _DownloadProgressIndicator(
+                            progress: _downloadProgress!,
+                            receivedBytes: _downloadReceivedBytes,
+                            totalBytes: _downloadTotalBytes,
+                          ),
+                  ),
                 ),
               if (!_suspendViewer && _error != null)
                 ColoredBox(
@@ -245,6 +276,62 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _DownloadProgressIndicator extends StatelessWidget {
+  const _DownloadProgressIndicator({
+    required this.progress,
+    required this.receivedBytes,
+    required this.totalBytes,
+  });
+
+  final double progress;
+  final int receivedBytes;
+  final int totalBytes;
+
+  String _formatBytes(int bytes) {
+    if (bytes < 1024 * 1024) {
+      return '${(bytes / 1024).toStringAsFixed(0)} KB';
+    }
+    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final percentValue = progress * 100;
+    final percent = percentValue > 0 && percentValue < 1
+        ? percentValue.toStringAsFixed(2)
+        : percentValue.toStringAsFixed(0);
+    return SizedBox(
+      width: 210,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '$percent%',
+            style: const TextStyle(
+              color: Colors.black87,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 10),
+          LinearProgressIndicator(
+            value: progress,
+            minHeight: 7,
+            borderRadius: BorderRadius.circular(8),
+            backgroundColor: Colors.black12,
+            color: Colors.black54,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '${_formatBytes(receivedBytes)} / ${_formatBytes(totalBytes)}',
+            style: const TextStyle(color: Colors.black54, fontSize: 12),
+          ),
+        ],
       ),
     );
   }
