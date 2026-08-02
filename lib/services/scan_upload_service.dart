@@ -16,6 +16,7 @@ class ScanUploadResult {
     this.doorwayWidthM,
     this.doorwayAreaM2,
     this.windowAreaM2,
+    this.roomTypes = const <String>[],
   });
 
   final int id;
@@ -28,6 +29,7 @@ class ScanUploadResult {
   final double? doorwayWidthM;
   final double? doorwayAreaM2;
   final double? windowAreaM2;
+  final List<String> roomTypes;
 }
 
 /// Anonymous scan upload / list against the UyDosh backend (`/makon3d/scans`).
@@ -84,6 +86,11 @@ class ScanUploadService {
       doorwayWidthM: (data["doorwayWidthM"] as num?)?.toDouble(),
       doorwayAreaM2: (data["doorwayAreaM2"] as num?)?.toDouble(),
       windowAreaM2: (data["windowAreaM2"] as num?)?.toDouble(),
+      roomTypes:
+          (data["roomTypes"] as List?)?.whereType<String>().toList(
+            growable: false,
+          ) ??
+          const <String>[],
     );
   }
 

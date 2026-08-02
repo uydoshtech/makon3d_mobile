@@ -7,6 +7,7 @@ import 'package:makon3d_mobile/l10n/l10n.dart';
 import 'package:makon3d_mobile/models/housing_scan.dart';
 import 'package:makon3d_mobile/models/makon_project.dart';
 import 'package:makon3d_mobile/models/project_room.dart';
+import 'package:makon3d_mobile/models/room_type.dart';
 import 'package:makon3d_mobile/scan_flow/makon_entire_housing_coordinator.dart';
 import 'package:makon3d_mobile/scan_flow/makon_room_by_room_coordinator.dart';
 import 'package:makon3d_mobile/screens/edit_project_screen.dart';
@@ -14,6 +15,7 @@ import 'package:makon3d_mobile/screens/room_materials_screen.dart';
 import 'package:makon3d_mobile/screens/scan_detail_screen.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
 import 'package:makon3d_mobile/services/room_usdz_viewer_service.dart';
+import 'package:makon3d_mobile/services/scan_upload_service.dart';
 import 'package:makon3d_mobile/widgets/photogrammetry_package_actions.dart';
 import 'package:makon3d_mobile/widgets/project_delete_dialog.dart';
 import 'package:makon3d_mobile/widgets/scan_mini_preview.dart';
@@ -31,12 +33,16 @@ class ProjectDashboardScreen extends StatefulWidget {
 
 class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
   bool _openingFullscreen = false;
+  List<String> _remoteRoomTypes = const <String>[];
+  int? _loadedRoomTypesScanId;
 
   @override
   void initState() {
     super.initState();
     MakonProjectStore.instance.addListener(_onStoreChanged);
-    unawaited(MakonProjectStore.instance.ensureLoaded());
+    unawaited(
+      MakonProjectStore.instance.ensureLoaded().then((_) => _loadRoomTypes()),
+    );
   }
 
   @override
@@ -46,7 +52,27 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
   }
 
   void _onStoreChanged() {
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(() {});
+      unawaited(_loadRoomTypes());
+    }
+  }
+
+  Future<void> _loadRoomTypes() async {
+    final scan = _project?.entireHousingScan;
+    final remoteId = scan?.remoteScanId;
+    if (scan == null || scan.roomTypes.isNotEmpty || remoteId == null) return;
+    if (_loadedRoomTypesScanId == remoteId) return;
+    _loadedRoomTypesScanId = remoteId;
+    try {
+      final remote = await ScanUploadService.getScan(remoteId);
+      if (!mounted || _project?.entireHousingScan?.remoteScanId != remoteId) {
+        return;
+      }
+      setState(() => _remoteRoomTypes = remote.roomTypes);
+    } catch (_) {
+      // Detection metadata is decorative; project details remain usable.
+    }
   }
 
   MakonProject? get _project =>
@@ -234,6 +260,10 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
               onStartScan: _startEntireHousingScan,
               onOpenModel: () => unawaited(_openHousingModel()),
               onOpenMaterials: () => unawaited(_openEntireHousingMaterials()),
+              detectedRoomTypes:
+                  project.entireHousingScan?.roomTypes.isNotEmpty == true
+                  ? project.entireHousingScan!.roomTypes
+                  : _remoteRoomTypes,
             )
           : _RoomByRoomBody(
               project: project,
@@ -254,6 +284,7 @@ class _EntireHousingBody extends StatelessWidget {
     required this.onStartScan,
     required this.onOpenModel,
     required this.onOpenMaterials,
+    required this.detectedRoomTypes,
   });
 
   final MakonProject project;
@@ -261,6 +292,7 @@ class _EntireHousingBody extends StatelessWidget {
   final VoidCallback onStartScan;
   final VoidCallback onOpenModel;
   final VoidCallback onOpenMaterials;
+  final List<String> detectedRoomTypes;
 
   @override
   Widget build(BuildContext context) {
@@ -291,6 +323,10 @@ class _EntireHousingBody extends StatelessWidget {
             isLoadingFullscreen: openingFullscreen,
             onOpenFullscreen: onOpenModel,
           ),
+          if (detectedRoomTypes.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            _DetectedRoomTypesPill(roomTypes: detectedRoomTypes),
+          ],
           const SizedBox(height: 16),
           ListTile(
             contentPadding: EdgeInsets.zero,
@@ -348,6 +384,56 @@ class _EntireHousingBody extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+}
+
+class _DetectedRoomTypesPill extends StatelessWidget {
+  const _DetectedRoomTypesPill({required this.roomTypes});
+
+  final List<String> roomTypes;
+
+  @override
+  Widget build(BuildContext context) {
+    final supported = <RoomType>{};
+    for (final value in roomTypes) {
+      final type = RoomType.tryParse(value);
+      if (type == RoomType.livingRoom ||
+          type == RoomType.bedroom ||
+          type == RoomType.kitchen ||
+          type == RoomType.bathroom) {
+        supported.add(type!);
+      }
+    }
+    if (supported.isEmpty) return const SizedBox.shrink();
+
+    final colors = Theme.of(context).colorScheme;
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: colors.primary.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: colors.primary.withValues(alpha: 0.45)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (var index = 0; index < supported.length; index++) ...[
+              if (index > 0) const SizedBox(width: 8),
+              Tooltip(
+                message: L10n.get(supported.elementAt(index).titleKey),
+                child: Icon(
+                  supported.elementAt(index).icon,
+                  size: 19,
+                  color: colors.primary,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

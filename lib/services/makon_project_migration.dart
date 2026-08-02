@@ -61,6 +61,7 @@ class MakonProjectMigration {
       doorwayWidthM: scan.doorwayWidthM,
       doorwayAreaM2: scan.doorwayAreaM2,
       windowAreaM2: scan.windowAreaM2,
+      roomTypes: scan.roomTypes,
       worldPlusXBearingDeg: scan.worldPlusXBearingDeg,
       capturedAt: created,
     );

@@ -13,6 +13,7 @@ class MakonScan {
     this.doorwayWidthM,
     this.doorwayAreaM2,
     this.windowAreaM2,
+    this.roomTypes = const <String>[],
     this.worldPlusXBearingDeg,
     this.rotationGifUrl,
     this.posterImageUrl,
@@ -36,6 +37,7 @@ class MakonScan {
   final double? doorwayWidthM;
   final double? doorwayAreaM2;
   final double? windowAreaM2;
+  final List<String> roomTypes;
   final double? worldPlusXBearingDeg;
   final String? rotationGifUrl;
   final String? posterImageUrl;
@@ -58,6 +60,11 @@ class MakonScan {
       doorwayWidthM: (json["doorwayWidthM"] as num?)?.toDouble(),
       doorwayAreaM2: (json["doorwayAreaM2"] as num?)?.toDouble(),
       windowAreaM2: (json["windowAreaM2"] as num?)?.toDouble(),
+      roomTypes:
+          (json["roomTypes"] as List?)?.whereType<String>().toList(
+            growable: false,
+          ) ??
+          const <String>[],
       worldPlusXBearingDeg: (json["worldPlusXBearingDeg"] as num?)?.toDouble(),
       rotationGifUrl: json["rotationGifUrl"] as String?,
       posterImageUrl: json["posterImageUrl"] as String?,
