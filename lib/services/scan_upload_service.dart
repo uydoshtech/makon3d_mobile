@@ -17,6 +17,7 @@ class ScanUploadResult {
     this.doorwayAreaM2,
     this.windowAreaM2,
     this.roomTypes = const <String>[],
+    this.objectCounts = const <String, int>{},
   });
 
   final int id;
@@ -30,6 +31,7 @@ class ScanUploadResult {
   final double? doorwayAreaM2;
   final double? windowAreaM2;
   final List<String> roomTypes;
+  final Map<String, int> objectCounts;
 }
 
 /// Anonymous scan upload / list against the UyDosh backend (`/makon3d/scans`).
@@ -91,6 +93,11 @@ class ScanUploadService {
             growable: false,
           ) ??
           const <String>[],
+      objectCounts:
+          (data["objectCounts"] as Map?)?.map(
+            (key, value) => MapEntry(key.toString(), (value as num).toInt()),
+          ) ??
+          const <String, int>{},
     );
   }
 

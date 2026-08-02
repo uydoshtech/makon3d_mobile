@@ -14,6 +14,7 @@ class MakonScan {
     this.doorwayAreaM2,
     this.windowAreaM2,
     this.roomTypes = const <String>[],
+    this.objectCounts = const <String, int>{},
     this.worldPlusXBearingDeg,
     this.rotationGifUrl,
     this.posterImageUrl,
@@ -38,6 +39,7 @@ class MakonScan {
   final double? doorwayAreaM2;
   final double? windowAreaM2;
   final List<String> roomTypes;
+  final Map<String, int> objectCounts;
   final double? worldPlusXBearingDeg;
   final String? rotationGifUrl;
   final String? posterImageUrl;
@@ -65,6 +67,11 @@ class MakonScan {
             growable: false,
           ) ??
           const <String>[],
+      objectCounts:
+          (json["objectCounts"] as Map?)?.map(
+            (key, value) => MapEntry(key.toString(), (value as num).toInt()),
+          ) ??
+          const <String, int>{},
       worldPlusXBearingDeg: (json["worldPlusXBearingDeg"] as num?)?.toDouble(),
       rotationGifUrl: json["rotationGifUrl"] as String?,
       posterImageUrl: json["posterImageUrl"] as String?,

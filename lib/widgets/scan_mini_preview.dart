@@ -175,6 +175,9 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
                   key: _previewViewKey,
                   filePath: path,
                   autoRotate: !_suspendViewer,
+                  // Fill the project card more aggressively than the shared
+                  // listing preview while retaining a small rotation margin.
+                  framingPadding: 1.14,
                 ),
               if (_loading && !showPreview)
                 const ColoredBox(

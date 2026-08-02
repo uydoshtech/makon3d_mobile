@@ -142,6 +142,9 @@ class L10n {
       "project_action_3d_model": "3D Model",
       "project_action_measurements": "Measurements",
       "project_action_materials": "Material Estimates",
+      "project_detected_objects": "Detected objects",
+      "room_scan_stats_openings": "Openings",
+      "room_scan_stats_shower": "Shower",
       "project_rescan": "Rescan property",
       "materials_floor_title": "Floor tiles",
       "materials_floor_surface": "Floor",
@@ -519,6 +522,9 @@ class L10n {
       "project_action_3d_model": "3D-модель",
       "project_action_measurements": "Размеры",
       "project_action_materials": "Расчёт материалов",
+      "project_detected_objects": "Обнаруженные объекты",
+      "room_scan_stats_openings": "Проёмы",
+      "room_scan_stats_shower": "Душ",
       "project_rescan": "Пересканировать объект",
       "materials_floor_title": "Плитка на пол",
       "materials_floor_surface": "Пол",
@@ -620,7 +626,8 @@ class L10n {
       "room_scan_photogrammetry_upload":
           "Загрузка архива фотограмметрии: {percent}%",
       "room_scan_photogrammetry_retry": "Повторить загрузку фотограмметрии",
-      "room_scan_photogrammetry_retry_ok": "Фотограмметрия поставлена в очередь",
+      "room_scan_photogrammetry_retry_ok":
+          "Фотограмметрия поставлена в очередь",
       "room_scan_photogrammetry_retry_missing":
           "Локальный архив фотограмметрии не найден",
       "room_scan_photogrammetry_retry_failed":
@@ -899,6 +906,9 @@ class L10n {
       "project_action_3d_model": "3D model",
       "project_action_measurements": "O'lchamlar",
       "project_action_materials": "Material hisobi",
+      "project_detected_objects": "Aniqlangan obyektlar",
+      "room_scan_stats_openings": "Ochiq joylar",
+      "room_scan_stats_shower": "Dush",
       "project_rescan": "Ob'ektni qayta skanerlash",
       "materials_floor_title": "Pol plitkasi",
       "materials_floor_surface": "Pol",

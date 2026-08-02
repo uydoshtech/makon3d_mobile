@@ -34,14 +34,17 @@ class ProjectDashboardScreen extends StatefulWidget {
 class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
   bool _openingFullscreen = false;
   List<String> _remoteRoomTypes = const <String>[];
-  int? _loadedRoomTypesScanId;
+  Map<String, int> _remoteObjectCounts = const <String, int>{};
+  int? _loadedDetectionScanId;
 
   @override
   void initState() {
     super.initState();
     MakonProjectStore.instance.addListener(_onStoreChanged);
     unawaited(
-      MakonProjectStore.instance.ensureLoaded().then((_) => _loadRoomTypes()),
+      MakonProjectStore.instance.ensureLoaded().then(
+        (_) => _loadDetectionMetadata(),
+      ),
     );
   }
 
@@ -54,22 +57,26 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
   void _onStoreChanged() {
     if (mounted) {
       setState(() {});
-      unawaited(_loadRoomTypes());
+      unawaited(_loadDetectionMetadata());
     }
   }
 
-  Future<void> _loadRoomTypes() async {
+  Future<void> _loadDetectionMetadata() async {
     final scan = _project?.entireHousingScan;
     final remoteId = scan?.remoteScanId;
-    if (scan == null || scan.roomTypes.isNotEmpty || remoteId == null) return;
-    if (_loadedRoomTypesScanId == remoteId) return;
-    _loadedRoomTypesScanId = remoteId;
+    if (scan == null || remoteId == null) return;
+    if (scan.roomTypes.isNotEmpty && scan.objectCounts.isNotEmpty) return;
+    if (_loadedDetectionScanId == remoteId) return;
+    _loadedDetectionScanId = remoteId;
     try {
       final remote = await ScanUploadService.getScan(remoteId);
       if (!mounted || _project?.entireHousingScan?.remoteScanId != remoteId) {
         return;
       }
-      setState(() => _remoteRoomTypes = remote.roomTypes);
+      setState(() {
+        _remoteRoomTypes = remote.roomTypes;
+        _remoteObjectCounts = remote.objectCounts;
+      });
     } catch (_) {
       // Detection metadata is decorative; project details remain usable.
     }
@@ -264,6 +271,10 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
                   project.entireHousingScan?.roomTypes.isNotEmpty == true
                   ? project.entireHousingScan!.roomTypes
                   : _remoteRoomTypes,
+              detectedObjectCounts:
+                  project.entireHousingScan?.objectCounts.isNotEmpty == true
+                  ? project.entireHousingScan!.objectCounts
+                  : _remoteObjectCounts,
             )
           : _RoomByRoomBody(
               project: project,
@@ -285,6 +296,7 @@ class _EntireHousingBody extends StatelessWidget {
     required this.onOpenModel,
     required this.onOpenMaterials,
     required this.detectedRoomTypes,
+    required this.detectedObjectCounts,
   });
 
   final MakonProject project;
@@ -293,6 +305,7 @@ class _EntireHousingBody extends StatelessWidget {
   final VoidCallback onOpenModel;
   final VoidCallback onOpenMaterials;
   final List<String> detectedRoomTypes;
+  final Map<String, int> detectedObjectCounts;
 
   @override
   Widget build(BuildContext context) {
@@ -358,6 +371,8 @@ class _EntireHousingBody extends StatelessWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: onOpenMaterials,
           ),
+          if (detectedObjectCounts.isNotEmpty)
+            _DetectedObjectsSection(counts: detectedObjectCounts),
           const SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: onStartScan,
@@ -434,6 +449,71 @@ class _DetectedRoomTypesPill extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _DetectedObjectsSection extends StatelessWidget {
+  const _DetectedObjectsSection({required this.counts});
+
+  final Map<String, int> counts;
+
+  static const _labelKeys = <String, String>{
+    'window': 'room_scan_stats_windows',
+    'door': 'room_scan_stats_doors',
+    'opening': 'room_scan_stats_openings',
+    'storage': 'room_scan_stats_storage',
+    'cabinet': 'room_scan_stats_cabinet',
+    'bed': 'room_scan_stats_bed',
+    'sofa': 'room_scan_stats_sofa',
+    'table': 'room_scan_stats_table',
+    'chair': 'room_scan_stats_chair',
+    'television': 'room_scan_stats_television',
+    'refrigerator': 'room_scan_stats_refrigerator',
+    'sink': 'room_scan_stats_sink',
+    'toilet': 'room_scan_stats_toilet',
+    'bathtub': 'room_scan_stats_bathtub',
+    'shower': 'room_scan_stats_shower',
+    'oven': 'room_scan_stats_oven',
+    'stove': 'room_scan_stats_stove',
+    'dishwasher': 'room_scan_stats_dishwasher',
+    'washerDryer': 'room_scan_stats_washer_dryer',
+    'fireplace': 'room_scan_stats_fireplace',
+    'stairs': 'room_scan_stats_stairs',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final entries = counts.entries.where((entry) => entry.value > 0).toList();
+    if (entries.isEmpty) return const SizedBox.shrink();
+    return ExpansionTile(
+      tilePadding: EdgeInsets.zero,
+      childrenPadding: const EdgeInsets.only(left: 56, right: 8, bottom: 8),
+      leading: const Icon(Icons.chair_outlined),
+      title: Text(L10n.get('project_detected_objects')),
+      shape: const Border(),
+      collapsedShape: const Border(),
+      children: [
+        for (final entry in entries)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 7),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    L10n.get(_labelKeys[entry.key] ?? 'room_scan_stats_object'),
+                  ),
+                ),
+                Text(
+                  '× ${entry.value}',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }

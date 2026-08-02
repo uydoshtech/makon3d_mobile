@@ -15,6 +15,7 @@ class HousingScan {
     this.doorwayAreaM2,
     this.windowAreaM2,
     this.roomTypes = const <String>[],
+    this.objectCounts = const <String, int>{},
     this.worldPlusXBearingDeg,
     this.capturedAt,
   });
@@ -37,6 +38,7 @@ class HousingScan {
   final double? doorwayAreaM2;
   final double? windowAreaM2;
   final List<String> roomTypes;
+  final Map<String, int> objectCounts;
   final double? worldPlusXBearingDeg;
   final DateTime? capturedAt;
 
@@ -67,6 +69,7 @@ class HousingScan {
       doorwayAreaM2: doorwayAreaM2,
       windowAreaM2: windowAreaM2,
       roomTypes: roomTypes,
+      objectCounts: objectCounts,
       worldPlusXBearingDeg: worldPlusXBearingDeg,
       capturedAt: capturedAt,
     );
@@ -99,6 +102,7 @@ class HousingScan {
     'doorwayAreaM2': doorwayAreaM2,
     'windowAreaM2': windowAreaM2,
     'roomTypes': roomTypes,
+    'objectCounts': objectCounts,
     'worldPlusXBearingDeg': worldPlusXBearingDeg,
     'capturedAt': capturedAt?.toIso8601String(),
   };
@@ -123,6 +127,11 @@ class HousingScan {
             growable: false,
           ) ??
           const <String>[],
+      objectCounts:
+          (json['objectCounts'] as Map?)?.map(
+            (key, value) => MapEntry(key.toString(), (value as num).toInt()),
+          ) ??
+          const <String, int>{},
       worldPlusXBearingDeg: (json['worldPlusXBearingDeg'] as num?)?.toDouble(),
       capturedAt: json['capturedAt'] != null
           ? DateTime.tryParse(json['capturedAt'].toString())
@@ -144,6 +153,7 @@ class HousingScan {
     double? doorwayAreaM2,
     double? windowAreaM2,
     List<String>? roomTypes,
+    Map<String, int>? objectCounts,
     double? worldPlusXBearingDeg,
     DateTime? capturedAt,
   }) {
@@ -162,6 +172,7 @@ class HousingScan {
       doorwayAreaM2: doorwayAreaM2 ?? this.doorwayAreaM2,
       windowAreaM2: windowAreaM2 ?? this.windowAreaM2,
       roomTypes: roomTypes ?? this.roomTypes,
+      objectCounts: objectCounts ?? this.objectCounts,
       worldPlusXBearingDeg: worldPlusXBearingDeg ?? this.worldPlusXBearingDeg,
       capturedAt: capturedAt ?? this.capturedAt,
     );
