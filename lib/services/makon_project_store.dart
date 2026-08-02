@@ -415,10 +415,30 @@ class MakonProjectStore extends ChangeNotifier {
       final restored = remote
           .where((p) => !localIds.contains(p.id))
           .toList(growable: false);
+      var changed = false;
       if (restored.isNotEmpty) {
         final merged = [..._projects, ...restored]
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
         _projects = merged;
+        changed = true;
+      }
+      // Local wins for project identity, but adopt remote scan media when this
+      // device has an unscanned room/housing and the backup already has a model
+      // (e.g. photogrammetry USDZ attached on another device / simulator).
+      final byId = {for (final p in remote) p.id: p};
+      final healed = <MakonProject>[];
+      for (final local in _projects) {
+        final remoteProject = byId[local.id];
+        if (remoteProject == null) {
+          healed.add(local);
+          continue;
+        }
+        final next = _mergeRemoteScanMedia(local, remoteProject);
+        if (next != local) changed = true;
+        healed.add(next);
+      }
+      if (changed) {
+        _projects = healed;
         await _persist();
         notifyListeners();
       }
@@ -426,6 +446,38 @@ class MakonProjectStore extends ChangeNotifier {
     } catch (e) {
       debugPrint('MakonProjectStore backend sync failed: $e');
     }
+  }
+
+  /// Copies remote housing/room scans onto [local] only where local has no model.
+  MakonProject _mergeRemoteScanMedia(MakonProject local, MakonProject remote) {
+    var changed = false;
+
+    HousingScan? entire = local.entireHousingScan;
+    final remoteEntire = remote.entireHousingScan;
+    if (remoteEntire != null &&
+        remoteEntire.hasModel &&
+        entire?.hasModel != true) {
+      entire = remoteEntire;
+      changed = true;
+    }
+
+    final remoteRooms = {for (final r in remote.rooms) r.id: r};
+    final rooms = <ProjectRoom>[];
+    for (final room in local.rooms) {
+      final remoteRoom = remoteRooms[room.id];
+      final remoteScan = remoteRoom?.scan;
+      if (remoteScan != null &&
+          remoteScan.hasModel &&
+          room.scan?.hasModel != true) {
+        rooms.add(room.copyWith(scan: remoteScan));
+        changed = true;
+      } else {
+        rooms.add(room);
+      }
+    }
+
+    if (!changed) return local;
+    return local.copyWith(entireHousingScan: entire, rooms: rooms);
   }
 
   void _handleAuthChanged() {

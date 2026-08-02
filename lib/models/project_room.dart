@@ -56,6 +56,14 @@ class ProjectRoom {
   };
 
   factory ProjectRoom.fromJson(Map<String, dynamic> json) {
+    Map<String, dynamic>? scanJson;
+    final rawScan = json['scan'];
+    if (rawScan is Map<String, dynamic>) {
+      scanJson = rawScan;
+    } else if (rawScan is Map) {
+      // Dio / jsonb nested maps are often Map<dynamic, dynamic>.
+      scanJson = Map<String, dynamic>.from(rawScan);
+    }
     return ProjectRoom(
       id: json['id'] as String? ?? '',
       roomType:
@@ -64,9 +72,7 @@ class ProjectRoom {
           ? DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now()
           : DateTime.now(),
       name: json['name'] as String?,
-      scan: json['scan'] is Map<String, dynamic>
-          ? HousingScan.fromJson(json['scan'] as Map<String, dynamic>)
-          : null,
+      scan: scanJson != null ? HousingScan.fromJson(scanJson) : null,
       layoutOffsetXM: (json['layoutOffsetXM'] as num?)?.toDouble(),
       layoutOffsetZM: (json['layoutOffsetZM'] as num?)?.toDouble(),
       layoutYawDeg: (json['layoutYawDeg'] as num?)?.toDouble(),

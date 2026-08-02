@@ -64,17 +64,23 @@ class MakonProject {
       for (final item in roomsJson) {
         if (item is Map<String, dynamic>) {
           rooms.add(ProjectRoom.fromJson(item));
+        } else if (item is Map) {
+          rooms.add(ProjectRoom.fromJson(Map<String, dynamic>.from(item)));
         }
       }
     }
 
     // Migration: missing scanMode — infer from content.
     final parsedMode = ScanMode.tryParse(json['scanMode'] as String?);
-    final entire = json['entireHousingScan'] is Map<String, dynamic>
-        ? HousingScan.fromJson(
-            json['entireHousingScan'] as Map<String, dynamic>,
-          )
-        : null;
+    Map<String, dynamic>? entireJson;
+    final rawEntire = json['entireHousingScan'];
+    if (rawEntire is Map<String, dynamic>) {
+      entireJson = rawEntire;
+    } else if (rawEntire is Map) {
+      entireJson = Map<String, dynamic>.from(rawEntire);
+    }
+    final entire =
+        entireJson != null ? HousingScan.fromJson(entireJson) : null;
     final scanMode =
         parsedMode ?? migrateScanMode(entireHousingScan: entire, rooms: rooms);
 
