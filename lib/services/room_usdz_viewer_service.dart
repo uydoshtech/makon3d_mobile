@@ -113,8 +113,38 @@ class RoomUsdzViewerService {
     }
   }
 
+  /// Resolves a persisted local USDZ path after an iOS app-container move.
+  ///
+  /// Absolute sandbox paths contain a container UUID. During simulator
+  /// reinstalls (and some restore/update flows) iOS can move the app data to a
+  /// new UUID while SharedPreferences still contains the previous absolute
+  /// path. The relative path below Library/Application Support remains stable.
+  static Future<File?> resolveLocalUsdz(String? persistedPath) async {
+    final raw = persistedPath?.trim();
+    if (raw == null || raw.isEmpty) return null;
+
+    final direct = File(raw);
+    if (direct.existsSync() && looksLikeUsdz(direct)) return direct;
+
+    const marker = '/Library/Application Support/';
+    final markerIndex = raw.indexOf(marker);
+    if (markerIndex < 0) return null;
+
+    final relative = raw.substring(markerIndex + marker.length);
+    final support = await getApplicationSupportDirectory();
+    final relocated = File('${support.path}/$relative');
+    if (relocated.existsSync() && looksLikeUsdz(relocated)) {
+      debugPrint('Recovered relocated USDZ: $raw -> ${relocated.path}');
+      return relocated;
+    }
+    return null;
+  }
+
   /// Downloads USDZ to the per-scan temp cache (for mini preview or fullscreen).
   /// Returns null on non-iOS. [pathOrUrl] may be relative or absolute.
+  ///
+  /// Cache is keyed by [scanId] plus a sidecar of the absolute URL so replacing
+  /// the remote asset (e.g. RoomPlan → photogrammetry USDZ) re-downloads.
   static Future<File?> downloadUsdToCache(
     String pathOrUrl, {
     required int scanId,
@@ -123,22 +153,33 @@ class RoomUsdzViewerService {
     final absolute = ScanUploadService.hostedUrl(pathOrUrl);
     final temp = await getTemporaryDirectory();
     final file = File("${temp.path}/makon3d_scan_$scanId.usdz");
-    if (file.existsSync() && looksLikeUsdz(file)) {
+    final urlSidecar = File("${temp.path}/makon3d_scan_$scanId.usdz.url");
+    final cachedUrl = urlSidecar.existsSync()
+        ? urlSidecar.readAsStringSync().trim()
+        : '';
+    if (file.existsSync() &&
+        looksLikeUsdz(file) &&
+        cachedUrl == absolute) {
       return file;
     }
     if (file.existsSync()) {
-      // Stale HTML/error body from a prior 200-on-missing-image response.
+      // Stale HTML/error body, or URL changed (new remote asset for this scan).
       try {
         await file.delete();
       } catch (_) {}
     }
+    try {
+      if (urlSidecar.existsSync()) await urlSidecar.delete();
+    } catch (_) {}
     final dio = Dio(
       BaseOptions(
         connectTimeout: const Duration(seconds: 45),
-        receiveTimeout: const Duration(minutes: 2),
+        // Photogrammetry USDZ can be hundreds of MB on slow networks.
+        receiveTimeout: const Duration(minutes: 20),
         responseType: ResponseType.bytes,
         // Reject HTML health-check / SPA fallbacks that used to return 200.
-        validateStatus: (status) => status != null && status >= 200 && status < 300,
+        validateStatus: (status) =>
+            status != null && status >= 200 && status < 300,
       ),
     );
     final response = await dio.download(absolute, file.path);
@@ -151,6 +192,9 @@ class RoomUsdzViewerService {
       } catch (_) {}
       throw StateError("Downloaded USDZ is missing, empty, or not a ZIP/USDZ");
     }
+    try {
+      await urlSidecar.writeAsString(absolute, flush: true);
+    } catch (_) {}
     return file;
   }
 
@@ -188,18 +232,15 @@ class RoomUsdzViewerService {
   }) async {
     if (!isIOSDevice) return false;
 
-    final local = localUsdzPath?.trim();
-    if (local != null && local.isNotEmpty) {
-      final file = File(local);
-      if (file.existsSync() && looksLikeUsdz(file)) {
-        return presentLocalFile(
-          file.path,
-          scanId: scanId,
-          languageCode: languageCode,
-          worldPlusXBearingDeg: worldPlusXBearingDeg,
-          shareScanId: shareScanId,
-        );
-      }
+    final file = await resolveLocalUsdz(localUsdzPath);
+    if (file != null) {
+      return presentLocalFile(
+        file.path,
+        scanId: scanId,
+        languageCode: languageCode,
+        worldPlusXBearingDeg: worldPlusXBearingDeg,
+        shareScanId: shareScanId,
+      );
     }
 
     final url = usdzUrl?.trim();

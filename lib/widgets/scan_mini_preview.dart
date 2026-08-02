@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:room_scan_kit/room_scan_kit.dart';
@@ -88,18 +87,17 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
         return;
       }
 
-      final local = widget.localUsdzPath?.trim();
-      if (local != null && local.isNotEmpty) {
-        final file = File(local);
-        if (file.existsSync() && RoomUsdzViewerService.looksLikeUsdz(file)) {
-          if (!mounted) return;
-          setState(() {
-            _localPath = file.path;
-            _loading = false;
-            _error = null;
-          });
-          return;
-        }
+      final localFile = await RoomUsdzViewerService.resolveLocalUsdz(
+        widget.localUsdzPath,
+      );
+      if (localFile != null) {
+        if (!mounted) return;
+        setState(() {
+          _localPath = localFile.path;
+          _loading = false;
+          _error = null;
+        });
+        return;
       }
 
       final url = widget.usdzUrl?.trim();

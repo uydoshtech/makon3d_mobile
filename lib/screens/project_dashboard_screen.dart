@@ -42,10 +42,35 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
     super.initState();
     MakonProjectStore.instance.addListener(_onStoreChanged);
     unawaited(
-      MakonProjectStore.instance.ensureLoaded().then(
-        (_) => _loadDetectionMetadata(),
-      ),
+      MakonProjectStore.instance.ensureLoaded().then((_) async {
+        await _refreshProjectScanMedia();
+        await _loadDetectionMetadata();
+      }),
     );
+  }
+
+  /// Pull latest remote USDZ/GLB URLs so photogrammetry replacements show up
+  /// without re-scanning. Persists when the URL (or cleared local path) changes.
+  Future<void> _refreshProjectScanMedia() async {
+    final project = _project;
+    if (project == null) return;
+    final scans = <HousingScan>[
+      if (project.entireHousingScan != null) project.entireHousingScan!,
+      for (final room in project.rooms)
+        if (room.scan != null) room.scan!,
+    ];
+    for (final scan in scans) {
+      if (scan.remoteScanId == null) continue;
+      try {
+        final updated = await MakonProjectStore.instance.refreshScanMedia(scan);
+        await MakonProjectStore.instance.replaceScanMedia(
+          previous: scan,
+          updated: updated,
+        );
+      } catch (_) {
+        // Offline / transient API errors — keep the cached project media.
+      }
+    }
   }
 
   @override
@@ -341,13 +366,6 @@ class _EntireHousingBody extends StatelessWidget {
             _DetectedRoomTypesPill(roomTypes: detectedRoomTypes),
           ],
           const SizedBox(height: 16),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.view_in_ar),
-            title: Text(L10n.get('project_action_3d_model')),
-            trailing: const Icon(Icons.fullscreen),
-            onTap: onOpenModel,
-          ),
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.straighten),

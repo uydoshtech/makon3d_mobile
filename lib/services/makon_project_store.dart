@@ -193,6 +193,10 @@ class MakonProjectStore extends ChangeNotifier {
 
   /// Refresh [scan]'s usdz/glb URLs from the backend. Returns an updated scan
   /// when the remote row still exists; clears model media when it was deleted.
+  ///
+  /// When the remote USDZ URL changes (e.g. RoomPlan → photogrammetry), clears
+  /// [HousingScan.localUsdzPath] so the viewer downloads the new remote file
+  /// instead of keeping a stale on-device path.
   Future<HousingScan> refreshScanMedia(HousingScan scan) async {
     final remoteId = scan.remoteScanId;
     if (remoteId == null || remoteId <= 0) return scan;
@@ -203,11 +207,35 @@ class MakonProjectStore extends ChangeNotifier {
       if ((usdz == null || usdz.isEmpty) && (glb == null || glb.isEmpty)) {
         return scan.withoutModelMedia();
       }
-      return scan.withRemoteMedia(
+      final previousUsdz = scan.usdzUrl?.trim() ?? '';
+      final urlChanged = usdz != null && usdz.isNotEmpty && usdz != previousUsdz;
+      final updated = scan.withRemoteMedia(
         remoteScanId: remoteId,
         usdzUrl: usdz,
         glbUrl: glb,
       );
+      // Prefer the new remote asset over a stale on-device USDZ path.
+      if (urlChanged && (updated.localUsdzPath?.isNotEmpty ?? false)) {
+        return HousingScan(
+          id: updated.id,
+          remoteScanId: updated.remoteScanId,
+          usdzUrl: updated.usdzUrl,
+          glbUrl: updated.glbUrl,
+          floorLongM: updated.floorLongM,
+          floorShortM: updated.floorShortM,
+          heightM: updated.heightM,
+          floorAreaM2: updated.floorAreaM2,
+          wallPerimeterM: updated.wallPerimeterM,
+          doorwayWidthM: updated.doorwayWidthM,
+          doorwayAreaM2: updated.doorwayAreaM2,
+          windowAreaM2: updated.windowAreaM2,
+          roomTypes: updated.roomTypes,
+          objectCounts: updated.objectCounts,
+          worldPlusXBearingDeg: updated.worldPlusXBearingDeg,
+          capturedAt: updated.capturedAt,
+        );
+      }
+      return updated;
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) {
         return scan.withoutModelMedia();
