@@ -19,6 +19,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   static const _holdMs = 1200;
+  static const _bootstrapTimeout = Duration(seconds: 8);
 
   @override
   void initState() {
@@ -27,13 +28,25 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _run() async {
-    await Future.wait<void>([
-      Future<void>.delayed(const Duration(milliseconds: _holdMs)),
-      if (AuthState().isSignedIn) ...[
-        MakonProjectStore.instance.ensureLoaded(),
-        MakonProjectMigration.runIfNeeded(),
-      ],
-    ]);
+    final minimumHold = Future<void>.delayed(
+      const Duration(milliseconds: _holdMs),
+    );
+
+    if (AuthState().isSignedIn) {
+      try {
+        await (() async {
+          await MakonProjectStore.instance.ensureLoaded();
+          await MakonProjectMigration.runIfNeeded();
+        })().timeout(_bootstrapTimeout);
+      } catch (error, stackTrace) {
+        // Local data initialization must never trap the user on the splash
+        // screen. The project store can recover and notify the UI later.
+        debugPrint('Splash project bootstrap failed: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
+    }
+
+    await minimumHold;
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
