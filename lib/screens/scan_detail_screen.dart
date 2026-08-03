@@ -95,6 +95,11 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
     if (_openingFullscreen) return;
     setState(() => _openingFullscreen = true);
     try {
+      // Release the embedded SceneKit scene before fullscreen decodes the same
+      // large texture atlases again.
+      await WidgetsBinding.instance.endOfFrame;
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      if (!mounted) return;
       final remoteId = _scan.remoteScanId;
       if (remoteId != null) {
         try {

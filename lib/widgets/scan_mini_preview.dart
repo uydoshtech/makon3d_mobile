@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:room_scan_kit/room_scan_kit.dart';
@@ -51,6 +52,9 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
   double? _downloadProgress;
   int _downloadReceivedBytes = 0;
   int _downloadTotalBytes = 0;
+  bool _deferLargePreview = false;
+
+  static const int _maximumEmbeddedPreviewBytes = 64 * 1024 * 1024;
 
   bool get _suspendViewer => widget.isLoadingFullscreen;
 
@@ -80,6 +84,7 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
       _downloadProgress = null;
       _downloadReceivedBytes = 0;
       _downloadTotalBytes = 0;
+      _deferLargePreview = false;
     });
 
     try {
@@ -101,6 +106,7 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
         if (!mounted) return;
         setState(() {
           _localPath = localFile.path;
+          _deferLargePreview = _isTooLargeForEmbeddedPreview(localFile);
           _loading = false;
           _error = null;
         });
@@ -149,6 +155,7 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
       }
       setState(() {
         _localPath = file.path;
+        _deferLargePreview = _isTooLargeForEmbeddedPreview(file);
         _loading = false;
         _error = null;
       });
@@ -162,9 +169,15 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
     }
   }
 
+  bool _isTooLargeForEmbeddedPreview(File file) {
+    try {
+      return file.lengthSync() > _maximumEmbeddedPreviewBytes;
+    } catch (_) {
+      return true;
+    }
+  }
+
   void _onFullscreenTap() {
-    // Keep the mini PlatformView mounted while fullscreen opens — tearing it
-    // down early flashed empty sky until the modal covered the card.
     if (_suspendViewer || widget.onOpenFullscreen == null) return;
     widget.onOpenFullscreen!();
   }
@@ -191,7 +204,10 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
           child: Stack(
             fit: StackFit.expand,
             children: [
-              if (showPreview)
+              // A photogrammetry USDZ may decode several GB of texture data.
+              // Unmount the embedded SceneKit view before fullscreen creates
+              // its own scene, otherwise iOS briefly holds both copies.
+              if (showPreview && !_deferLargePreview && !_suspendViewer)
                 RoomUsdzPreview(
                   key: _previewViewKey,
                   filePath: path,
@@ -199,6 +215,14 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
                   // Fill the project card more aggressively than the shared
                   // listing preview while retaining a small rotation margin.
                   framingPadding: 1.14,
+                ),
+              if (showPreview && _deferLargePreview && !_suspendViewer)
+                const Center(
+                  child: Icon(
+                    Icons.view_in_ar_outlined,
+                    color: Colors.black54,
+                    size: 48,
+                  ),
                 ),
               if (_loading && !showPreview)
                 ColoredBox(

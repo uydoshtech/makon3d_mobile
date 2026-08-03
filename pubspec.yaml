@@ -2,7 +2,7 @@ name: makon3d_mobile
 description: "Makon 3D — LiDAR 3D room scanning app."
 publish_to: 'none'
 
-version: 1.0.0+51
+version: 1.0.0+54
 
 environment:
   sdk: ^3.12.2
@@ -31,7 +31,7 @@ dependencies:
   room_scan_kit:
     git:
       url: https://github.com/uydoshtech/room_scan_kit.git
-      ref: v0.6.28
+      ref: v0.6.31
   shared_preferences: ^2.5.3
   sign_in_with_apple: ^8.1.0
   telegram_login: ^1.2.1

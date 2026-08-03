@@ -148,6 +148,11 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
     if (_openingFullscreen) return;
     setState(() => _openingFullscreen = true);
     try {
+      // Let Flutter remove the embedded SceneKit preview and give iOS a moment
+      // to release its decoded texture resources before loading fullscreen.
+      await WidgetsBinding.instance.endOfFrame;
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      if (!mounted) return;
       final ok = await RoomUsdzViewerService.openUsdz(
         localUsdzPath: scan.localUsdzPath,
         usdzUrl: scan.usdzUrl,
