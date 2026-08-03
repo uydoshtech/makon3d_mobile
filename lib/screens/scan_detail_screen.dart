@@ -65,8 +65,8 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
     }
   }
 
-  /// Re-fetch usdz/glb from the API; clear dead remoteScanId when the row
-  /// was deleted from the gallery (404) so Retry / Rescan stay coherent.
+  /// Re-fetch usdz/glb from the API without discarding the project's last
+  /// known media references when the remote service is incomplete/unavailable.
   Future<void> _refreshMedia() async {
     final previous = _scan;
     if (previous.remoteScanId == null) return;
@@ -139,12 +139,6 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
           }
         } on DioException catch (e) {
           if (e.response?.statusCode == 404) {
-            final cleared = _scan.withoutModelMedia();
-            await MakonProjectStore.instance.replaceScanMedia(
-              previous: _scan,
-              updated: cleared,
-            );
-            if (mounted) setState(() => _scan = cleared);
             if (mounted) {
               Toasts.showError(context, L10n.get('scans_open_error'));
             }

@@ -135,7 +135,7 @@ class L10n {
       "scan_delete": "Delete scan",
       "scan_delete_confirm_title": "Delete scan?",
       "scan_delete_confirm_message":
-          "Scan #{id} will be deleted. This cannot be undone.",
+          "Scan #{id} and its 3D model will be permanently removed from every linked project. This cannot be undone.",
       "scan_deleted": "Scan deleted",
       "scan_delete_failed": "Could not delete the scan. Try again later.",
       "project_scan_mode_label": "Scan mode",
@@ -515,7 +515,7 @@ class L10n {
       "scan_delete": "Удалить скан",
       "scan_delete_confirm_title": "Удалить скан?",
       "scan_delete_confirm_message":
-          "Скан #{id} будет удалён. Это действие нельзя отменить.",
+          "Скан #{id} и его 3D-модель будут навсегда удалены из всех связанных проектов. Это действие нельзя отменить.",
       "scan_deleted": "Скан удалён",
       "scan_delete_failed": "Не удалось удалить скан. Попробуйте позже.",
       "project_scan_mode_label": "Режим сканирования",
@@ -898,7 +898,7 @@ class L10n {
       "scan_delete": "Skanni o'chirish",
       "scan_delete_confirm_title": "Skan o'chirilsinmi?",
       "scan_delete_confirm_message":
-          "Skan #{id} o'chiriladi. Buni ortga qaytarib bo'lmaydi.",
+          "Skan #{id} va uning 3D modeli barcha bog'langan loyihalardan butunlay o'chiriladi. Buni ortga qaytarib bo'lmaydi.",
       "scan_deleted": "Skan o'chirildi",
       "scan_delete_failed":
           "Skanni o'chirib bo'lmadi. Keyinroq urinib ko'ring.",

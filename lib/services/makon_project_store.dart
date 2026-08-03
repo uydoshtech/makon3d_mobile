@@ -66,9 +66,16 @@ class MakonProjectStore extends ChangeNotifier {
     }
     if (raw == null || raw.isEmpty) {
       _projects = const [];
+      // A development reinstall (and occasionally a TestFlight/container
+      // migration) can start with an empty SharedPreferences domain even
+      // though the authenticated account still has its project backups.
+      // Restore synchronously before declaring the store loaded; otherwise
+      // the Projects screen renders a durable-looking empty state while the
+      // recovery request is still running in the background.
+      _backendSyncStarted = true;
+      await _syncWithBackend();
       _loaded = true;
       notifyListeners();
-      _startBackendSync();
       return;
     }
     try {
@@ -87,6 +94,14 @@ class MakonProjectStore extends ChangeNotifier {
     } catch (e) {
       debugPrint('MakonProjectStore load failed: $e');
       _projects = const [];
+    }
+    if (_projects.isEmpty) {
+      // An empty/corrupt preferences payload has the same recovery semantics
+      // as a missing one. Wait for the account backup before exposing the
+      // store, so an app/container migration cannot flash an empty project
+      // list and let that state drive follow-up actions.
+      _backendSyncStarted = true;
+      await _syncWithBackend();
     }
     _loaded = true;
     notifyListeners();
@@ -191,8 +206,12 @@ class MakonProjectStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Refresh [scan]'s usdz/glb URLs from the backend. Returns an updated scan
-  /// when the remote row still exists; clears model media when it was deleted.
+  /// Refresh [scan]'s usdz/glb URLs from the backend.
+  ///
+  /// This method is intentionally non-destructive. A missing or temporarily
+  /// incomplete remote row must not erase the last known media references from
+  /// the local project and then propagate that loss to the project backup.
+  /// Explicit scan/project deletion flows are responsible for detaching media.
   ///
   /// When the remote USDZ URL changes (e.g. RoomPlan → photogrammetry), clears
   /// [HousingScan.localUsdzPath] so the viewer downloads the new remote file
@@ -205,10 +224,11 @@ class MakonProjectStore extends ChangeNotifier {
       final usdz = remote.usdzUrl?.trim();
       final glb = remote.glbUrl?.trim();
       if ((usdz == null || usdz.isEmpty) && (glb == null || glb.isEmpty)) {
-        return scan.withoutModelMedia();
+        return scan;
       }
       final previousUsdz = scan.usdzUrl?.trim() ?? '';
-      final urlChanged = usdz != null && usdz.isNotEmpty && usdz != previousUsdz;
+      final urlChanged =
+          usdz != null && usdz.isNotEmpty && usdz != previousUsdz;
       final updated = scan.withRemoteMedia(
         remoteScanId: remoteId,
         usdzUrl: usdz,
@@ -221,7 +241,7 @@ class MakonProjectStore extends ChangeNotifier {
       return updated;
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) {
-        return scan.withoutModelMedia();
+        return scan;
       }
       rethrow;
     }
@@ -510,7 +530,9 @@ class MakonProjectStore extends ChangeNotifier {
       doorwayWidthM: local.doorwayWidthM ?? remote.doorwayWidthM,
       doorwayAreaM2: local.doorwayAreaM2 ?? remote.doorwayAreaM2,
       windowAreaM2: local.windowAreaM2 ?? remote.windowAreaM2,
-      roomTypes: local.roomTypes.isNotEmpty ? local.roomTypes : remote.roomTypes,
+      roomTypes: local.roomTypes.isNotEmpty
+          ? local.roomTypes
+          : remote.roomTypes,
       objectCounts: local.objectCounts.isNotEmpty
           ? local.objectCounts
           : remote.objectCounts,
