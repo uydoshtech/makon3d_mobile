@@ -328,6 +328,16 @@ class RoomUsdzViewerService {
     if (!file.existsSync() || file.lengthSync() == 0) {
       throw StateError("USDZ not found at $path");
     }
+    // SceneKit expands JPEG atlases into uncompressed GPU textures. A large
+    // photogrammetry USDZ can therefore require several GB while loading and
+    // be terminated by iOS before Swift can report an error. Mobile LODs stay
+    // below this ceiling; reject an unsafe cached original instead of crashing.
+    const maximumSafeViewerFileBytes = 192 * 1024 * 1024;
+    if (file.lengthSync() > maximumSafeViewerFileBytes) {
+      throw StateError(
+        "USDZ is too large for the iOS viewer; a mobile model is required",
+      );
+    }
     final listingId = viewerListingId(scanId);
     _ensureFurnitureEditsSink();
     final enableShare = shareScanId != null && shareScanId > 0;
