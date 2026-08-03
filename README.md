@@ -1,5 +1,19 @@
 # Makon 3D
 
+## Project persistence
+
+Authenticated projects are cached transactionally in
+`Application Support/makon_projects.sqlite3`, partitioned by account. The
+backend project API remains the durable cross-device copy. An empty local
+database triggers a server restore and is never interpreted as a remote
+deletion.
+
+Older releases stored the complete project list as JSON in
+`SharedPreferences`. On first launch after upgrading, that JSON is imported
+into SQLite in one transaction and removed only after the import succeeds.
+`SharedPreferences` remains in use for lightweight settings and migration
+markers, not project records.
+
 Standalone iOS app for LiDAR 3D room scanning, extracted from the UyDosh app.
 One screen: scan a room with Apple RoomPlan, upload the USDZ to the UyDosh
 backend (which also converts it to GLB), then explore the result in the native

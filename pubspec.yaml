@@ -2,7 +2,7 @@ name: makon3d_mobile
 description: "Makon 3D — LiDAR 3D room scanning app."
 publish_to: 'none'
 
-version: 1.0.0+56
+version: 1.0.0+57
 
 environment:
   sdk: ^3.12.2
@@ -34,6 +34,7 @@ dependencies:
       ref: v0.6.32
   shared_preferences: ^2.5.3
   sign_in_with_apple: ^8.1.0
+  sqflite: ^2.4.2
   telegram_login: ^1.2.1
   flutter_secure_storage: ^10.3.1
 
@@ -41,6 +42,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  sqflite_common_ffi: ^2.3.6
 
 flutter:
   # Match UyDosh: stay on CocoaPods. SPM fails on room_scan_kit because its

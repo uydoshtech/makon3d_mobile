@@ -10,6 +10,7 @@ import 'package:makon3d_mobile/models/housing_scan.dart';
 import 'package:makon3d_mobile/models/makon_project.dart';
 import 'package:makon3d_mobile/models/project_room.dart';
 import 'package:makon3d_mobile/services/auth/auth_state.dart';
+import 'package:makon3d_mobile/services/makon_project_database.dart';
 import 'package:makon3d_mobile/services/project_sync_service.dart';
 import 'package:makon3d_mobile/services/scan_upload_service.dart';
 
@@ -28,6 +29,7 @@ class MakonProjectStore extends ChangeNotifier {
   List<MakonProject> _projects = const [];
   bool _loaded = false;
   bool _backendSyncStarted = false;
+  Future<void>? _loadFuture;
 
   List<MakonProject> get projects => List.unmodifiable(_projects);
   bool get isLoaded => _loaded;
@@ -53,59 +55,81 @@ class MakonProjectStore extends ChangeNotifier {
       _startBackendSync();
       return;
     }
-    final prefs = await SharedPreferences.getInstance();
-    var raw = prefs.getString(_prefsKey);
-    // The former device-wide cache belongs to the first account that claims
-    // this device's legacy backups. Move it once, then never expose it to a
-    // different account on this device.
-    if ((raw == null || raw.isEmpty) &&
-        (prefs.getString(_legacyPrefsKey)?.isNotEmpty ?? false)) {
-      raw = prefs.getString(_legacyPrefsKey);
-      await prefs.setString(_prefsKey, raw!);
-      await prefs.remove(_legacyPrefsKey);
-    }
-    if (raw == null || raw.isEmpty) {
-      _projects = const [];
-      // A development reinstall (and occasionally a TestFlight/container
-      // migration) can start with an empty SharedPreferences domain even
-      // though the authenticated account still has its project backups.
-      // Restore synchronously before declaring the store loaded; otherwise
-      // the Projects screen renders a durable-looking empty state while the
-      // recovery request is still running in the background.
-      _backendSyncStarted = true;
-      await _syncWithBackend();
-      _loaded = true;
-      notifyListeners();
+    final pending = _loadFuture;
+    if (pending != null) {
+      await pending;
       return;
     }
+    final load = _loadProjects();
+    _loadFuture = load;
     try {
-      final decoded = jsonDecode(raw);
-      final list = <MakonProject>[];
-      if (decoded is List) {
-        for (final item in decoded) {
-          if (item is Map<String, dynamic>) {
-            list.add(MakonProject.fromJson(item));
-          } else if (item is Map) {
-            list.add(MakonProject.fromJson(Map<String, dynamic>.from(item)));
-          }
-        }
-      }
-      _projects = list;
-    } catch (e) {
-      debugPrint('MakonProjectStore load failed: $e');
-      _projects = const [];
+      await load;
+    } finally {
+      if (identical(_loadFuture, load)) _loadFuture = null;
+    }
+  }
+
+  Future<void> _loadProjects() async {
+    final userId = _userId;
+    _projects = await MakonProjectDatabase.instance.loadProjects(userId);
+    if (_projects.isEmpty) {
+      _projects = await _importSharedPreferencesProjects(userId);
     }
     if (_projects.isEmpty) {
-      // An empty/corrupt preferences payload has the same recovery semantics
-      // as a missing one. Wait for the account backup before exposing the
-      // store, so an app/container migration cannot flash an empty project
-      // list and let that state drive follow-up actions.
+      // Empty local cache means "restore the account snapshot", never
+      // "delete remote projects". Wait before exposing the store to the UI.
       _backendSyncStarted = true;
       await _syncWithBackend();
     }
     _loaded = true;
     notifyListeners();
     _startBackendSync();
+  }
+
+  int get _userId {
+    final userId = AuthState().userId;
+    if (userId == null || userId <= 0) {
+      throw StateError('A signed-in user is required for project storage.');
+    }
+    return userId;
+  }
+
+  /// One-time migration from the old account-scoped JSON preferences value.
+  /// The source key is removed only after the SQLite transaction succeeds.
+  Future<List<MakonProject>> _importSharedPreferencesProjects(
+    int userId,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    var sourceKey = _prefsKey;
+    var raw = prefs.getString(sourceKey);
+    if (raw == null || raw.isEmpty) {
+      sourceKey = _legacyPrefsKey;
+      raw = prefs.getString(sourceKey);
+    }
+    if (raw == null || raw.isEmpty) return const [];
+
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! List) return const [];
+      final projects = <MakonProject>[];
+      for (final item in decoded) {
+        if (item is Map) {
+          final project = MakonProject.fromJson(
+            Map<String, dynamic>.from(item),
+          );
+          if (project.id.isNotEmpty) projects.add(project);
+        }
+      }
+      await MakonProjectDatabase.instance.replaceProjects(userId, projects);
+      await prefs.remove(sourceKey);
+      // Remove an empty/stale account value when the device-wide legacy value
+      // was the successful migration source.
+      if (sourceKey == _legacyPrefsKey) await prefs.remove(_prefsKey);
+      return projects;
+    } catch (error) {
+      debugPrint('MakonProjectStore preferences migration failed: $error');
+      return const [];
+    }
   }
 
   Future<bool> get hasCompletedScanMigration async {
@@ -380,11 +404,7 @@ class MakonProjectStore extends ChangeNotifier {
   }
 
   Future<void> _persist() async {
-    final prefs = await SharedPreferences.getInstance();
-    final encoded = jsonEncode(
-      _projects.map((p) => p.toJson()).toList(growable: false),
-    );
-    await prefs.setString(_prefsKey, encoded);
+    await MakonProjectDatabase.instance.replaceProjects(_userId, _projects);
   }
 
   /// One-shot background reconcile with the backend backups:
