@@ -159,7 +159,16 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
         _loading = false;
         _error = null;
       });
+      debugPrint(
+        'ScanMiniPreview ready scan=${widget.scanId} '
+        'bytes=${file.lengthSync()} deferred=$_deferLargePreview '
+        'source=${widget.usdzUrl}',
+      );
     } catch (e) {
+      debugPrint(
+        'ScanMiniPreview failed scan=${widget.scanId} '
+        'source=${widget.usdzUrl}: $e',
+      );
       if (!mounted) return;
       setState(() {
         _loading = false;
@@ -217,11 +226,34 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
                   framingPadding: 1.14,
                 ),
               if (showPreview && _deferLargePreview && !_suspendViewer)
-                const Center(
-                  child: Icon(
-                    Icons.view_in_ar_outlined,
-                    color: Colors.black54,
-                    size: 48,
+                Center(
+                  child: InkWell(
+                    onTap: _onFullscreenTap,
+                    borderRadius: BorderRadius.circular(16),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 18,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.view_in_ar_outlined,
+                            color: Colors.black54,
+                            size: 48,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            L10n.get('room_3d_viewer_title'),
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               if (_loading && !showPreview)

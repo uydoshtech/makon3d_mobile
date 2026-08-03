@@ -84,6 +84,11 @@ class HousingScan {
       remoteScanId: remoteScanId,
       usdzUrl: usdzUrl,
       glbUrl: glbUrl,
+      // A scan can be migrated from the legacy EC2 GLB to a canonical S3
+      // USDZ. In that case a null value from the backend is authoritative;
+      // keeping the old relative GLB URL makes the project look like it has
+      // two competing model sources.
+      clearGlbUrl: glbUrl == null || glbUrl.isEmpty,
     );
   }
 
@@ -157,14 +162,16 @@ class HousingScan {
     double? worldPlusXBearingDeg,
     DateTime? capturedAt,
     bool clearLocalUsdzPath = false,
+    bool clearGlbUrl = false,
   }) {
     return HousingScan(
       id: id,
-      localUsdzPath:
-          clearLocalUsdzPath ? null : (localUsdzPath ?? this.localUsdzPath),
+      localUsdzPath: clearLocalUsdzPath
+          ? null
+          : (localUsdzPath ?? this.localUsdzPath),
       remoteScanId: remoteScanId ?? this.remoteScanId,
       usdzUrl: usdzUrl ?? this.usdzUrl,
-      glbUrl: glbUrl ?? this.glbUrl,
+      glbUrl: clearGlbUrl ? null : (glbUrl ?? this.glbUrl),
       floorLongM: floorLongM ?? this.floorLongM,
       floorShortM: floorShortM ?? this.floorShortM,
       heightM: heightM ?? this.heightM,
