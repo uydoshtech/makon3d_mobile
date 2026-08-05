@@ -114,7 +114,7 @@ class FloorTileLayoutScreen extends StatelessWidget {
                           children: [
                             _LegendRow(
                               icon: Icons.trending_flat_rounded,
-                              color: theme.colorScheme.tertiary,
+                              color: theme.colorScheme.secondary,
                               label: L10n.get(
                                 'materials_tile_layout_direction_legend',
                               ),
@@ -359,9 +359,18 @@ class _TilePlanPainter extends CustomPainter {
 
   void _paintDirectionPath(Canvas canvas, List<Rect> rects) {
     if (rects.isEmpty) return;
+    final firstTile = rects.first;
+    final routeWidth = math.max(1.6, math.min(3.4, firstTile.height * 0.14));
+    final routeColor = colors.secondary;
+    final pathOutlinePaint = Paint()
+      ..color = colors.onSurface.withValues(alpha: 0.18)
+      ..strokeWidth = routeWidth + 1.4
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..style = PaintingStyle.stroke;
     final pathPaint = Paint()
-      ..color = colors.tertiary.withValues(alpha: 0.72)
-      ..strokeWidth = 2.4
+      ..color = routeColor
+      ..strokeWidth = routeWidth
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
       ..style = PaintingStyle.stroke;
@@ -370,8 +379,8 @@ class _TilePlanPainter extends CustomPainter {
     for (var row = 0; row < layout.rows; row++) {
       final first = rects[row * layout.columns];
       final last = rects[row * layout.columns + layout.columns - 1];
-      final start = row.isEven ? first.center : last.center;
-      final end = row.isEven ? last.center : first.center;
+      final start = row.isEven ? _directionPoint(first) : _directionPoint(last);
+      final end = row.isEven ? _directionPoint(last) : _directionPoint(first);
       if (row == 0) {
         path.moveTo(start.dx, start.dy);
       } else {
@@ -379,32 +388,52 @@ class _TilePlanPainter extends CustomPainter {
       }
       path.lineTo(end.dx, end.dy);
     }
+    canvas.drawPath(path, pathOutlinePaint);
     canvas.drawPath(path, pathPaint);
 
     for (var row = 0; row < layout.rows; row++) {
       final first = rects[row * layout.columns];
       final last = rects[row * layout.columns + layout.columns - 1];
-      final from = row.isEven ? first.center : last.center;
-      final to = row.isEven ? last.center : first.center;
+      final from = row.isEven ? _directionPoint(first) : _directionPoint(last);
+      final to = row.isEven ? _directionPoint(last) : _directionPoint(first);
       final direction = (to - from).direction;
-      final center = Offset.lerp(from, to, 0.68)!;
+      final tip = Offset.lerp(from, to, 0.72)!;
       final arrowSize = math.max(
-        2.8,
-        math.min(7.0, math.min(first.width, first.height) * 0.3),
+        3.2,
+        math.min(8.0, math.min(first.width, first.height) * 0.42),
       );
+      final unit = Offset(math.cos(direction), math.sin(direction));
+      final normal = Offset(-unit.dy, unit.dx);
+      final baseCenter = tip - unit * arrowSize;
       final arrow = Path()
-        ..moveTo(
-          center.dx - math.cos(direction - math.pi / 5) * arrowSize,
-          center.dy - math.sin(direction - math.pi / 5) * arrowSize,
-        )
-        ..lineTo(center.dx, center.dy)
+        ..moveTo(tip.dx, tip.dy)
         ..lineTo(
-          center.dx - math.cos(direction + math.pi / 5) * arrowSize,
-          center.dy - math.sin(direction + math.pi / 5) * arrowSize,
-        );
-      canvas.drawPath(arrow, pathPaint);
+          baseCenter.dx + normal.dx * arrowSize * 0.62,
+          baseCenter.dy + normal.dy * arrowSize * 0.62,
+        )
+        ..lineTo(
+          baseCenter.dx - normal.dx * arrowSize * 0.62,
+          baseCenter.dy - normal.dy * arrowSize * 0.62,
+        )
+        ..close();
+      canvas.drawPath(
+        arrow,
+        Paint()
+          ..color = colors.onSurface.withValues(alpha: 0.22)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.2,
+      );
+      canvas.drawPath(
+        arrow,
+        Paint()
+          ..color = routeColor
+          ..style = PaintingStyle.fill,
+      );
     }
   }
+
+  Offset _directionPoint(Rect tile) =>
+      Offset(tile.center.dx, tile.top + tile.height * 0.24);
 
   void _paintNumbers(Canvas canvas, List<Rect> rects, Size size) {
     final roomBorderInset = math.min(
@@ -417,12 +446,15 @@ class _TilePlanPainter extends CustomPainter {
         final rect = rects[row * layout.columns + column];
         final number = layout.tileNumberAt(row, column).toString();
         final safeTileRect = rect.intersect(safeRoomRect);
+        final isCutColumn = layout.hasCutColumn && column == layout.columns - 1;
         final availableWidth = math.max(
           0.5,
-          math.max(
-            safeTileRect.width - 1.2,
-            math.min(14.0, rect.height * 0.75),
-          ),
+          isCutColumn
+              ? math.max(
+                  safeTileRect.width - 1.2,
+                  math.min(14.0, rect.height * 0.75),
+                )
+              : safeTileRect.width - 1.2,
         );
         final availableHeight = math.max(0.5, safeTileRect.height - 1.2);
         var fontSize = math.max(1.0, math.min(10.0, rect.height * 0.34));

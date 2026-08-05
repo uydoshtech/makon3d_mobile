@@ -29,6 +29,8 @@ void main() {
       comment: 'The apartment is vacant.',
       publishedAt: DateTime.utc(2026, 8, 6),
       responseCount: 7,
+      remoteJobId: 91,
+      status: ContractorListingStatus.assigned,
     );
     final project = MakonProject(
       id: 'project-1',
@@ -49,6 +51,8 @@ void main() {
     expect(restoredListing.budgetMode, ContractorBudgetMode.range);
     expect(restoredListing.budgetMinMillion, 20);
     expect(restoredListing.responseCount, 7);
+    expect(restoredListing.remoteJobId, 91);
+    expect(restoredListing.status, ContractorListingStatus.assigned);
   });
 
   test('invalid contractor listing JSON is ignored safely', () {

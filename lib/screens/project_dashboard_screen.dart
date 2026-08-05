@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:room_scan_kit/scan_flow/scan_flow.dart';
 
 import 'package:makon3d_mobile/l10n/l10n.dart';
+import 'package:makon3d_mobile/models/contractor_listing.dart';
 import 'package:makon3d_mobile/models/housing_scan.dart';
 import 'package:makon3d_mobile/models/makon_project.dart';
 import 'package:makon3d_mobile/models/project_room.dart';
@@ -11,6 +12,7 @@ import 'package:makon3d_mobile/models/room_type.dart';
 import 'package:makon3d_mobile/scan_flow/makon_entire_housing_coordinator.dart';
 import 'package:makon3d_mobile/scan_flow/makon_room_by_room_coordinator.dart';
 import 'package:makon3d_mobile/screens/contractor_listing_flow_screen.dart';
+import 'package:makon3d_mobile/screens/customer_contractor_job_screen.dart';
 import 'package:makon3d_mobile/screens/edit_project_screen.dart';
 import 'package:makon3d_mobile/screens/room_materials_screen.dart';
 import 'package:makon3d_mobile/screens/scan_detail_screen.dart';
@@ -264,6 +266,18 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
   }
 
   Future<void> _openContractorListing() async {
+    final listing = _project?.contractorListing;
+    if (listing?.remoteJobId case final jobId?) {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => CustomerContractorJobScreen(
+            projectId: widget.projectId,
+            jobId: jobId,
+          ),
+        ),
+      );
+      return;
+    }
     await Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(
         builder: (_) =>
@@ -735,6 +749,7 @@ class _ContractorSearchCard extends StatelessWidget {
     final scheme = theme.colorScheme;
     final listing = project.contractorListing;
     final isPublished = listing != null;
+    final isOpen = listing?.status == ContractorListingStatus.open;
 
     return Material(
       color: isPublished
@@ -783,7 +798,14 @@ class _ContractorSearchCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              L10n.get('contractor_publication_active'),
+                              L10n.get(
+                                isOpen
+                                    ? 'contractor_publication_active'
+                                    : listing.status ==
+                                          ContractorListingStatus.assigned
+                                    ? 'contractor_status_assigned'
+                                    : 'contractor_status_closed',
+                              ),
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: const Color(0xFF2E7D32),
                                 fontWeight: FontWeight.w800,
@@ -794,9 +816,13 @@ class _ContractorSearchCard extends StatelessWidget {
                       ),
                     Text(
                       L10n.get(
-                        isPublished
+                        !isPublished
+                            ? 'contractor_card_title'
+                            : isOpen
                             ? 'contractor_status_searching'
-                            : 'contractor_card_title',
+                            : listing.status == ContractorListingStatus.assigned
+                            ? 'contractor_status_assigned'
+                            : 'contractor_status_closed',
                       ),
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w800,

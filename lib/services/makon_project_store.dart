@@ -12,6 +12,8 @@ import 'package:makon3d_mobile/models/project_room.dart';
 import 'package:makon3d_mobile/services/auth/auth_state.dart';
 import 'package:makon3d_mobile/services/makon_project_database.dart';
 import 'package:makon3d_mobile/services/project_sync_service.dart';
+import 'package:makon3d_mobile/services/room_scan_bounds_service.dart';
+import 'package:makon3d_mobile/services/room_usdz_viewer_service.dart';
 import 'package:makon3d_mobile/services/scan_upload_service.dart';
 
 /// Local persistence for Makon projects, partitioned by signed-in account and
@@ -241,19 +243,44 @@ class MakonProjectStore extends ChangeNotifier {
   /// [HousingScan.localUsdzPath] so the viewer downloads the new remote file
   /// instead of keeping a stale on-device path.
   Future<HousingScan> refreshScanMedia(HousingScan scan) async {
-    final remoteId = scan.remoteScanId;
-    if (remoteId == null || remoteId <= 0) return scan;
+    var enriched = scan;
+    final localPath = scan.localUsdzPath?.trim();
+    if (scan.objectCounts.isEmpty &&
+        localPath != null &&
+        localPath.isNotEmpty &&
+        File(localPath).existsSync()) {
+      try {
+        final localMetrics = await RoomScanBoundsService.computeFromUsdPath(
+          localPath,
+        );
+        if (localMetrics != null && localMetrics.objectCounts.isNotEmpty) {
+          enriched = scan.copyWith(
+            floorLongM: localMetrics.floorLongM,
+            floorShortM: localMetrics.floorShortM,
+            heightM: localMetrics.heightM,
+            floorAreaM2: localMetrics.floorAreaM2,
+            objectCounts: localMetrics.objectCounts,
+            worldPlusXBearingDeg: localMetrics.worldPlusXBearingDeg,
+          );
+        }
+      } catch (error) {
+        debugPrint('[RoomScan] Could not read local USDZ metadata: $error');
+      }
+    }
+
+    final remoteId = enriched.remoteScanId;
+    if (remoteId == null || remoteId <= 0) return enriched;
     try {
       final remote = await ScanUploadService.getScan(remoteId);
       final usdz = remote.usdzUrl?.trim();
       final glb = remote.glbUrl?.trim();
       if ((usdz == null || usdz.isEmpty) && (glb == null || glb.isEmpty)) {
-        return scan;
+        return enriched;
       }
-      final previousUsdz = scan.usdzUrl?.trim() ?? '';
+      final previousUsdz = enriched.usdzUrl?.trim() ?? '';
       final urlChanged =
           usdz != null && usdz.isNotEmpty && usdz != previousUsdz;
-      var updated = scan.withRemoteMedia(
+      var updated = enriched.withRemoteMedia(
         remoteScanId: remoteId,
         usdzUrl: usdz,
         glbUrl: glb,
@@ -274,6 +301,34 @@ class MakonProjectStore extends ChangeNotifier {
         worldPlusXBearingDeg: remote.worldPlusXBearingDeg,
         capturedAt: remote.createdAt,
       );
+      final isRoomPlanUsdz =
+          usdz != null &&
+          Uri.tryParse(usdz)?.path.toLowerCase().endsWith('/room_scan.usdz') ==
+              true;
+      if (updated.objectCounts.isEmpty && isRoomPlanUsdz) {
+        try {
+          var localFile = await RoomUsdzViewerService.resolveLocalUsdz(
+            updated.localUsdzPath,
+            fallbackPathOrUrl: usdz,
+          );
+          localFile ??= await RoomUsdzViewerService.downloadUsdToCache(
+            usdz,
+            scanId: remoteId,
+          );
+          if (localFile != null) {
+            final localMetrics = await RoomScanBoundsService.computeFromUsdPath(
+              localFile.path,
+            );
+            if (localMetrics != null && localMetrics.objectCounts.isNotEmpty) {
+              updated = updated.copyWith(
+                objectCounts: localMetrics.objectCounts,
+              );
+            }
+          }
+        } catch (error) {
+          debugPrint('[RoomScan] Could not inspect remote USDZ: $error');
+        }
+      }
       // Prefer the new remote asset over a stale on-device USDZ path.
       if (urlChanged && (updated.localUsdzPath?.isNotEmpty ?? false)) {
         return updated.copyWith(clearLocalUsdzPath: true);
@@ -281,7 +336,7 @@ class MakonProjectStore extends ChangeNotifier {
       return updated;
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) {
-        return scan;
+        return enriched;
       }
       rethrow;
     }

@@ -6,6 +6,7 @@ import 'package:makon3d_mobile/l10n/l10n.dart';
 import 'package:makon3d_mobile/models/contractor_listing.dart';
 import 'package:makon3d_mobile/models/housing_scan.dart';
 import 'package:makon3d_mobile/models/makon_project.dart';
+import 'package:makon3d_mobile/services/contractor_marketplace_service.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
 import 'package:makon3d_mobile/theme/makon_colors.dart';
 import 'package:makon3d_mobile/widgets/toasts.dart';
@@ -88,7 +89,9 @@ class _ContractorListingFlowScreenState
     _showMeasurements = visibility.showMeasurements;
     _showMaterialEstimate = visibility.showMaterialEstimate;
     _showPhotos = visibility.showPhotos;
-    _showExactAddress = visibility.showExactAddress;
+    // Exact address is never public. It can only be revealed to the accepted
+    // contractor from the offers screen.
+    _showExactAddress = false;
   }
 
   @override
@@ -241,8 +244,17 @@ class _ContractorListingFlowScreenState
       responseCount: previous?.responseCount ?? 0,
     );
     try {
+      final job = await ContractorMarketplaceService.publishJob(
+        project: project,
+        listing: listing,
+      );
+      final confirmedListing = listing.copyWith(
+        remoteJobId: job.id,
+        responseCount: job.offerCount,
+        status: job.status,
+      );
       await MakonProjectStore.instance.upsert(
-        project.copyWith(contractorListing: listing),
+        project.copyWith(contractorListing: confirmedListing),
       );
       if (!mounted) return;
       Navigator.of(context).pop(true);
@@ -484,9 +496,9 @@ class _ContractorListingFlowScreenState
         icon: Icons.pin_drop_outlined,
         title: L10n.get('contractor_share_address'),
         subtitle: L10n.get('contractor_share_address_warning'),
-        value: _showExactAddress,
+        value: false,
         isSensitive: true,
-        onChanged: (value) => setState(() => _showExactAddress = value),
+        onChanged: null,
       ),
     ]);
   }
@@ -673,10 +685,8 @@ class _ContractorListingFlowScreenState
       _InfoCard(
         icon: Icons.lock_outline,
         title: L10n.get('contractor_privacy_ready_title'),
-        subtitle: _showExactAddress
-            ? L10n.get('contractor_privacy_exact_address')
-            : L10n.get('contractor_privacy_hidden_address'),
-        highlighted: !_showExactAddress,
+        subtitle: L10n.get('contractor_privacy_hidden_address'),
+        highlighted: true,
       ),
     ]);
   }
@@ -999,7 +1009,7 @@ class _VisibilityTile extends StatelessWidget {
   final String title;
   final String? subtitle;
   final bool value;
-  final ValueChanged<bool> onChanged;
+  final ValueChanged<bool>? onChanged;
   final bool isSensitive;
 
   @override

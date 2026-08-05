@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:makon3d_mobile/l10n/l10n.dart';
+import 'package:makon3d_mobile/models/makon_user_role.dart';
+import 'package:makon3d_mobile/screens/contractor_jobs_feed_screen.dart';
 import 'package:makon3d_mobile/screens/new_project_screen.dart';
 import 'package:makon3d_mobile/screens/projects_list_screen.dart';
 import 'package:makon3d_mobile/screens/scans_list_screen.dart';
@@ -62,21 +64,28 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     final onProjects = _index == _projectsTab;
+    final isContractor = AuthState().makonRole == MakonUserRole.contractor;
     return Scaffold(
       extendBody: true,
       body: IndexedStack(
         index: _index,
         children: [
-          ProjectsListScreen(
-            isActive: onProjects,
-            onCreateProject: () => unawaited(_openNewProject()),
-            onOpenAccount: () => _goToTab(_settingsTab),
-          ),
+          if (isContractor)
+            ContractorJobsFeedScreen(
+              onOpenAccount: () => _goToTab(_settingsTab),
+            )
+          else
+            ProjectsListScreen(
+              isActive: onProjects,
+              onCreateProject: () => unawaited(_openNewProject()),
+              onOpenAccount: () => _goToTab(_settingsTab),
+            ),
           ScansListScreen(isActive: _index == _scansListTab),
           const SettingsScreen(),
         ],
       ),
-      floatingActionButton: onProjects && AuthState().isSignedIn
+      floatingActionButton:
+          onProjects && AuthState().isSignedIn && !isContractor
           ? FloatingActionButton(
               onPressed: () => unawaited(_openNewProject()),
               tooltip: L10n.get('project_new_title'),
@@ -87,6 +96,8 @@ class _MainShellState extends State<MainShell> {
       bottomNavigationBar: MakonCurvedNavBar(
         currentIndex: _index,
         onTap: _goToTab,
+        firstLabelKey: isContractor ? 'nav_jobs' : 'nav_projects',
+        firstIcon: isContractor ? Icons.work_outline : Icons.folder_outlined,
       ),
     );
   }

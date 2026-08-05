@@ -16,6 +16,24 @@ enum ContractorBudgetMode {
   }
 }
 
+enum ContractorListingStatus {
+  open('open'),
+  assigned('assigned'),
+  closed('closed'),
+  cancelled('cancelled');
+
+  const ContractorListingStatus(this.wireValue);
+
+  final String wireValue;
+
+  static ContractorListingStatus fromWireValue(Object? value) {
+    return values.firstWhere(
+      (status) => status.wireValue == value,
+      orElse: () => ContractorListingStatus.open,
+    );
+  }
+}
+
 /// Stable work identifiers stored independently from the current UI language.
 enum ContractorWorkType {
   fullRenovation('full_renovation'),
@@ -151,6 +169,8 @@ class ContractorListing {
     this.budgetMaxMillion,
     this.comment,
     this.responseCount = 0,
+    this.remoteJobId,
+    this.status = ContractorListingStatus.open,
   });
 
   final List<ContractorWorkType> workTypes;
@@ -166,6 +186,32 @@ class ContractorListing {
   final String? comment;
   final DateTime publishedAt;
   final int responseCount;
+  final int? remoteJobId;
+  final ContractorListingStatus status;
+
+  ContractorListing copyWith({
+    int? responseCount,
+    int? remoteJobId,
+    ContractorListingStatus? status,
+  }) {
+    return ContractorListing(
+      workTypes: workTypes,
+      publicLocation: publicLocation,
+      visibility: visibility,
+      budgetMode: budgetMode,
+      detectedVolumes: detectedVolumes,
+      budgetMinMillion: budgetMinMillion,
+      budgetMaxMillion: budgetMaxMillion,
+      startDate: startDate,
+      desiredDurationDays: desiredDurationDays,
+      siteVisitAvailable: siteVisitAvailable,
+      comment: comment,
+      publishedAt: publishedAt,
+      responseCount: responseCount ?? this.responseCount,
+      remoteJobId: remoteJobId ?? this.remoteJobId,
+      status: status ?? this.status,
+    );
+  }
 
   Map<String, dynamic> toJson() => <String, dynamic>{
     'workTypes': workTypes.map((type) => type.wireValue).toList(),
@@ -183,6 +229,8 @@ class ContractorListing {
     'comment': comment,
     'publishedAt': publishedAt.toIso8601String(),
     'responseCount': responseCount,
+    'remoteJobId': remoteJobId,
+    'status': status.wireValue,
   };
 
   static ContractorListing? tryFromJson(Object? value) {
@@ -223,6 +271,8 @@ class ContractorListing {
         comment: json['comment'] as String?,
         publishedAt: publishedAt,
         responseCount: (json['responseCount'] as num?)?.toInt() ?? 0,
+        remoteJobId: (json['remoteJobId'] as num?)?.toInt(),
+        status: ContractorListingStatus.fromWireValue(json['status']),
       );
     } catch (_) {
       return null;

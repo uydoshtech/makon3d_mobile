@@ -10,11 +10,15 @@ class MakonCurvedNavBar extends StatelessWidget {
   const MakonCurvedNavBar({
     required this.currentIndex,
     required this.onTap,
+    this.firstLabelKey = "nav_projects",
+    this.firstIcon = Icons.folder_outlined,
     super.key,
   });
 
   final int currentIndex;
   final ValueChanged<int> onTap;
+  final String firstLabelKey;
+  final IconData firstIcon;
 
   static const Color _barColor = MakonColors.inkElevated;
   static const Color _orbColor = MakonColors.yellow;
@@ -28,8 +32,8 @@ class MakonCurvedNavBar extends StatelessWidget {
       builder: (context, _) {
         final items = <Widget>[
           _navItem(
-            icon: Icons.folder_outlined,
-            labelKey: "nav_projects",
+            icon: firstIcon,
+            labelKey: firstLabelKey,
             selected: currentIndex == 0,
           ),
           _navItem(

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:makon3d_mobile/l10n/l10n.dart';
+import 'package:makon3d_mobile/models/contractor_listing.dart';
 import 'package:makon3d_mobile/models/makon_project.dart';
 import 'package:makon3d_mobile/screens/project_dashboard_screen.dart';
 import 'package:makon3d_mobile/services/auth/auth_state.dart';
@@ -297,15 +298,23 @@ class _ProjectCard extends StatelessWidget {
                             Container(
                               width: 7,
                               height: 7,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF2E7D32),
+                              decoration: BoxDecoration(
+                                color:
+                                    listing.status ==
+                                        ContractorListingStatus.open
+                                    ? const Color(0xFF2E7D32)
+                                    : theme.colorScheme.onSurfaceVariant,
                                 shape: BoxShape.circle,
                               ),
                             ),
                             const SizedBox(width: 6),
                             Flexible(
                               child: Text(
-                                '${L10n.get('contractor_status_searching')} · '
+                                '${L10n.get(switch (listing.status) {
+                                  ContractorListingStatus.open => 'contractor_status_searching',
+                                  ContractorListingStatus.assigned => 'contractor_status_assigned',
+                                  ContractorListingStatus.closed || ContractorListingStatus.cancelled => 'contractor_status_closed',
+                                })} · '
                                 '${L10n.get('contractor_responses_short').replaceAll('{count}', '${listing.responseCount}')}',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
