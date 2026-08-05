@@ -2,6 +2,7 @@ import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/foundation.dart";
 import "package:google_sign_in/google_sign_in.dart";
 
+import "package:makon3d_mobile/models/makon_user_role.dart";
 import "package:makon3d_mobile/services/auth/auth_api.dart";
 import "package:makon3d_mobile/services/auth/firebase_bootstrap.dart";
 import "package:makon3d_mobile/services/auth/session_manager.dart";
@@ -21,6 +22,7 @@ class AuthState extends ChangeNotifier {
   String? _displayName;
   String? _avatarUrl;
   String? _method;
+  MakonUserRole? _makonRole;
 
   bool get isSignedIn => _signedIn;
   int? get userId => _userId;
@@ -28,6 +30,7 @@ class AuthState extends ChangeNotifier {
   String? get displayName => _displayName;
   String? get avatarUrl => _avatarUrl;
   String? get method => _method;
+  MakonUserRole? get makonRole => _makonRole;
 
   /// Restore the persisted session at app launch (before runApp).
   static Future<void> initialize() async {
@@ -49,7 +52,8 @@ class AuthState extends ChangeNotifier {
       .._email = session.email
       .._displayName = session.displayName
       .._avatarUrl = avatarUrl
-      .._method = session.method;
+      .._method = session.method
+      .._makonRole = session.makonRole;
 
     if (avatarUrl != null && avatarUrl.trim().isNotEmpty) {
       await SessionManager.saveSession(
@@ -59,6 +63,7 @@ class AuthState extends ChangeNotifier {
         displayName: session.displayName,
         avatarUrl: avatarUrl,
         method: session.method,
+        makonRole: session.makonRole,
       );
     }
   }
@@ -79,6 +84,7 @@ class AuthState extends ChangeNotifier {
       displayName: name,
       avatarUrl: photo,
       method: method,
+      makonRole: session.makonRole,
     );
     _signedIn = true;
     _userId = session.userId;
@@ -86,7 +92,45 @@ class AuthState extends ChangeNotifier {
     _displayName = name;
     _avatarUrl = photo;
     _method = method;
+    _makonRole = session.makonRole;
     notifyListeners();
+  }
+
+  /// Best-effort refresh for sessions persisted by older app versions and
+  /// for role changes made on another device.
+  Future<void> refreshMakonRole() async {
+    if (!_signedIn) return;
+    try {
+      final role = await AuthApi.fetchMakonRole();
+      if (role == _makonRole) return;
+      _makonRole = role;
+      await _persistCurrentSession();
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Makon role refresh failed (non-fatal): $e");
+    }
+  }
+
+  Future<void> setMakonRole(MakonUserRole role) async {
+    if (!_signedIn) throw StateError("Sign in before selecting a Makon role.");
+    final saved = await AuthApi.updateMakonRole(role);
+    _makonRole = saved;
+    await _persistCurrentSession();
+    notifyListeners();
+  }
+
+  Future<void> _persistCurrentSession() async {
+    final token = await SessionManager.getToken();
+    if (token == null || token.isEmpty || _userId == null) return;
+    await SessionManager.saveSession(
+      token: token,
+      userId: _userId!,
+      email: _email,
+      displayName: _displayName,
+      avatarUrl: _avatarUrl,
+      method: _method,
+      makonRole: _makonRole,
+    );
   }
 
   /// Clear the backend session plus any provider-side state (Firebase,
@@ -112,6 +156,7 @@ class AuthState extends ChangeNotifier {
     _displayName = null;
     _avatarUrl = null;
     _method = null;
+    _makonRole = null;
     notifyListeners();
   }
 }

@@ -90,6 +90,7 @@ class L10n {
       "settings_title": "Settings",
       "settings_language_title": "Language",
       "settings_account_title": "Account",
+      "settings_primary_profile": "Primary profile",
       "settings_sign_in": "Sign in",
       "settings_sign_out": "Sign out",
       "settings_app_version": "Version {version}",
@@ -101,6 +102,20 @@ class L10n {
       "sign_in_with_telegram": "Continue with Telegram",
       "sign_in_failed": "Sign-in failed. Try again.",
       "sign_in_unavailable": "Sign-in is not available in this build.",
+      "makon_role_choose_title": "How will you use Makon?",
+      "makon_role_choose_subtitle":
+          "Choose your primary profile. You can change it later in Settings.",
+      "makon_role_customer_title": "I’m hiring for a renovation",
+      "makon_role_customer_subtitle":
+          "I want to plan a renovation and find professionals",
+      "makon_role_contractor_title": "I do renovation work",
+      "makon_role_contractor_subtitle":
+          "I’m a professional or represent a renovation crew",
+      "makon_role_supplier_title": "I sell materials",
+      "makon_role_supplier_subtitle":
+          "I represent a store or building-material supplier",
+      "makon_role_continue": "Continue",
+      "makon_role_save_failed": "Could not save the profile. Try again.",
       "projects_list_title": "Projects",
       "projects_empty":
           "No projects yet.\nCreate a project to choose how you want to scan.",
@@ -469,6 +484,7 @@ class L10n {
       "settings_title": "Настройки",
       "settings_language_title": "Язык",
       "settings_account_title": "Аккаунт",
+      "settings_primary_profile": "Основной профиль",
       "settings_sign_in": "Войти",
       "settings_sign_out": "Выйти",
       "settings_app_version": "Версия {version}",
@@ -480,6 +496,20 @@ class L10n {
       "sign_in_with_telegram": "Продолжить с Telegram",
       "sign_in_failed": "Не удалось войти. Попробуйте снова.",
       "sign_in_unavailable": "Вход недоступен в этой сборке.",
+      "makon_role_choose_title": "Как вы будете пользоваться Makon?",
+      "makon_role_choose_subtitle":
+          "Выберите основной профиль. Позже его можно изменить в настройках.",
+      "makon_role_customer_title": "Заказываю ремонт",
+      "makon_role_customer_subtitle":
+          "Хочу спланировать ремонт и найти исполнителей",
+      "makon_role_contractor_title": "Выполняю ремонт",
+      "makon_role_contractor_subtitle":
+          "Я мастер или представляю ремонтную бригаду",
+      "makon_role_supplier_title": "Продаю материалы",
+      "makon_role_supplier_subtitle":
+          "Я представляю магазин или поставщика стройматериалов",
+      "makon_role_continue": "Продолжить",
+      "makon_role_save_failed": "Не удалось сохранить профиль. Попробуйте снова.",
       "projects_list_title": "Проекты",
       "projects_empty":
           "Пока нет проектов.\nСоздайте проект и выберите способ сканирования.",
@@ -852,6 +882,7 @@ class L10n {
       "settings_title": "Sozlamalar",
       "settings_language_title": "Til",
       "settings_account_title": "Hisob",
+      "settings_primary_profile": "Asosiy profil",
       "settings_sign_in": "Kirish",
       "settings_sign_out": "Chiqish",
       "settings_app_version": "Versiya {version}",
@@ -863,6 +894,20 @@ class L10n {
       "sign_in_with_telegram": "Telegram bilan davom etish",
       "sign_in_failed": "Kirish amalga oshmadi. Qayta urinib ko'ring.",
       "sign_in_unavailable": "Bu buildda kirish mavjud emas.",
+      "makon_role_choose_title": "Makondan qanday foydalanasiz?",
+      "makon_role_choose_subtitle":
+          "Asosiy profilingizni tanlang. Uni keyinroq sozlamalarda o'zgartirishingiz mumkin.",
+      "makon_role_customer_title": "Ta'mirlashga buyurtma beraman",
+      "makon_role_customer_subtitle":
+          "Ta'mirlashni rejalashtirmoqchiman va ustalarni topmoqchiman",
+      "makon_role_contractor_title": "Ta'mirlash ishlarini bajaraman",
+      "makon_role_contractor_subtitle":
+          "Men ustaman yoki ta'mirlash brigadasi vakiliman",
+      "makon_role_supplier_title": "Materiallar sotaman",
+      "makon_role_supplier_subtitle":
+          "Men do'kon yoki qurilish materiallari yetkazib beruvchisiman",
+      "makon_role_continue": "Davom etish",
+      "makon_role_save_failed": "Profilni saqlab bo'lmadi. Qayta urinib ko'ring.",
       "projects_list_title": "Loyihalar",
       "projects_empty":
           "Hali loyiha yo'q.\nSkanlash usulini tanlash uchun loyiha yarating.",

@@ -1,6 +1,6 @@
 import "package:flutter/material.dart";
 
-import "package:makon3d_mobile/screens/main_shell.dart";
+import "package:makon3d_mobile/screens/makon_role_gate.dart";
 import "package:makon3d_mobile/services/auth/auth_state.dart";
 import "package:makon3d_mobile/services/makon_project_migration.dart";
 import "package:makon3d_mobile/services/makon_project_store.dart";
@@ -35,6 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (AuthState().isSignedIn) {
       try {
         await (() async {
+          await AuthState().refreshMakonRole();
           await MakonProjectStore.instance.ensureLoaded();
           await MakonProjectMigration.runIfNeeded();
         })().timeout(_bootstrapTimeout);
@@ -50,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
-        pageBuilder: (_, _, _) => const MainShell(),
+        pageBuilder: (_, _, _) => const MakonRoleGate(),
         transitionsBuilder: (_, animation, _, child) {
           return FadeTransition(opacity: animation, child: child);
         },

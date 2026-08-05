@@ -1,6 +1,7 @@
 import "package:dio/dio.dart";
 import "package:flutter/foundation.dart" show debugPrint;
 
+import "package:makon3d_mobile/models/makon_user_role.dart";
 import "package:makon3d_mobile/services/auth/session_manager.dart";
 
 /// Parsed response of the UyDosh session-minting endpoints
@@ -12,6 +13,7 @@ class BackendSession {
     this.email,
     this.displayName,
     this.avatarUrl,
+    this.makonRole,
   });
 
   final String sessionToken;
@@ -19,6 +21,7 @@ class BackendSession {
   final String? email;
   final String? displayName;
   final String? avatarUrl;
+  final MakonUserRole? makonRole;
 
   factory BackendSession.fromJson(Map<String, dynamic> json) {
     final token = json["sessionToken"];
@@ -44,6 +47,7 @@ class BackendSession {
       avatarUrl:
           profileMap["avatar_url"] as String? ??
           userMap["avatar_url"] as String?,
+      makonRole: MakonUserRole.fromApi(userMap["makon_role"]),
     );
   }
 }
@@ -108,6 +112,25 @@ abstract final class AuthApi {
       data: <String, dynamic>{"id_token": idToken},
     );
     return BackendSession.fromJson(response.data ?? const {});
+  }
+
+  /// Reads the product-specific role for an existing persisted session.
+  static Future<MakonUserRole?> fetchMakonRole() async {
+    final response = await _dio.get<Map<String, dynamic>>("/users/me");
+    return MakonUserRole.fromApi(response.data?["makon_role"]);
+  }
+
+  /// Saves the primary role selected during Makon onboarding.
+  static Future<MakonUserRole> updateMakonRole(MakonUserRole role) async {
+    final response = await _dio.patch<Map<String, dynamic>>(
+      "/users/me/makon-role",
+      data: <String, dynamic>{"makon_role": role.apiValue},
+    );
+    final saved = MakonUserRole.fromApi(response.data?["makon_role"]);
+    if (saved == null) {
+      throw Exception("Backend response is missing makon_role");
+    }
+    return saved;
   }
 
   /// Best-effort: forward Apple's one-shot `authorization_code` so the

@@ -1,5 +1,7 @@
 import "package:flutter_secure_storage/flutter_secure_storage.dart";
 
+import "package:makon3d_mobile/models/makon_user_role.dart";
+
 /// Snapshot of the persisted backend session.
 class StoredSession {
   const StoredSession({
@@ -9,6 +11,7 @@ class StoredSession {
     this.displayName,
     this.avatarUrl,
     this.method,
+    this.makonRole,
   });
 
   final String token;
@@ -19,6 +22,7 @@ class StoredSession {
 
   /// "apple" | "google" | "telegram" — informational only.
   final String? method;
+  final MakonUserRole? makonRole;
 }
 
 /// Persists the UyDosh backend session (`sessionToken` from
@@ -35,6 +39,7 @@ abstract final class SessionManager {
   static const _nameKey = "makon3d_session_name";
   static const _avatarUrlKey = "makon3d_session_avatar_url";
   static const _methodKey = "makon3d_session_method";
+  static const _makonRoleKey = "makon3d_session_makon_role";
 
   static String? _cachedToken;
   static bool _tokenLoaded = false;
@@ -46,6 +51,7 @@ abstract final class SessionManager {
     String? displayName,
     String? avatarUrl,
     String? method,
+    MakonUserRole? makonRole,
   }) async {
     await _storage.write(key: _tokenKey, value: token);
     await _storage.write(key: _userIdKey, value: userId.toString());
@@ -53,6 +59,7 @@ abstract final class SessionManager {
     await _writeOrDelete(_nameKey, displayName);
     await _writeOrDelete(_avatarUrlKey, avatarUrl);
     await _writeOrDelete(_methodKey, method);
+    await _writeOrDelete(_makonRoleKey, makonRole?.apiValue);
     _cachedToken = token;
     _tokenLoaded = true;
   }
@@ -77,12 +84,14 @@ abstract final class SessionManager {
     String? name;
     String? avatarUrl;
     String? method;
+    String? makonRole;
     try {
       userIdRaw = await _storage.read(key: _userIdKey);
       email = await _storage.read(key: _emailKey);
       name = await _storage.read(key: _nameKey);
       avatarUrl = await _storage.read(key: _avatarUrlKey);
       method = await _storage.read(key: _methodKey);
+      makonRole = await _storage.read(key: _makonRoleKey);
     } catch (_) {
       // Keychain hiccup — token alone is still a valid session.
     }
@@ -93,6 +102,7 @@ abstract final class SessionManager {
       displayName: name,
       avatarUrl: avatarUrl,
       method: method,
+      makonRole: MakonUserRole.fromApi(makonRole),
     );
   }
 
@@ -106,6 +116,7 @@ abstract final class SessionManager {
       _nameKey,
       _avatarUrlKey,
       _methodKey,
+      _makonRoleKey,
     ]) {
       try {
         await _storage.delete(key: key);

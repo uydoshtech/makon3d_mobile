@@ -4,6 +4,8 @@ import "package:flutter/material.dart";
 import "package:package_info_plus/package_info_plus.dart";
 
 import "package:makon3d_mobile/l10n/l10n.dart";
+import "package:makon3d_mobile/models/makon_user_role.dart";
+import "package:makon3d_mobile/screens/makon_role_selection_screen.dart";
 import "package:makon3d_mobile/services/auth/auth_state.dart";
 import "package:makon3d_mobile/theme/makon_colors.dart";
 import "package:makon3d_mobile/widgets/sign_in_sheet.dart";
@@ -78,9 +80,9 @@ class SettingsScreen extends StatelessWidget {
           return Text(
             L10n.get("settings_app_version").replaceAll("{version}", display),
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: MakonColors.inkMuted,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: MakonColors.inkMuted),
           );
         },
       ),
@@ -120,15 +122,43 @@ class SettingsScreen extends StatelessWidget {
         ? auth.email
         : null;
 
-    return ListTile(
-      leading: const Icon(Icons.person, color: MakonColors.yellow),
-      title: Text(title),
-      subtitle: subtitle == null ? null : Text(subtitle),
-      trailing: IconButton(
-        onPressed: () => unawaited(_confirmSignOut(context)),
-        tooltip: L10n.get("settings_sign_out"),
-        icon: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
-      ),
+    return Column(
+      children: [
+        ListTile(
+          leading: const Icon(Icons.person, color: MakonColors.yellow),
+          title: Text(title),
+          subtitle: subtitle == null ? null : Text(subtitle),
+          trailing: IconButton(
+            onPressed: () => unawaited(_confirmSignOut(context)),
+            tooltip: L10n.get("settings_sign_out"),
+            icon: Icon(
+              Icons.logout,
+              color: Theme.of(context).colorScheme.error,
+            ),
+          ),
+        ),
+        if (auth.makonRole != null)
+          ListTile(
+            leading: const Icon(
+              Icons.badge_outlined,
+              color: MakonColors.inkMuted,
+            ),
+            title: Text(L10n.get("settings_primary_profile")),
+            subtitle: Text(L10n.get(auth.makonRole!.titleL10nKey)),
+            trailing: const Icon(
+              Icons.chevron_right,
+              color: MakonColors.inkMuted,
+            ),
+            onTap: () => unawaited(
+              Navigator.of(context).push<void>(
+                MaterialPageRoute<void>(
+                  builder: (_) =>
+                      const MakonRoleSelectionScreen(isRequired: false),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
