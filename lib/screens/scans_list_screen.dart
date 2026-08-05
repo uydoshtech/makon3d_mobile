@@ -4,12 +4,12 @@ import "package:dio/dio.dart";
 import "package:flutter/material.dart";
 
 import "package:makon3d_mobile/l10n/l10n.dart";
+import "package:makon3d_mobile/models/housing_scan.dart";
 import "package:makon3d_mobile/models/makon_scan.dart";
+import "package:makon3d_mobile/screens/scan_detail_screen.dart";
 import "package:makon3d_mobile/services/makon_project_store.dart";
-import "package:makon3d_mobile/services/room_usdz_viewer_service.dart";
 import "package:makon3d_mobile/services/scan_upload_service.dart";
 import "package:makon3d_mobile/services/scans_refresh_notifier.dart";
-import "package:makon3d_mobile/screens/textured_glb_viewer_screen.dart";
 import "package:makon3d_mobile/widgets/toasts.dart";
 
 /// Lists all recent public scans (everyone's, for now — same feed as the
@@ -28,7 +28,6 @@ class _ScansListScreenState extends State<ScansListScreen> {
   List<MakonScan>? _scans;
   Object? _error;
   bool _loading = false;
-  int? _openingId;
   int? _deletingId;
   CancelToken? _loadToken;
   bool _loadedOnce = false;
@@ -95,60 +94,32 @@ class _ScansListScreenState extends State<ScansListScreen> {
   }
 
   Future<void> _openScan(MakonScan scan) async {
-    final refreshed = await ScanUploadService.getScan(scan.id);
-    if (!mounted) return;
-    final textured = refreshed.texturedGlbUrl;
-    if (textured != null && textured.isNotEmpty) {
-      final choice = await showModalBottomSheet<String>(
-        context: context,
-        builder: (context) => SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.account_tree_outlined),
-                title: Text(L10n.get("room_3d_structure")),
-                onTap: () => Navigator.pop(context, "structure"),
-              ),
-              ListTile(
-                leading: const Icon(Icons.texture),
-                title: Text(L10n.get("room_3d_textured")),
-                onTap: () => Navigator.pop(context, "textured"),
-              ),
-            ],
-          ),
+    final detailScan = HousingScan(
+      id: "remote-${scan.id}",
+      remoteScanId: scan.id,
+      usdzUrl: scan.usdzUrl,
+      glbUrl: scan.glbUrl,
+      floorLongM: scan.floorLongM,
+      floorShortM: scan.floorShortM,
+      heightM: scan.heightM,
+      floorAreaM2: scan.floorAreaM2,
+      wallPerimeterM: scan.wallPerimeterM,
+      doorwayWidthM: scan.doorwayWidthM,
+      doorwayAreaM2: scan.doorwayAreaM2,
+      windowAreaM2: scan.windowAreaM2,
+      roomTypes: scan.roomTypes,
+      objectCounts: scan.objectCounts,
+      worldPlusXBearingDeg: scan.worldPlusXBearingDeg,
+      capturedAt: scan.createdAt,
+    );
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (_) => ScanDetailScreen(
+          title: "${L10n.get("scans_item_title")} #${scan.id}",
+          scan: detailScan,
         ),
-      );
-      if (!mounted || choice == null) return;
-      if (choice == "textured") {
-        await Navigator.of(context).push<void>(
-          MaterialPageRoute<void>(
-            builder: (_) => TexturedGlbViewerScreen(glbUrl: textured),
-          ),
-        );
-        return;
-      }
-    }
-    final url = refreshed.usdzUrl;
-    if (url == null || url.isEmpty) {
-      Toasts.showError(context, L10n.get("scans_open_error"));
-      return;
-    }
-    setState(() => _openingId = scan.id);
-    try {
-      await RoomUsdzViewerService.downloadAndPresent(
-        url,
-        scanId: scan.id,
-        languageCode: LanguageState().currentLanguage,
-        worldPlusXBearingDeg: refreshed.worldPlusXBearingDeg,
-        shareScanId: scan.id,
-      );
-    } catch (_) {
-      if (!mounted) return;
-      Toasts.showError(context, L10n.get("scans_open_error"));
-    } finally {
-      if (mounted) setState(() => _openingId = null);
-    }
+      ),
+    );
   }
 
   Future<void> _deleteScan(MakonScan scan) async {
@@ -311,7 +282,6 @@ class _ScansListScreenState extends State<ScansListScreen> {
         separatorBuilder: (_, _) => const SizedBox(height: 4),
         itemBuilder: (context, index) {
           final scan = scans[index];
-          final opening = _openingId == scan.id;
           final deleting = _deletingId == scan.id;
           return ListTile(
             shape: RoundedRectangleBorder(
@@ -319,16 +289,10 @@ class _ScansListScreenState extends State<ScansListScreen> {
             ),
             leading: CircleAvatar(
               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-              child: opening
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Icon(
-                      Icons.view_in_ar,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ),
+              child: Icon(
+                Icons.view_in_ar,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
             ),
             title: Text("${L10n.get("scans_item_title")} #${scan.id}"),
             subtitle: Text(_subtitle(scan)),
@@ -346,9 +310,7 @@ class _ScansListScreenState extends State<ScansListScreen> {
                     ),
                     onPressed: () => unawaited(_deleteScan(scan)),
                   ),
-            onTap: opening || deleting
-                ? null
-                : () => unawaited(_openScan(scan)),
+            onTap: deleting ? null : () => unawaited(_openScan(scan)),
           );
         },
       ),

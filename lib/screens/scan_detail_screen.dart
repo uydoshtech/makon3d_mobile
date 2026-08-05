@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show listEquals, mapEquals;
 import 'package:flutter/material.dart';
 
 import 'package:makon3d_mobile/l10n/l10n.dart';
@@ -10,6 +11,7 @@ import 'package:makon3d_mobile/screens/textured_glb_viewer_screen.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
 import 'package:makon3d_mobile/services/room_usdz_viewer_service.dart';
 import 'package:makon3d_mobile/services/scan_upload_service.dart';
+import 'package:makon3d_mobile/widgets/detected_objects_section.dart';
 import 'package:makon3d_mobile/widgets/photogrammetry_package_actions.dart';
 import 'package:makon3d_mobile/widgets/scan_mini_preview.dart';
 import 'package:makon3d_mobile/widgets/toasts.dart';
@@ -75,9 +77,13 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
         previous,
       );
       if (!mounted) return;
-      if (updated.remoteScanId == previous.remoteScanId &&
+      final unchanged =
+          updated.remoteScanId == previous.remoteScanId &&
           updated.usdzUrl == previous.usdzUrl &&
-          updated.glbUrl == previous.glbUrl) {
+          updated.glbUrl == previous.glbUrl &&
+          listEquals(updated.roomTypes, previous.roomTypes) &&
+          mapEquals(updated.objectCounts, previous.objectCounts);
+      if (unchanged) {
         return;
       }
       await MakonProjectStore.instance.replaceScanMedia(
@@ -240,6 +246,10 @@ class _ScanDetailScreenState extends State<ScanDetailScreen> {
               title: Text(L10n.get('project_action_measurements')),
               subtitle: Text(L10n.get('scans_no_metrics')),
             ),
+          if (scan.objectCounts.values.any((count) => count > 0)) ...[
+            const SizedBox(height: 12),
+            DetectedObjectsSection(counts: scan.objectCounts),
+          ],
           if (widget.projectId != null) ...[
             ListTile(
               contentPadding: EdgeInsets.zero,

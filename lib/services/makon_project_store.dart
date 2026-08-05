@@ -253,10 +253,26 @@ class MakonProjectStore extends ChangeNotifier {
       final previousUsdz = scan.usdzUrl?.trim() ?? '';
       final urlChanged =
           usdz != null && usdz.isNotEmpty && usdz != previousUsdz;
-      final updated = scan.withRemoteMedia(
+      var updated = scan.withRemoteMedia(
         remoteScanId: remoteId,
         usdzUrl: usdz,
         glbUrl: glb,
+      );
+      updated = updated.copyWith(
+        floorLongM: remote.floorLongM,
+        floorShortM: remote.floorShortM,
+        heightM: remote.heightM,
+        floorAreaM2: remote.floorAreaM2,
+        wallPerimeterM: remote.wallPerimeterM,
+        doorwayWidthM: remote.doorwayWidthM,
+        doorwayAreaM2: remote.doorwayAreaM2,
+        windowAreaM2: remote.windowAreaM2,
+        roomTypes: remote.roomTypes.isNotEmpty ? remote.roomTypes : null,
+        objectCounts: remote.objectCounts.isNotEmpty
+            ? remote.objectCounts
+            : null,
+        worldPlusXBearingDeg: remote.worldPlusXBearingDeg,
+        capturedAt: remote.createdAt,
       );
       // Prefer the new remote asset over a stale on-device USDZ path.
       if (urlChanged && (updated.localUsdzPath?.isNotEmpty ?? false)) {
@@ -284,7 +300,9 @@ class MakonProjectStore extends ChangeNotifier {
         previous.remoteScanId == updated.remoteScanId &&
         previous.usdzUrl == updated.usdzUrl &&
         previous.glbUrl == updated.glbUrl &&
-        previous.localUsdzPath == updated.localUsdzPath;
+        previous.localUsdzPath == updated.localUsdzPath &&
+        listEquals(previous.roomTypes, updated.roomTypes) &&
+        mapEquals(previous.objectCounts, updated.objectCounts);
     if (same) return;
     await ensureLoaded();
     if (!AuthState().isSignedIn) return;

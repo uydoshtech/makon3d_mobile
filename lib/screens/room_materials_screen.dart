@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +10,7 @@ import 'package:makon3d_mobile/models/housing_scan.dart';
 import 'package:makon3d_mobile/models/makon_project.dart';
 import 'package:makon3d_mobile/models/project_room.dart';
 import 'package:makon3d_mobile/models/wallpaper_prefs.dart';
+import 'package:makon3d_mobile/screens/floor_tile_layout_screen.dart';
 import 'package:makon3d_mobile/services/floor_tile_estimate.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
 import 'package:makon3d_mobile/widgets/keyboard_dismiss_scope.dart';
@@ -262,6 +264,55 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
     KeyboardDismissScope.dismiss();
     setState(() => _wastePercent = value);
     _schedulePersist();
+  }
+
+  void _openTileLayout(FloorTileEstimate estimate) {
+    KeyboardDismissScope.dismiss();
+    final scan = _scan;
+    final measuredLong = scan?.floorLongM;
+    final measuredShort = scan?.floorShortM;
+
+    double roomLengthM;
+    double roomWidthM;
+    if (measuredLong != null &&
+        measuredLong > 0 &&
+        measuredShort != null &&
+        measuredShort > 0) {
+      roomLengthM = measuredLong;
+      roomWidthM = measuredShort;
+    } else if (measuredLong != null && measuredLong > 0) {
+      roomLengthM = measuredLong;
+      roomWidthM = estimate.floorAreaM2 / measuredLong;
+    } else if (measuredShort != null && measuredShort > 0) {
+      roomWidthM = measuredShort;
+      roomLengthM = estimate.floorAreaM2 / measuredShort;
+    } else {
+      roomLengthM = math.sqrt(estimate.floorAreaM2);
+      roomWidthM = roomLengthM;
+    }
+
+    // Preserve the scanned room proportions while matching the measured floor
+    // area. The stored length/width are bounding dimensions and can otherwise
+    // overstate an irregular room's tile positions considerably.
+    final boundsAreaM2 = roomLengthM * roomWidthM;
+    if (boundsAreaM2 > 0) {
+      final areaScale = math.sqrt(estimate.floorAreaM2 / boundsAreaM2);
+      roomLengthM *= areaScale;
+      roomWidthM *= areaScale;
+    }
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => FloorTileLayoutScreen(
+          roomName: _title,
+          roomWidthM: roomWidthM,
+          roomLengthM: roomLengthM,
+          tileWidthCm: _widthCm,
+          tileLengthCm: _heightCm,
+          purchaseTileCount: estimate.tileCount,
+        ),
+      ),
+    );
   }
 
   // --- Walls (wallpaper) handlers --------------------------------------------
@@ -716,6 +767,9 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
                         plinthPerimeterM,
                         plinthNote,
                         noAreaKey,
+                        tileEstimate == null
+                            ? null
+                            : () => _openTileLayout(tileEstimate),
                       ),
               ),
             ),
@@ -753,6 +807,7 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
     double? plinthPerimeterM,
     String plinthNote,
     String noAreaKey,
+    VoidCallback? onOpenLayout,
   ) {
     if (estimate == null) {
       return Text(L10n.get(noAreaKey), style: theme.textTheme.bodyLarge);
@@ -814,6 +869,34 @@ class _RoomMaterialsScreenState extends State<RoomMaterialsScreen> {
             plinthNote,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+        if (onOpenLayout != null) ...[
+          const SizedBox(height: 12),
+          const Divider(height: 1),
+          const SizedBox(height: 4),
+          TextButton(
+            onPressed: onOpenLayout,
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              alignment: Alignment.centerLeft,
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.grid_view_rounded, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    L10n.get('materials_tile_layout_button'),
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                const Icon(Icons.chevron_right_rounded),
+              ],
             ),
           ),
         ],

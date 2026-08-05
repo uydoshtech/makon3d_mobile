@@ -1,5 +1,6 @@
 import 'package:room_scan_kit/scan_flow/scan_flow.dart';
 
+import 'package:makon3d_mobile/models/contractor_listing.dart';
 import 'package:makon3d_mobile/models/floor_tile_prefs.dart';
 import 'package:makon3d_mobile/models/housing_scan.dart';
 import 'package:makon3d_mobile/models/project_room.dart';
@@ -19,6 +20,7 @@ class MakonProject {
     this.mergedStructureLocalPath,
     this.entireHousingFloorTilePrefs,
     this.entireHousingWallpaperPrefs,
+    this.contractorListing,
   });
 
   final String id;
@@ -39,6 +41,9 @@ class MakonProject {
   /// Wallpaper settings when [scanMode] is entire housing (one space).
   final WallpaperPrefs? entireHousingWallpaperPrefs;
 
+  /// Public brief currently searchable by contractors, when present.
+  final ContractorListing? contractorListing;
+
   bool get hasEntireHousingModel => entireHousingScan?.hasModel == true;
 
   int get scannedRoomCount => rooms.where((r) => r.isScanned).length;
@@ -55,6 +60,7 @@ class MakonProject {
     'mergedStructureLocalPath': mergedStructureLocalPath,
     'entireHousingFloorTilePrefs': entireHousingFloorTilePrefs?.toJson(),
     'entireHousingWallpaperPrefs': entireHousingWallpaperPrefs?.toJson(),
+    'contractorListing': contractorListing?.toJson(),
   };
 
   factory MakonProject.fromJson(Map<String, dynamic> json) {
@@ -79,8 +85,7 @@ class MakonProject {
     } else if (rawEntire is Map) {
       entireJson = Map<String, dynamic>.from(rawEntire);
     }
-    final entire =
-        entireJson != null ? HousingScan.fromJson(entireJson) : null;
+    final entire = entireJson != null ? HousingScan.fromJson(entireJson) : null;
     final scanMode =
         parsedMode ?? migrateScanMode(entireHousingScan: entire, rooms: rooms);
 
@@ -113,6 +118,9 @@ class MakonProject {
       entireHousingWallpaperPrefs: WallpaperPrefs.tryFromJson(
         json['entireHousingWallpaperPrefs'],
       ),
+      contractorListing: ContractorListing.tryFromJson(
+        json['contractorListing'],
+      ),
     );
   }
 
@@ -143,9 +151,11 @@ class MakonProject {
     String? mergedStructureLocalPath,
     FloorTilePrefs? entireHousingFloorTilePrefs,
     WallpaperPrefs? entireHousingWallpaperPrefs,
+    ContractorListing? contractorListing,
     bool clearEntireHousingScan = false,
     bool clearAddress = false,
     bool clearNotes = false,
+    bool clearContractorListing = false,
   }) {
     return MakonProject(
       id: id,
@@ -164,6 +174,9 @@ class MakonProject {
           entireHousingFloorTilePrefs ?? this.entireHousingFloorTilePrefs,
       entireHousingWallpaperPrefs:
           entireHousingWallpaperPrefs ?? this.entireHousingWallpaperPrefs,
+      contractorListing: clearContractorListing
+          ? null
+          : (contractorListing ?? this.contractorListing),
     );
   }
 }

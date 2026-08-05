@@ -10,6 +10,7 @@ import 'package:makon3d_mobile/models/project_room.dart';
 import 'package:makon3d_mobile/models/room_type.dart';
 import 'package:makon3d_mobile/scan_flow/makon_entire_housing_coordinator.dart';
 import 'package:makon3d_mobile/scan_flow/makon_room_by_room_coordinator.dart';
+import 'package:makon3d_mobile/screens/contractor_listing_flow_screen.dart';
 import 'package:makon3d_mobile/screens/edit_project_screen.dart';
 import 'package:makon3d_mobile/screens/room_materials_screen.dart';
 import 'package:makon3d_mobile/screens/scan_detail_screen.dart';
@@ -19,6 +20,7 @@ import 'package:makon3d_mobile/services/scan_upload_service.dart';
 import 'package:makon3d_mobile/widgets/photogrammetry_package_actions.dart';
 import 'package:makon3d_mobile/widgets/project_delete_dialog.dart';
 import 'package:makon3d_mobile/widgets/scan_mini_preview.dart';
+import 'package:makon3d_mobile/widgets/detected_objects_section.dart';
 import 'package:makon3d_mobile/widgets/toasts.dart';
 
 /// Mode-aware project home. Does not re-ask for scan mode.
@@ -261,6 +263,15 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
     );
   }
 
+  Future<void> _openContractorListing() async {
+    await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) =>
+            ContractorListingFlowScreen(projectId: widget.projectId),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final project = _project;
@@ -297,6 +308,7 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
               onStartScan: _startEntireHousingScan,
               onOpenModel: () => unawaited(_openHousingModel()),
               onOpenMaterials: () => unawaited(_openEntireHousingMaterials()),
+              onOpenContractors: () => unawaited(_openContractorListing()),
               detectedRoomTypes:
                   project.entireHousingScan?.roomTypes.isNotEmpty == true
                   ? project.entireHousingScan!.roomTypes
@@ -313,6 +325,7 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
               onRescanRoom: _rescanRoom,
               onConfirmDeleteRoom: _confirmDeleteRoom,
               onDeleteRoom: _deleteRoom,
+              onOpenContractors: () => unawaited(_openContractorListing()),
             ),
     );
   }
@@ -327,6 +340,7 @@ class _EntireHousingBody extends StatelessWidget {
     required this.onOpenMaterials,
     required this.detectedRoomTypes,
     required this.detectedObjectCounts,
+    required this.onOpenContractors,
   });
 
   final MakonProject project;
@@ -336,6 +350,7 @@ class _EntireHousingBody extends StatelessWidget {
   final VoidCallback onOpenMaterials;
   final List<String> detectedRoomTypes;
   final Map<String, int> detectedObjectCounts;
+  final VoidCallback onOpenContractors;
 
   @override
   Widget build(BuildContext context) {
@@ -357,6 +372,8 @@ class _EntireHousingBody extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
+        const SizedBox(height: 20),
+        _ContractorSearchCard(project: project, onTap: onOpenContractors),
         const SizedBox(height: 24),
         if (hasModel && scan != null) ...[
           ScanMiniPreview(
@@ -394,8 +411,10 @@ class _EntireHousingBody extends StatelessWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: onOpenMaterials,
           ),
-          if (detectedObjectCounts.isNotEmpty)
-            _DetectedObjectsSection(counts: detectedObjectCounts),
+          if (detectedObjectCounts.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            DetectedObjectsSection(counts: detectedObjectCounts),
+          ],
           const SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: onStartScan,
@@ -476,71 +495,6 @@ class _DetectedRoomTypesPill extends StatelessWidget {
   }
 }
 
-class _DetectedObjectsSection extends StatelessWidget {
-  const _DetectedObjectsSection({required this.counts});
-
-  final Map<String, int> counts;
-
-  static const _labelKeys = <String, String>{
-    'window': 'room_scan_stats_windows',
-    'door': 'room_scan_stats_doors',
-    'opening': 'room_scan_stats_openings',
-    'storage': 'room_scan_stats_storage',
-    'cabinet': 'room_scan_stats_cabinet',
-    'bed': 'room_scan_stats_bed',
-    'sofa': 'room_scan_stats_sofa',
-    'table': 'room_scan_stats_table',
-    'chair': 'room_scan_stats_chair',
-    'television': 'room_scan_stats_television',
-    'refrigerator': 'room_scan_stats_refrigerator',
-    'sink': 'room_scan_stats_sink',
-    'toilet': 'room_scan_stats_toilet',
-    'bathtub': 'room_scan_stats_bathtub',
-    'shower': 'room_scan_stats_shower',
-    'oven': 'room_scan_stats_oven',
-    'stove': 'room_scan_stats_stove',
-    'dishwasher': 'room_scan_stats_dishwasher',
-    'washerDryer': 'room_scan_stats_washer_dryer',
-    'fireplace': 'room_scan_stats_fireplace',
-    'stairs': 'room_scan_stats_stairs',
-  };
-
-  @override
-  Widget build(BuildContext context) {
-    final entries = counts.entries.where((entry) => entry.value > 0).toList();
-    if (entries.isEmpty) return const SizedBox.shrink();
-    return ExpansionTile(
-      tilePadding: EdgeInsets.zero,
-      childrenPadding: const EdgeInsets.only(left: 56, right: 8, bottom: 8),
-      leading: const Icon(Icons.chair_outlined),
-      title: Text(L10n.get('project_detected_objects')),
-      shape: const Border(),
-      collapsedShape: const Border(),
-      children: [
-        for (final entry in entries)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 7),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    L10n.get(_labelKeys[entry.key] ?? 'room_scan_stats_object'),
-                  ),
-                ),
-                Text(
-                  '× ${entry.value}',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
-                ),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-}
-
 class _RoomByRoomBody extends StatelessWidget {
   const _RoomByRoomBody({
     required this.project,
@@ -549,6 +503,7 @@ class _RoomByRoomBody extends StatelessWidget {
     required this.onRescanRoom,
     required this.onConfirmDeleteRoom,
     required this.onDeleteRoom,
+    required this.onOpenContractors,
   });
 
   final MakonProject project;
@@ -557,6 +512,7 @@ class _RoomByRoomBody extends StatelessWidget {
   final ValueChanged<ProjectRoom> onRescanRoom;
   final Future<bool> Function(ProjectRoom room) onConfirmDeleteRoom;
   final ValueChanged<ProjectRoom> onDeleteRoom;
+  final VoidCallback onOpenContractors;
 
   @override
   Widget build(BuildContext context) {
@@ -577,6 +533,11 @@ class _RoomByRoomBody extends StatelessWidget {
                   label: L10n.get('project_scan_mode_label'),
                   title: L10n.get(ScanMode.roomByRoom.titleKey),
                   description: L10n.get(ScanMode.roomByRoom.subtitleKey),
+                ),
+                const SizedBox(height: 16),
+                _ContractorSearchCard(
+                  project: project,
+                  onTap: onOpenContractors,
                 ),
                 const SizedBox(height: 28),
                 Text(
@@ -756,6 +717,110 @@ class _EmptyRoomsCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ContractorSearchCard extends StatelessWidget {
+  const _ContractorSearchCard({required this.project, required this.onTap});
+
+  final MakonProject project;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final listing = project.contractorListing;
+    final isPublished = listing != null;
+
+    return Material(
+      color: isPublished
+          ? scheme.surfaceContainerHighest
+          : scheme.secondaryContainer,
+      borderRadius: BorderRadius.circular(18),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: isPublished ? scheme.primary : scheme.secondary,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  isPublished
+                      ? Icons.campaign_outlined
+                      : Icons.engineering_outlined,
+                  color: isPublished ? scheme.onPrimary : scheme.onSecondary,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (isPublished)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 5),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 7,
+                              height: 7,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFF2E7D32),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              L10n.get('contractor_publication_active'),
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: const Color(0xFF2E7D32),
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    Text(
+                      L10n.get(
+                        isPublished
+                            ? 'contractor_status_searching'
+                            : 'contractor_card_title',
+                      ),
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      isPublished
+                          ? L10n.get(
+                              'contractor_responses_template',
+                            ).replaceAll('{count}', '${listing.responseCount}')
+                          : L10n.get('contractor_card_subtitle'),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
+            ],
+          ),
         ),
       ),
     );
