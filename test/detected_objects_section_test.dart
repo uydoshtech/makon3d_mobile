@@ -39,12 +39,17 @@ void main() {
     expect(find.byKey(const Key("detected_objects_section")), findsOneWidget);
     expect(find.text("Обнаруженные объекты"), findsOneWidget);
     expect(find.text("Окна"), findsOneWidget);
-    expect(find.text("Хранение"), findsOneWidget);
+    expect(find.text("Хранилище"), findsOneWidget);
     expect(find.text("Диваны"), findsOneWidget);
     expect(find.text("Столы"), findsOneWidget);
     expect(find.text("Стулья"), findsOneWidget);
     expect(find.text("Двери"), findsNothing);
     expect(find.text("× 3"), findsOneWidget);
     expect(find.text("× 2"), findsNWidgets(2));
+    expect(find.byIcon(Icons.window_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.inventory_2_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.weekend_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.table_restaurant_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.chair_outlined), findsOneWidget);
   });
 }

@@ -482,6 +482,7 @@ class RoomUsdzViewerService {
       "floorPlanChangeFloor": l("room_3d_floor_plan_change_floor"),
       "floorPlanChangeWallsTitle": l("room_3d_floor_plan_change_walls_title"),
       "floorPlanChangeFloorTitle": l("room_3d_floor_plan_change_floor_title"),
+      "floorPlanFloorTint": l("room_3d_floor_plan_floor_tint"),
       "floorPlanWallBrick": l("room_3d_floor_plan_wall_brick"),
       "floorPlanWallPlaster": l("room_3d_floor_plan_wall_plaster"),
       "floorPlanWallPainted": l("room_3d_floor_plan_wall_painted"),

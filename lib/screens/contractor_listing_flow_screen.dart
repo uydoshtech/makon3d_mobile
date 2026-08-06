@@ -1,14 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'package:makon3d_mobile/l10n/l10n.dart';
 import 'package:makon3d_mobile/models/contractor_listing.dart';
 import 'package:makon3d_mobile/models/housing_scan.dart';
 import 'package:makon3d_mobile/models/makon_project.dart';
 import 'package:makon3d_mobile/services/contractor_marketplace_service.dart';
+import 'package:makon3d_mobile/services/geocode_service.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
 import 'package:makon3d_mobile/theme/makon_colors.dart';
+import 'package:makon3d_mobile/widgets/keyboard_dismiss_scope.dart';
 import 'package:makon3d_mobile/widgets/toasts.dart';
 
 /// Five-step customer flow that turns a Makon3D project into a contractor brief.
@@ -33,6 +36,7 @@ class _ContractorListingFlowScreenState
 
   int _step = 0;
   bool _isSaving = false;
+  bool _locating = false;
   late Set<ContractorWorkType> _workTypes;
   late List<ContractorWorkVolume> _detectedVolumes;
   late bool _includeDetectedVolumes;
@@ -426,6 +430,60 @@ class _ContractorListingFlowScreenState
     ]);
   }
 
+  /// Fills the public location field from the device GPS — same flow as
+  /// new/edit project address fields.
+  Future<void> _useCurrentLocation() async {
+    if (_locating) return;
+    KeyboardDismissScope.dismiss();
+    setState(() => _locating = true);
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        if (!mounted) return;
+        Toasts.showInfo(context, L10n.get('location_services_disabled'));
+        return;
+      }
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        if (!mounted) return;
+        Toasts.showInfo(context, L10n.get('location_permission_denied'));
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.medium,
+          timeLimit: Duration(seconds: 12),
+        ),
+      );
+      final address = await GeocodeService.reverseGeocode(
+        latitude: position.latitude,
+        longitude: position.longitude,
+        lang: LanguageState().currentLanguage,
+      );
+      if (!mounted) return;
+      if (address == null) {
+        Toasts.showError(context, L10n.get('current_location_address_failed'));
+        return;
+      }
+      _locationController.text = address;
+      setState(() {});
+    } on TimeoutException {
+      if (!mounted) return;
+      Toasts.showError(context, L10n.get('current_location_address_failed'));
+    } catch (_) {
+      if (!mounted) return;
+      Toasts.showError(context, L10n.get('current_location_address_failed'));
+    } finally {
+      if (mounted) setState(() => _locating = false);
+    }
+  }
+
   Widget _buildAccessStep(BuildContext context) {
     return _stepScrollView([
       _SectionIntro(
@@ -440,6 +498,20 @@ class _ContractorListingFlowScreenState
           labelText: L10n.get('contractor_public_location'),
           hintText: L10n.get('contractor_public_location_hint'),
           prefixIcon: const Icon(Icons.location_on_outlined),
+          suffixIcon: _locating
+              ? const Padding(
+                  padding: EdgeInsets.all(14),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                )
+              : IconButton(
+                  tooltip: L10n.get('use_current_location'),
+                  icon: const Icon(Icons.my_location),
+                  onPressed: () => unawaited(_useCurrentLocation()),
+                ),
           border: const OutlineInputBorder(),
           errorText: _locationController.text.trim().isEmpty
               ? L10n.get('contractor_public_location_required')

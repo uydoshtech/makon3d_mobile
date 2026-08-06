@@ -38,6 +38,30 @@ class DetectedObjectsSection extends StatelessWidget {
     "stairs": "room_scan_stats_stairs",
   };
 
+  static const _icons = <String, IconData>{
+    "window": Icons.window_outlined,
+    "door": Icons.door_front_door_outlined,
+    "opening": Icons.open_in_full_outlined,
+    "storage": Icons.inventory_2_outlined,
+    "cabinet": Icons.door_sliding_outlined,
+    "bed": Icons.bed_outlined,
+    "sofa": Icons.weekend_outlined,
+    "table": Icons.table_restaurant_outlined,
+    "chair": Icons.chair_outlined,
+    "television": Icons.tv_outlined,
+    "refrigerator": Icons.kitchen_outlined,
+    "sink": Icons.countertops_outlined,
+    "toilet": Icons.wc_outlined,
+    "bathtub": Icons.bathtub_outlined,
+    "shower": Icons.shower_outlined,
+    "oven": Icons.microwave_outlined,
+    "stove": Icons.soup_kitchen_outlined,
+    "dishwasher": Icons.cleaning_services_outlined,
+    "washerDryer": Icons.local_laundry_service_outlined,
+    "fireplace": Icons.fireplace_outlined,
+    "stairs": Icons.stairs_outlined,
+  };
+
   @override
   Widget build(BuildContext context) {
     final entries = counts.entries
@@ -75,6 +99,12 @@ class DetectedObjectsSection extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 14),
               child: Row(
                 children: [
+                  Icon(
+                    _icon(entries[index].key),
+                    size: 22,
+                    color: MakonColors.inkMuted,
+                  ),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       _label(entries[index].key),
@@ -96,6 +126,9 @@ class DetectedObjectsSection extends StatelessWidget {
       ),
     );
   }
+
+  static IconData _icon(String type) =>
+      _icons[type] ?? Icons.category_outlined;
 
   static String _label(String type) {
     final key = _labelKeys[type];

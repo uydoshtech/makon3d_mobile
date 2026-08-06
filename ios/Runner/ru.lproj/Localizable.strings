@@ -8,7 +8,7 @@
 "roomplan_stats_objects" = "Объекты";
 "roomplan_compass" = "Компас";
 "roomplan_stats_television" = "ТВ";
-"roomplan_stats_storage" = "Хранение";
+"roomplan_stats_storage" = "Хранилище";
 "roomplan_stats_cabinet" = "Шкаф";
 "roomplan_stats_sofa" = "Диван";
 "roomplan_stats_bed" = "Кровать";
@@ -28,7 +28,7 @@
 "roomplan_detected_wall" = "✓ Обнаружена стена";
 "roomplan_detected_door" = "✓ Обнаружена дверь";
 "roomplan_detected_window" = "✓ Обнаружено окно";
-"roomplan_detected_storage" = "✓ Обнаружено хранение";
+"roomplan_detected_storage" = "✓ Обнаружено хранилище";
 "roomplan_detected_cabinet" = "✓ Обнаружен шкаф";
 "roomplan_detected_bed" = "✓ Обнаружена кровать";
 "roomplan_detected_sofa" = "✓ Обнаружен диван";

@@ -441,33 +441,17 @@ class _TilePlanPainter extends CustomPainter {
       math.min(size.width, size.height) / 4,
     );
     final safeRoomRect = (Offset.zero & size).deflate(roomBorderInset);
+    final maxDigitCount = layout.positionCount.toString().length;
+    final fontSizeByDigitCount = <int, double>{
+      for (var digits = 1; digits <= maxDigitCount; digits++)
+        digits: _numberFontSize(rects, digits),
+    };
     for (var row = 0; row < layout.rows; row++) {
       for (var column = 0; column < layout.columns; column++) {
         final rect = rects[row * layout.columns + column];
         final number = layout.tileNumberAt(row, column).toString();
-        final safeTileRect = rect.intersect(safeRoomRect);
-        final isCutColumn = layout.hasCutColumn && column == layout.columns - 1;
-        final availableWidth = math.max(
-          0.5,
-          isCutColumn
-              ? math.max(
-                  safeTileRect.width - 1.2,
-                  math.min(14.0, rect.height * 0.75),
-                )
-              : safeTileRect.width - 1.2,
-        );
-        final availableHeight = math.max(0.5, safeTileRect.height - 1.2);
-        var fontSize = math.max(1.0, math.min(10.0, rect.height * 0.34));
-        var textPainter = _numberPainter(number, fontSize);
-        if (textPainter.width > availableWidth ||
-            textPainter.height > availableHeight) {
-          final fitScale = math.min(
-            availableWidth / textPainter.width,
-            availableHeight / textPainter.height,
-          );
-          fontSize = math.max(0.5, fontSize * fitScale);
-          textPainter = _numberPainter(number, fontSize);
-        }
+        final fontSize = fontSizeByDigitCount[number.length]!;
+        final textPainter = _numberPainter(number, fontSize);
 
         final horizontalPadding = math.min(fontSize * 0.22, 1.2);
         final verticalPadding = math.min(fontSize * 0.16, 0.8);
@@ -510,6 +494,31 @@ class _TilePlanPainter extends CustomPainter {
     }
   }
 
+  double _numberFontSize(List<Rect> rects, int digitCount) {
+    if (rects.isEmpty) return 1;
+    var nominalWidth = 0.0;
+    var nominalHeight = 0.0;
+    for (final rect in rects) {
+      nominalWidth = math.max(nominalWidth, rect.width);
+      nominalHeight = math.max(nominalHeight, rect.height);
+    }
+
+    final availableWidth = math.max(0.5, nominalWidth - 1.2);
+    final availableHeight = math.max(0.5, nominalHeight - 1.2);
+    var fontSize = math.max(0.5, math.min(10.0, nominalHeight * 0.34));
+    final widestReference = List.filled(digitCount, '8').join();
+    final referencePainter = _numberPainter(widestReference, fontSize);
+    if (referencePainter.width > availableWidth ||
+        referencePainter.height > availableHeight) {
+      final fitScale = math.min(
+        availableWidth / referencePainter.width,
+        availableHeight / referencePainter.height,
+      );
+      fontSize = math.max(0.35, fontSize * fitScale);
+    }
+    return fontSize;
+  }
+
   TextPainter _numberPainter(String number, double fontSize) {
     return TextPainter(
       text: TextSpan(
@@ -518,6 +527,7 @@ class _TilePlanPainter extends CustomPainter {
           color: colors.onSurface,
           fontSize: fontSize,
           fontWeight: FontWeight.w700,
+          fontFeatures: const [FontFeature.tabularFigures()],
           height: 1,
         ),
       ),
