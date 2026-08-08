@@ -34,10 +34,12 @@ class ProjectsListScreen extends StatefulWidget {
   State<ProjectsListScreen> createState() => _ProjectsListScreenState();
 }
 
-class _ProjectsListScreenState extends State<ProjectsListScreen> {
+class _ProjectsListScreenState extends State<ProjectsListScreen>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     MakonProjectStore.instance.addListener(_onChanged);
     AuthState().addListener(_onChanged);
     unawaited(MakonProjectStore.instance.ensureLoaded());
@@ -45,9 +47,17 @@ class _ProjectsListScreenState extends State<ProjectsListScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     MakonProjectStore.instance.removeListener(_onChanged);
     AuthState().removeListener(_onChanged);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && widget.isActive) {
+      unawaited(MakonProjectStore.instance.refreshFromRemote());
+    }
   }
 
   void _onChanged() {

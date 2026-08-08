@@ -77,8 +77,17 @@ class ProjectSyncService {
   static Future<void> deleteProject(String projectId) async {
     if (projectId.isEmpty) return;
     try {
-      await _dio.delete<void>(
+      final deviceId = await DeviceIdentity.get();
+      await _dio.put<void>(
         "/makon3d/projects/${Uri.encodeComponent(projectId)}",
+        data: <String, dynamic>{
+          "device_id": deviceId,
+          "data": <String, dynamic>{
+            "id": projectId,
+            "_deleted": true,
+            "updatedAt": DateTime.now().toUtc().toIso8601String(),
+          },
+        },
       );
     } catch (e) {
       debugPrint("ProjectSyncService delete failed ($projectId): $e");
@@ -100,20 +109,32 @@ class ProjectSyncService {
   /// are stripped: they point into the previous install's sandbox, and a
   /// never-uploaded scan is unrecoverable anyway — better to show the room as
   /// not scanned than to reference a dead file.
-  static Future<List<MakonProject>> fetchRemoteProjects() async {
+  static Future<RemoteProjectSnapshot> fetchRemoteProjects() async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(
         "/makon3d/projects",
       );
       final raw = response.data?["projects"];
-      if (raw is! List) return const [];
+      if (raw is! List) return const RemoteProjectSnapshot();
       final projects = <MakonProject>[];
+      final deletedAt = <String, DateTime>{};
       for (final item in raw) {
         if (item is! Map) continue;
         final data = item["data"];
         if (data is! Map) continue;
         try {
           final json = Map<String, dynamic>.from(data);
+          if (json["_deleted"] == true) {
+            final id = (item["projectId"] ?? json["id"])?.toString() ?? "";
+            final timestamp = DateTime.tryParse(
+              (json["updatedAt"] ?? item["updatedAt"])?.toString() ?? "",
+            );
+            if (id.isNotEmpty && timestamp != null) deletedAt[id] = timestamp;
+            continue;
+          }
+          // Legacy backups did not carry a client mutation timestamp. The
+          // backend row timestamp is the best available ordering for them.
+          json.putIfAbsent("updatedAt", () => item["updatedAt"]);
           _stripLocalPaths(json);
           final project = MakonProject.fromJson(json);
           if (project.id.isNotEmpty) projects.add(project);
@@ -121,10 +142,10 @@ class ProjectSyncService {
           debugPrint("ProjectSyncService skipped bad backup: $e");
         }
       }
-      return projects;
+      return RemoteProjectSnapshot(projects: projects, deletedAt: deletedAt);
     } catch (e) {
       debugPrint("ProjectSyncService fetch failed: $e");
-      return const [];
+      return const RemoteProjectSnapshot();
     }
   }
 
@@ -141,4 +162,14 @@ class ProjectSyncService {
       }
     }
   }
+}
+
+class RemoteProjectSnapshot {
+  const RemoteProjectSnapshot({
+    this.projects = const [],
+    this.deletedAt = const {},
+  });
+
+  final List<MakonProject> projects;
+  final Map<String, DateTime> deletedAt;
 }

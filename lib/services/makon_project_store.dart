@@ -162,6 +162,7 @@ class MakonProjectStore extends ChangeNotifier {
   Future<void> upsert(MakonProject project) async {
     await ensureLoaded();
     if (!AuthState().isSignedIn) return;
+    project = project.copyWith(updatedAt: DateTime.now().toUtc());
     final next = [..._projects];
     final index = next.indexWhere((p) => p.id == project.id);
     if (index >= 0) {
@@ -493,9 +494,8 @@ class MakonProjectStore extends ChangeNotifier {
   /// One-shot background reconcile with the backend backups:
   /// - legacy device backups are claimed by this account;
   /// - remote projects unknown locally are restored (the reinstall case);
-  /// - every local project is (re-)pushed, healing failed past pushes.
-  /// Local always wins for projects present on both sides — this device is
-  /// the only writer of its own backups.
+  /// - projects are reconciled by their client mutation timestamp;
+  /// - only locally newer projects are pushed back to the backend.
   void _startBackendSync() {
     if (!AuthState().isSignedIn || _backendSyncStarted) return;
     _backendSyncStarted = true;
@@ -514,43 +514,57 @@ class MakonProjectStore extends ChangeNotifier {
     try {
       await ProjectSyncService.claimDeviceProjects();
       if (!AuthState().isSignedIn) return;
-      final remote = await ProjectSyncService.fetchRemoteProjects();
+      final remoteSnapshot = await ProjectSyncService.fetchRemoteProjects();
+      final remote = remoteSnapshot.projects;
       if (!AuthState().isSignedIn) return;
-      final localIds = _projects.map((p) => p.id).toSet();
-      final restored = remote
-          .where((p) => !localIds.contains(p.id))
-          .toList(growable: false);
-      var changed = false;
-      if (restored.isNotEmpty) {
-        final merged = [..._projects, ...restored]
-          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-        _projects = merged;
-        changed = true;
-      }
-      // Local wins for project identity, but adopt remote scan media when this
-      // device has an unscanned room/housing and the backup already has a model
-      // (e.g. photogrammetry USDZ attached on another device / simulator).
-      final byId = {for (final p in remote) p.id: p};
-      final healed = <MakonProject>[];
-      for (final local in _projects) {
-        final remoteProject = byId[local.id];
-        if (remoteProject == null) {
-          healed.add(local);
+      final localById = {for (final p in _projects) p.id: p};
+      final remoteById = {for (final p in remote) p.id: p};
+      final allIds = {...localById.keys, ...remoteById.keys};
+      final reconciled = <MakonProject>[];
+      final toPush = <MakonProject>[];
+      for (final id in allIds) {
+        final local = localById[id];
+        final remoteProject = remoteById[id];
+        final deletedAt = remoteSnapshot.deletedAt[id];
+        if (deletedAt != null &&
+            (local == null || !local.updatedAt.isAfter(deletedAt))) {
           continue;
         }
-        final next = _mergeRemoteScanMedia(local, remoteProject);
-        if (next != local) changed = true;
-        healed.add(next);
+        if (local == null) {
+          reconciled.add(remoteProject!);
+        } else if (remoteProject == null) {
+          reconciled.add(local);
+          toPush.add(local);
+        } else if (remoteProject.updatedAt.isAfter(local.updatedAt)) {
+          reconciled.add(remoteProject);
+        } else if (local.updatedAt.isAfter(remoteProject.updatedAt)) {
+          reconciled.add(local);
+          toPush.add(local);
+        } else {
+          // Equal timestamps normally mean identical data. Keep local paths but
+          // still heal server-side scan media repairs.
+          reconciled.add(_mergeRemoteScanMedia(local, remoteProject));
+        }
       }
+      reconciled.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      final changed = !_sameProjectSnapshots(_projects, reconciled);
       if (changed) {
-        _projects = healed;
+        _projects = reconciled;
         await _persist();
         notifyListeners();
       }
-      await ProjectSyncService.pushAll(_projects);
+      await ProjectSyncService.pushAll(toPush);
     } catch (e) {
       debugPrint('MakonProjectStore backend sync failed: $e');
     }
+  }
+
+  bool _sameProjectSnapshots(List<MakonProject> a, List<MakonProject> b) {
+    if (a.length != b.length) return false;
+    for (var i = 0; i < a.length; i++) {
+      if (jsonEncode(a[i].toJson()) != jsonEncode(b[i].toJson())) return false;
+    }
+    return true;
   }
 
   /// Heals local scan media from the remote backup when:

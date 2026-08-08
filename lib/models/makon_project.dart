@@ -13,6 +13,7 @@ class MakonProject {
     required this.name,
     required this.scanMode,
     required this.createdAt,
+    DateTime? updatedAt,
     this.address,
     this.notes,
     this.entireHousingScan,
@@ -21,12 +22,15 @@ class MakonProject {
     this.entireHousingFloorTilePrefs,
     this.entireHousingWallpaperPrefs,
     this.contractorListing,
-  });
+  }) : updatedAt = updatedAt ?? createdAt;
 
   final String id;
   final String name;
   final ScanMode scanMode;
   final DateTime createdAt;
+
+  /// Last user-visible mutation, used for cross-device conflict resolution.
+  final DateTime updatedAt;
   final String? address;
   final String? notes;
   final HousingScan? entireHousingScan;
@@ -53,6 +57,7 @@ class MakonProject {
     'name': name,
     'scanMode': scanMode.wireValue,
     'createdAt': createdAt.toIso8601String(),
+    'updatedAt': updatedAt.toUtc().toIso8601String(),
     'address': address,
     'notes': notes,
     'entireHousingScan': entireHousingScan?.toJson(),
@@ -98,6 +103,9 @@ class MakonProject {
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now()
           : DateTime.now(),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.tryParse(json['updatedAt'].toString())
+          : null,
       address: json['address'] as String?,
       notes: json['notes'] as String?,
       entireHousingScan: entire,
@@ -146,6 +154,7 @@ class MakonProject {
     String? name,
     String? address,
     String? notes,
+    DateTime? updatedAt,
     HousingScan? entireHousingScan,
     List<ProjectRoom>? rooms,
     String? mergedStructureLocalPath,
@@ -162,6 +171,7 @@ class MakonProject {
       name: name ?? this.name,
       scanMode: scanMode,
       createdAt: createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
       address: clearAddress ? null : (address ?? this.address),
       notes: clearNotes ? null : (notes ?? this.notes),
       entireHousingScan: clearEntireHousingScan
