@@ -8,6 +8,7 @@ import 'package:makon3d_mobile/models/contractor_listing.dart';
 import 'package:makon3d_mobile/services/contractor_marketplace_service.dart';
 import 'package:makon3d_mobile/theme/makon_colors.dart';
 import 'package:makon3d_mobile/widgets/app_bar_account_avatar.dart';
+import 'package:makon3d_mobile/widgets/makonix_loader.dart';
 import 'package:makon3d_mobile/widgets/toasts.dart';
 
 class ContractorJobsFeedScreen extends StatefulWidget {
@@ -76,7 +77,7 @@ class _ContractorJobsFeedScreenState extends State<ContractorJobsFeedScreen> {
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: MakonixLoader())
           : _failed
           ? _FeedMessage(
               icon: Icons.cloud_off_outlined,
@@ -181,7 +182,7 @@ class _ContractorJobDetailScreenState extends State<ContractorJobDetailScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(L10n.get('contractor_job_title'))),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: MakonixLoader())
           : _failed || job == null
           ? _FeedMessage(
               icon: Icons.cloud_off_outlined,

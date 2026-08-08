@@ -9,6 +9,7 @@ import 'package:makon3d_mobile/screens/project_dashboard_screen.dart';
 import 'package:makon3d_mobile/services/auth/auth_state.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
 import 'package:makon3d_mobile/widgets/app_bar_account_avatar.dart';
+import 'package:makon3d_mobile/widgets/makonix_loader.dart';
 import 'package:makon3d_mobile/widgets/project_delete_dialog.dart';
 import 'package:makon3d_mobile/widgets/sign_in_sheet.dart';
 
@@ -106,7 +107,7 @@ class _ProjectsListScreenState extends State<ProjectsListScreen> {
               ),
             )
           : !store.isLoaded
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: MakonixLoader())
           : RefreshIndicator(
               onRefresh: _onRefresh,
               child: projects.isEmpty

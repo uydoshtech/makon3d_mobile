@@ -9,6 +9,7 @@ import 'package:makon3d_mobile/screens/contractor_listing_flow_screen.dart';
 import 'package:makon3d_mobile/services/contractor_marketplace_service.dart';
 import 'package:makon3d_mobile/services/makon_project_store.dart';
 import 'package:makon3d_mobile/theme/makon_colors.dart';
+import 'package:makon3d_mobile/widgets/makonix_loader.dart';
 import 'package:makon3d_mobile/widgets/toasts.dart';
 
 class CustomerContractorJobScreen extends StatefulWidget {
@@ -226,7 +227,7 @@ class _CustomerContractorJobScreenState
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: MakonixLoader())
           : _failed || job == null
           ? Center(
               child: Padding(

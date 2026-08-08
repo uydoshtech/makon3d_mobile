@@ -15,6 +15,7 @@ import "package:makon3d_mobile/services/room_plan_capability.dart";
 import "package:makon3d_mobile/services/room_scan_bounds_service.dart";
 import "package:makon3d_mobile/services/room_usdz_viewer_service.dart";
 import "package:makon3d_mobile/services/scan_upload_service.dart";
+import "package:makon3d_mobile/widgets/makonix_loader.dart";
 import "package:makon3d_mobile/widgets/toasts.dart";
 
 /// RoomPlan (LiDAR) capture → upload USDZ to the backend.
@@ -414,7 +415,7 @@ class _ScanScreenState extends State<ScanScreen>
 
   Widget _buildBody(BuildContext context) {
     if (_roomPlanSupported == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: MakonixLoader());
     }
     if (_roomPlanSupported == false) {
       return Center(
@@ -449,7 +450,7 @@ class _ScanScreenState extends State<ScanScreen>
           if (_uploading)
             Column(
               children: [
-                const CircularProgressIndicator(),
+                const MakonixLoader(),
                 const SizedBox(height: 16),
                 Center(child: Text(L10n.get("room_scan_uploading"))),
                 const SizedBox(height: 16),

@@ -10,6 +10,7 @@ import 'package:makon3d_mobile/screens/customer_contractor_job_screen.dart';
 import 'package:makon3d_mobile/services/auth/auth_state.dart';
 import 'package:makon3d_mobile/services/contractor_marketplace_service.dart';
 import 'package:makon3d_mobile/theme/makon_colors.dart';
+import 'package:makon3d_mobile/widgets/makonix_loader.dart';
 
 /// Customer-facing contractor responses and contractor-facing submitted bids.
 /// Replaces the old standalone scan gallery tab; scans remain inside projects.
@@ -116,7 +117,7 @@ class _OffersScreenState extends State<OffersScreen> {
               text: L10n.get('offers_sign_in_required'),
             )
           : _loading && !_loadedOnce
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: MakonixLoader())
           : _failed
           ? _Message(
               icon: Icons.cloud_off_outlined,

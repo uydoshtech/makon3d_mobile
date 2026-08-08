@@ -8,6 +8,7 @@ import 'package:room_scan_kit/room_scan_kit.dart';
 import 'package:makon3d_mobile/base/ios_device.dart';
 import 'package:makon3d_mobile/l10n/l10n.dart';
 import 'package:makon3d_mobile/services/room_usdz_viewer_service.dart';
+import 'package:makon3d_mobile/widgets/makonix_loader.dart';
 
 /// Warm yellow sky gradient aligned with Makon brand colors.
 const List<Color> _roomScanSkyGradient = [Color(0xFFFFF6D6), Color(0xFFFFCC00)];
@@ -309,7 +310,7 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
                   color: Colors.transparent,
                   child: Center(
                     child: _downloadProgress == null
-                        ? const CircularProgressIndicator.adaptive()
+                        ? const MakonixLoader()
                         : _DownloadProgressIndicator(
                             progress: _downloadProgress!,
                             receivedBytes: _downloadReceivedBytes,

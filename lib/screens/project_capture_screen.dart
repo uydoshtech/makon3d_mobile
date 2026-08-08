@@ -19,6 +19,7 @@ import 'package:makon3d_mobile/services/native_language_service.dart';
 import 'package:makon3d_mobile/services/room_plan_capability.dart';
 import 'package:makon3d_mobile/services/room_scan_bounds_service.dart';
 import 'package:makon3d_mobile/services/scan_upload_service.dart';
+import 'package:makon3d_mobile/widgets/makonix_loader.dart';
 import 'package:makon3d_mobile/widgets/toasts.dart';
 
 /// Shared RoomPlan capture for a Makon project (entire housing or one room).
@@ -390,7 +391,7 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(L10n.get('room_scan_title'))),
       body: _roomPlanSupported == null
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: MakonixLoader())
           : _roomPlanSupported == false
           ? Center(
               child: Padding(
@@ -428,7 +429,7 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
                   if (_uploading)
                     Column(
                       children: [
-                        const CircularProgressIndicator(),
+                        const MakonixLoader(),
                         const SizedBox(height: 16),
                         Text(L10n.get('room_scan_uploading')),
                       ],

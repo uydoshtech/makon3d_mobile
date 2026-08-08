@@ -74,6 +74,7 @@ class L10n {
   static const Map<String, Map<String, String>> _strings = {
     "en": {
       "app_name": "Makon 3D",
+      "loading": "Loading",
       "cancel": "Cancel",
       "back": "Back",
       "done": "Done",
@@ -657,6 +658,7 @@ class L10n {
     },
     "ru": {
       "app_name": "Makon 3D",
+      "loading": "Загрузка",
       "cancel": "Отмена",
       "back": "Назад",
       "done": "Готово",
@@ -1250,6 +1252,7 @@ class L10n {
     },
     "uz": {
       "app_name": "Makon 3D",
+      "loading": "Yuklanmoqda",
       "cancel": "Bekor qilish",
       "back": "Orqaga",
       "done": "Tayyor",
