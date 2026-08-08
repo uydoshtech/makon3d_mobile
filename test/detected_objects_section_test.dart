@@ -21,6 +21,7 @@ void main() {
         home: const Scaffold(
           body: SingleChildScrollView(
             child: DetectedObjectsSection(
+              initiallyExpanded: true,
               counts: <String, int>{
                 "window": 3,
                 "storage": 2,

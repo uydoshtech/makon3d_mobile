@@ -7,7 +7,7 @@ import "package:makon3d_mobile/theme/makon_colors.dart";
 class DetectedObjectsSection extends StatelessWidget {
   const DetectedObjectsSection({
     required this.counts,
-    this.initiallyExpanded = true,
+    this.initiallyExpanded = false,
     super.key,
   });
 
@@ -83,7 +83,7 @@ class DetectedObjectsSection extends StatelessWidget {
         initiallyExpanded: initiallyExpanded,
         tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-        leading: const Icon(Icons.tune_rounded, color: MakonColors.yellow),
+        leading: const Icon(Icons.tune_rounded, color: MakonColors.black),
         title: Text(
           L10n.get("project_detected_objects"),
           style: theme.textTheme.titleMedium?.copyWith(
@@ -114,7 +114,7 @@ class DetectedObjectsSection extends StatelessWidget {
                   Text(
                     "× ${entries[index].value}",
                     style: theme.textTheme.titleMedium?.copyWith(
-                      color: MakonColors.yellow,
+                      color: MakonColors.black,
                       fontWeight: FontWeight.w800,
                     ),
                   ),

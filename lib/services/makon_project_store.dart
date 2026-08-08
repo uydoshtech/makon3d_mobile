@@ -351,11 +351,21 @@ class MakonProjectStore extends ChangeNotifier {
     required HousingScan previous,
     required HousingScan updated,
   }) async {
+    // Include footprint / wall metrics — a backend backfill can correct
+    // floor_area_m2 without changing USDZ/GLB URLs or object counts.
     final same =
         previous.remoteScanId == updated.remoteScanId &&
         previous.usdzUrl == updated.usdzUrl &&
         previous.glbUrl == updated.glbUrl &&
         previous.localUsdzPath == updated.localUsdzPath &&
+        previous.floorLongM == updated.floorLongM &&
+        previous.floorShortM == updated.floorShortM &&
+        previous.heightM == updated.heightM &&
+        previous.floorAreaM2 == updated.floorAreaM2 &&
+        previous.wallPerimeterM == updated.wallPerimeterM &&
+        previous.doorwayWidthM == updated.doorwayWidthM &&
+        previous.doorwayAreaM2 == updated.doorwayAreaM2 &&
+        previous.windowAreaM2 == updated.windowAreaM2 &&
         listEquals(previous.roomTypes, updated.roomTypes) &&
         mapEquals(previous.objectCounts, updated.objectCounts);
     if (same) return;
