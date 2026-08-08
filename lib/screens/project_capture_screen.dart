@@ -19,7 +19,6 @@ import 'package:makon3d_mobile/services/native_language_service.dart';
 import 'package:makon3d_mobile/services/room_plan_capability.dart';
 import 'package:makon3d_mobile/services/room_scan_bounds_service.dart';
 import 'package:makon3d_mobile/services/scan_upload_service.dart';
-import 'package:makon3d_mobile/services/scans_refresh_notifier.dart';
 import 'package:makon3d_mobile/widgets/toasts.dart';
 
 /// Shared RoomPlan capture for a Makon project (entire housing or one room).
@@ -216,7 +215,6 @@ class _ProjectCaptureScreenState extends State<ProjectCaptureScreen> {
       };
 
       await MakonProjectStore.instance.upsert(updated);
-      ScansRefreshNotifier.instance.notifyScansChanged();
 
       if (!mounted) return;
       Toasts.showSuccess(context, L10n.get('room_scan_success'));

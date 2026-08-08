@@ -15,7 +15,6 @@ import "package:makon3d_mobile/services/room_plan_capability.dart";
 import "package:makon3d_mobile/services/room_scan_bounds_service.dart";
 import "package:makon3d_mobile/services/room_usdz_viewer_service.dart";
 import "package:makon3d_mobile/services/scan_upload_service.dart";
-import "package:makon3d_mobile/services/scans_refresh_notifier.dart";
 import "package:makon3d_mobile/widgets/toasts.dart";
 
 /// RoomPlan (LiDAR) capture → upload USDZ to the backend.
@@ -194,7 +193,6 @@ class _ScanScreenState extends State<ScanScreen>
           ),
         );
       }
-      ScansRefreshNotifier.instance.notifyScansChanged();
       if (!mounted) return;
       setState(() {
         _lastScanPath = path;

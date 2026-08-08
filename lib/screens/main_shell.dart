@@ -7,14 +7,14 @@ import 'package:makon3d_mobile/l10n/l10n.dart';
 import 'package:makon3d_mobile/models/makon_user_role.dart';
 import 'package:makon3d_mobile/screens/contractor_jobs_feed_screen.dart';
 import 'package:makon3d_mobile/screens/new_project_screen.dart';
+import 'package:makon3d_mobile/screens/offers_screen.dart';
 import 'package:makon3d_mobile/screens/projects_list_screen.dart';
-import 'package:makon3d_mobile/screens/scans_list_screen.dart';
 import 'package:makon3d_mobile/screens/settings_screen.dart';
 import 'package:makon3d_mobile/services/auth/auth_state.dart';
 import 'package:makon3d_mobile/widgets/curved_nav_bar.dart';
 import 'package:makon3d_mobile/widgets/sign_in_sheet.dart';
 
-/// Three-tab shell: Projects + legacy device scans list + settings.
+/// Three-tab shell: projects/jobs + contractor offers + settings.
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -26,7 +26,7 @@ class _MainShellState extends State<MainShell> {
   int _index = 0;
 
   static const int _projectsTab = 0;
-  static const int _scansListTab = 1;
+  static const int _offersTab = 1;
   static const int _settingsTab = 2;
 
   @override
@@ -80,7 +80,10 @@ class _MainShellState extends State<MainShell> {
               onCreateProject: () => unawaited(_openNewProject()),
               onOpenAccount: () => _goToTab(_settingsTab),
             ),
-          ScansListScreen(isActive: _index == _scansListTab),
+          OffersScreen(
+            isActive: _index == _offersTab,
+            isContractor: isContractor,
+          ),
           const SettingsScreen(),
         ],
       ),
