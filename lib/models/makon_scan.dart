@@ -15,6 +15,7 @@ class MakonScan {
     this.windowAreaM2,
     this.roomTypes = const <String>[],
     this.objectCounts = const <String, int>{},
+    this.furnitureEdits,
     this.worldPlusXBearingDeg,
     this.rotationGifUrl,
     this.posterImageUrl,
@@ -40,6 +41,9 @@ class MakonScan {
   final double? windowAreaM2;
   final List<String> roomTypes;
   final Map<String, int> objectCounts;
+
+  /// Cumulative furniture / surface edits (`FurnitureEditsCodec` schema v1).
+  final Map<String, dynamic>? furnitureEdits;
   final double? worldPlusXBearingDeg;
   final String? rotationGifUrl;
   final String? posterImageUrl;
@@ -48,6 +52,13 @@ class MakonScan {
   final DateTime? createdAt;
 
   factory MakonScan.fromJson(Map<String, dynamic> json) {
+    final rawEdits = json["furnitureEdits"];
+    Map<String, dynamic>? furnitureEdits;
+    if (rawEdits is Map<String, dynamic>) {
+      furnitureEdits = rawEdits;
+    } else if (rawEdits is Map) {
+      furnitureEdits = Map<String, dynamic>.from(rawEdits);
+    }
     return MakonScan(
       id: (json["id"] as num?)?.toInt() ?? 0,
       usdzUrl: json["usdzUrl"] as String?,
@@ -72,6 +83,7 @@ class MakonScan {
             (key, value) => MapEntry(key.toString(), (value as num).toInt()),
           ) ??
           const <String, int>{},
+      furnitureEdits: furnitureEdits,
       worldPlusXBearingDeg: (json["worldPlusXBearingDeg"] as num?)?.toDouble(),
       rotationGifUrl: json["rotationGifUrl"] as String?,
       posterImageUrl: json["posterImageUrl"] as String?,

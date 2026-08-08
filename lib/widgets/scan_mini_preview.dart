@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -19,6 +20,9 @@ const double kScanMiniPreviewHeight = 280;
 /// Prefers [localUsdzPath] when the file still exists; otherwise downloads
 /// [usdzUrl] into the per-scan cache. Tap the expand button (or the whole card
 /// when [onOpenFullscreen] is set via the overlay) to open the native viewer.
+///
+/// Reloads persisted furniture edits after fullscreen closes so wall/floor
+/// finishes and furniture changes match the full viewer.
 class ScanMiniPreview extends StatefulWidget {
   const ScanMiniPreview({
     required this.scanId,
@@ -42,10 +46,6 @@ class ScanMiniPreview extends StatefulWidget {
 
 class _ScanMiniPreviewState extends State<ScanMiniPreview>
     with AutomaticKeepAliveClientMixin {
-  final GlobalKey _previewViewKey = GlobalKey(
-    debugLabel: 'makonScanMiniPreview',
-  );
-
   String? _localPath;
   Object? _error;
   bool _loading = true;
@@ -53,6 +53,8 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
   int _downloadReceivedBytes = 0;
   int _downloadTotalBytes = 0;
   bool _deferLargePreview = false;
+  Map<String, dynamic>? _furnitureEdits;
+  String _editsFingerprint = 'none';
 
   static const int _maximumEmbeddedPreviewBytes = 64 * 1024 * 1024;
 
@@ -74,7 +76,38 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
         oldWidget.usdzUrl != widget.usdzUrl ||
         oldWidget.scanId != widget.scanId) {
       unawaited(_load());
+      return;
     }
+    // Fullscreen persists edits on dismiss — remount the preview with them.
+    if (oldWidget.isLoadingFullscreen && !widget.isLoadingFullscreen) {
+      unawaited(_reloadFurnitureEdits());
+    }
+  }
+
+  String _fingerprintEdits(Map<String, dynamic>? edits) {
+    if (edits == null || edits.isEmpty) return 'none';
+    try {
+      return jsonEncode(edits);
+    } catch (_) {
+      return edits.hashCode.toString();
+    }
+  }
+
+  Future<void> _reloadFurnitureEdits() async {
+    // Last fullscreen publish is async over the method channel — give it a
+    // beat so SharedPreferences / remote PATCH reflect the final document.
+    await Future<void>.delayed(const Duration(milliseconds: 80));
+    final edits = await RoomUsdzViewerService.loadFurnitureEditsForScan(
+      widget.scanId,
+      remoteScanId: widget.scanId > 0 ? widget.scanId : null,
+    );
+    if (!mounted) return;
+    final fingerprint = _fingerprintEdits(edits);
+    if (fingerprint == _editsFingerprint) return;
+    setState(() {
+      _furnitureEdits = edits;
+      _editsFingerprint = fingerprint;
+    });
   }
 
   Future<void> _load() async {
@@ -98,6 +131,12 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
         return;
       }
 
+      final edits = await RoomUsdzViewerService.loadFurnitureEditsForScan(
+        widget.scanId,
+        remoteScanId: widget.scanId > 0 ? widget.scanId : null,
+      );
+      final editsFingerprint = _fingerprintEdits(edits);
+
       final localFile = await RoomUsdzViewerService.resolveLocalUsdz(
         widget.localUsdzPath,
         fallbackPathOrUrl: widget.usdzUrl,
@@ -106,6 +145,8 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
         if (!mounted) return;
         setState(() {
           _localPath = localFile.path;
+          _furnitureEdits = edits;
+          _editsFingerprint = editsFingerprint;
           _deferLargePreview = _isTooLargeForEmbeddedPreview(localFile);
           _loading = false;
           _error = null;
@@ -155,6 +196,8 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
       }
       setState(() {
         _localPath = file.path;
+        _furnitureEdits = edits;
+        _editsFingerprint = editsFingerprint;
         _deferLargePreview = _isTooLargeForEmbeddedPreview(file);
         _loading = false;
         _error = null;
@@ -162,7 +205,7 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
       debugPrint(
         'ScanMiniPreview ready scan=${widget.scanId} '
         'bytes=${file.lengthSync()} deferred=$_deferLargePreview '
-        'source=${widget.usdzUrl}',
+        'edits=$_editsFingerprint source=${widget.usdzUrl}',
       );
     } catch (e) {
       debugPrint(
@@ -218,12 +261,17 @@ class _ScanMiniPreviewState extends State<ScanMiniPreview>
               // its own scene, otherwise iOS briefly holds both copies.
               if (showPreview && !_deferLargePreview && !_suspendViewer)
                 RoomUsdzPreview(
-                  key: _previewViewKey,
+                  // Remount when edits change — PlatformView creationParams
+                  // are only read once at create time.
+                  key: ValueKey(
+                    'makonPreview-${widget.scanId}-$path-$_editsFingerprint',
+                  ),
                   filePath: path,
                   autoRotate: !_suspendViewer,
                   // Fill the project card more aggressively than the shared
                   // listing preview while retaining a small rotation margin.
                   framingPadding: 1.14,
+                  furnitureEdits: _furnitureEdits,
                 ),
               if (showPreview && _deferLargePreview && !_suspendViewer)
                 Center(

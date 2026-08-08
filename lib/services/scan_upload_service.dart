@@ -2,9 +2,11 @@ import "dart:convert";
 import "dart:io";
 
 import "package:dio/dio.dart";
+import "package:flutter/foundation.dart";
 
 import "package:makon3d_mobile/models/makon_scan.dart";
 import "package:makon3d_mobile/models/room_scan_metrics.dart";
+import "package:makon3d_mobile/services/auth/session_manager.dart";
 import "package:makon3d_mobile/services/device_identity.dart";
 
 class ScanUploadResult {
@@ -136,6 +138,31 @@ class ScanUploadService {
       "/makon3d/scans/$scanId",
     );
     return MakonScan.fromJson(response.data ?? const <String, dynamic>{});
+  }
+
+  /// Push furniture / surface edits for a remote scan (signed-in only).
+  /// [furnitureEdits] null clears the stored document.
+  static Future<void> patchFurnitureEdits(
+    int scanId,
+    Map<String, dynamic>? furnitureEdits,
+  ) async {
+    if (scanId <= 0) return;
+    final token = await SessionManager.getToken();
+    if (token == null || token.isEmpty) return;
+    try {
+      await _dio.patch<void>(
+        "/makon3d/scans/$scanId/furniture-edits",
+        data: <String, dynamic>{"furniture_edits": furnitureEdits},
+        options: Options(
+          headers: <String, dynamic>{"Authorization": "Bearer $token"},
+          sendTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+        ),
+      );
+    } catch (e) {
+      debugPrint("ScanUploadService patchFurnitureEdits failed ($scanId): $e");
+      rethrow;
+    }
   }
 
   static Future<List<MakonScan>> _listScans({

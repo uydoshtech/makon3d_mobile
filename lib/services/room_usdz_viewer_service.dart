@@ -17,7 +17,9 @@ import "package:makon3d_mobile/services/scan_upload_service.dart";
 ///
 /// Makon users always own their scans, so the viewer opens in owner-edit mode
 /// (`isListingOwner: true` + positive [scanId] as kit `listingId`) so chrome
-/// such as Add furniture is visible. Furniture edits persist locally per scan.
+/// such as Add furniture is visible. Furniture edits persist locally and, when
+/// [shareScanId] / a remote scan id is known and the user is signed in, sync
+/// to `PATCH /makon3d/scans/:id/furniture-edits` for cross-device restore.
 ///
 /// When [shareScanId] is set (remote API id), the native Share button is shown
 /// and shares the server rotation GIF + viewer link.
@@ -33,6 +35,9 @@ class RoomUsdzViewerService {
   static bool _shareSinkWired = false;
   static String _shareLanguageCode = "en";
   static final Map<int, int> _shareScanIdByListingId = <int, int>{};
+
+  /// Maps viewer `listingId` → remote API scan id for furniture-edit sync.
+  static final Map<int, int> _remoteScanIdByListingId = <int, int>{};
 
   /// Kit requires `listingId > 0`; [HousingScan.id.hashCode] can be ≤ 0.
   static int viewerListingId(int scanId) {
@@ -59,6 +64,42 @@ class RoomUsdzViewerService {
     return null;
   }
 
+  /// Resolve edits for preview / fullscreen: prefer the signed-in account's
+  /// remote document, fall back to on-device prefs, and upload local-only edits
+  /// once so older installs migrate into the cloud.
+  static Future<Map<String, dynamic>?> loadFurnitureEditsForScan(
+    int scanId, {
+    int? remoteScanId,
+  }) async {
+    final listingId = viewerListingId(scanId);
+    final syncId = remoteScanId != null && remoteScanId > 0
+        ? remoteScanId
+        : (scanId > 0 ? scanId : null);
+    if (syncId != null) {
+      _remoteScanIdByListingId[listingId] = syncId;
+    }
+
+    Map<String, dynamic>? remote;
+    if (syncId != null) {
+      try {
+        remote = (await ScanUploadService.getScan(syncId)).furnitureEdits;
+      } catch (e) {
+        debugPrint("Furniture edits remote fetch failed ($syncId): $e");
+      }
+    }
+
+    final local = await _loadFurnitureEdits(listingId);
+    if (remote != null) {
+      await _saveFurnitureEdits(listingId, remote);
+      return remote;
+    }
+    if (local != null && syncId != null) {
+      // Device had edits before cloud sync existed — push once.
+      unawaited(_pushFurnitureEdits(syncId, local));
+    }
+    return local;
+  }
+
   static Future<void> _saveFurnitureEdits(
     int listingId,
     Map<String, dynamic>? furnitureEdits,
@@ -72,12 +113,27 @@ class RoomUsdzViewerService {
     await prefs.setString(key, jsonEncode(furnitureEdits));
   }
 
+  static Future<void> _pushFurnitureEdits(
+    int remoteScanId,
+    Map<String, dynamic>? furnitureEdits,
+  ) async {
+    try {
+      await ScanUploadService.patchFurnitureEdits(remoteScanId, furnitureEdits);
+    } catch (e) {
+      debugPrint("Furniture edits push failed ($remoteScanId): $e");
+    }
+  }
+
   static void _ensureFurnitureEditsSink() {
     if (_furnitureSinkWired) return;
     _furnitureSinkWired = true;
     RoomUsdzViewer.onFurnitureEditsChanged = (listingId, furnitureEdits) async {
       try {
         await _saveFurnitureEdits(listingId, furnitureEdits);
+        final remoteId = _remoteScanIdByListingId[listingId];
+        if (remoteId != null && remoteId > 0) {
+          await _pushFurnitureEdits(remoteId, furnitureEdits);
+        }
       } catch (e) {
         debugPrint("Furniture edits save failed: $e");
       }
@@ -346,7 +402,14 @@ class RoomUsdzViewerService {
       _shareScanIdByListingId[listingId] = shareScanId;
       _ensureShareSink();
     }
-    final edits = furnitureEdits ?? await _loadFurnitureEdits(listingId);
+    if (shareScanId != null && shareScanId > 0) {
+      _remoteScanIdByListingId[listingId] = shareScanId;
+    } else if (scanId > 0) {
+      _remoteScanIdByListingId[listingId] = scanId;
+    }
+    final edits =
+        furnitureEdits ??
+        await loadFurnitureEditsForScan(scanId, remoteScanId: shareScanId);
     String l(String key) => L10n.getForLanguage(key, languageCode);
     final strings = <String, String>{
       "title": l("room_3d_viewer_title"),
