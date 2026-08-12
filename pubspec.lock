@@ -768,9 +768,11 @@ packages:
   room_scan_kit:
     dependency: "direct main"
     description:
-      path: "../room_scan_kit"
-      relative: true
-    source: path
+      path: "."
+      ref: e95e0d960ee73b35942dc38ce56a933bb26cee20
+      resolved-ref: e95e0d960ee73b35942dc38ce56a933bb26cee20
+      url: "https://github.com/uydoshtech/room_scan_kit.git"
+    source: git
     version: "0.6.44"
   share_plus:
     dependency: "direct main"
