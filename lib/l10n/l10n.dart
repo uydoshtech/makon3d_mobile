@@ -73,14 +73,14 @@ class L10n {
 
   static const Map<String, Map<String, String>> _strings = {
     "en": {
-      "app_name": "Makon 3D",
+      "app_name": "Makonix",
       "loading": "Loading",
       "cancel": "Cancel",
       "back": "Back",
       "done": "Done",
       "ok": "OK",
       "share_3d_scan_title": "Share",
-      "share_3d_scan_message": "View this 3D scan in Makon3D:",
+      "share_3d_scan_message": "View this 3D scan in Makonix:",
       "share_3d_scan_preparing": "Preparing animated 3D preview…",
       "share_3d_scan_failed":
           "The animated preview is not ready yet. The viewer link will be shared instead.",
@@ -196,7 +196,7 @@ class L10n {
       "contractor_work_doors": "Door installation",
       "contractor_work_baseboard": "Baseboard installation",
       "contractor_work_other": "Other",
-      "contractor_detected_title": "Makon3D found work quantities",
+      "contractor_detected_title": "Makonix found work quantities",
       "contractor_detected_subtitle":
           "Add measurements from your scans to the brief.",
       "contractor_add_detected": "Add to listing",
@@ -531,7 +531,7 @@ class L10n {
       "room_scan_not_supported":
           "3D room scan requires an iPhone or iPad with LiDAR.",
       "room_scan_camera_required":
-          "3D scan needs camera access. If you chose Don't Allow, turn on the camera for Makon 3D in Settings.",
+          "3D scan needs camera access. If you chose Don't Allow, turn on the camera for Makonix in Settings.",
       "room_scan_view_last": "View last scan",
       "room_3d_viewer_title": "3D",
       "room_3d_dimensions_caption": "Approximate dimensions",
@@ -688,14 +688,14 @@ class L10n {
       "room_3d_sun_elevation_format": "El %d°",
     },
     "ru": {
-      "app_name": "Makon 3D",
+      "app_name": "Makonix",
       "loading": "Загрузка",
       "cancel": "Отмена",
       "back": "Назад",
       "done": "Готово",
       "ok": "ОК",
       "share_3d_scan_title": "Поделиться",
-      "share_3d_scan_message": "Посмотрите этот 3D-скан в Makon3D:",
+      "share_3d_scan_message": "Посмотрите этот 3D-скан в Makonix:",
       "share_3d_scan_preparing": "Готовим анимированный 3D-превью…",
       "share_3d_scan_failed":
           "Анимированное превью ещё не готово. Будет отправлена ссылка на просмотр.",
@@ -815,7 +815,7 @@ class L10n {
       "contractor_work_doors": "Установка дверей",
       "contractor_work_baseboard": "Установка плинтуса",
       "contractor_work_other": "Другое",
-      "contractor_detected_title": "Makon3D нашёл объёмы работ",
+      "contractor_detected_title": "Makonix нашёл объёмы работ",
       "contractor_detected_subtitle": "Добавьте в техзадание данные из сканов.",
       "contractor_add_detected": "Добавить в заказ",
       "contractor_detected_added": "Добавлено в заказ",
@@ -1155,7 +1155,7 @@ class L10n {
           "3D-скан слишком большой для загрузки. Попробуйте отсканировать меньшую область.",
       "room_scan_not_supported": "3D-скан требует iPhone или iPad с LiDAR.",
       "room_scan_camera_required":
-          "Для 3D-сканирования нужен доступ к камере. Если вы нажали «Запретить», включите камеру для Makon 3D в Настройках.",
+          "Для 3D-сканирования нужен доступ к камере. Если вы нажали «Запретить», включите камеру для Makonix в Настройках.",
       "room_scan_view_last": "Смотреть последний скан",
       "room_3d_viewer_title": "3D",
       "room_3d_dimensions_caption": "Приблизительные размеры",
@@ -1314,14 +1314,14 @@ class L10n {
       "room_3d_sun_elevation_format": "Выс %d°",
     },
     "uz": {
-      "app_name": "Makon 3D",
+      "app_name": "Makonix",
       "loading": "Yuklanmoqda",
       "cancel": "Bekor qilish",
       "back": "Orqaga",
       "done": "Tayyor",
       "ok": "OK",
       "share_3d_scan_title": "Ulashish",
-      "share_3d_scan_message": "Ushbu 3D skanni Makon3D’da ko‘ring:",
+      "share_3d_scan_message": "Ushbu 3D skanni Makonix’da ko‘ring:",
       "share_3d_scan_preparing": "Animatsiyali 3D preview tayyorlanmoqda…",
       "share_3d_scan_failed":
           "Animatsiyali preview hali tayyor emas. O‘rniga ko‘rish havolasi ulashiladi.",
@@ -1442,7 +1442,7 @@ class L10n {
       "contractor_work_doors": "Eshik o'rnatish",
       "contractor_work_baseboard": "Plintus o'rnatish",
       "contractor_work_other": "Boshqa",
-      "contractor_detected_title": "Makon3D ish hajmlarini topdi",
+      "contractor_detected_title": "Makonix ish hajmlarini topdi",
       "contractor_detected_subtitle":
           "Skan ma'lumotlarini texnik topshiriqqa qo'shing.",
       "contractor_add_detected": "Buyurtmaga qo'shish",
@@ -1785,7 +1785,7 @@ class L10n {
       "room_scan_not_supported":
           "3D skan uchun LiDARli iPhone yoki iPad kerak.",
       "room_scan_camera_required":
-          "3D skan uchun kamera ruxsati kerak. «Ruxsat bermaslik»ni tanlasangiz, Sozlamalarda Makon 3D uchun kamerani yoqing.",
+          "3D skan uchun kamera ruxsati kerak. «Ruxsat bermaslik»ni tanlasangiz, Sozlamalarda Makonix uchun kamerani yoqing.",
       "room_scan_view_last": "Oxirgi skanni ko'rish",
       "room_3d_viewer_title": "3D",
       "room_3d_dimensions_caption": "Taxminiy o'lchamlar",

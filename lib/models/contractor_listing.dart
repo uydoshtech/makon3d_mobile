@@ -76,7 +76,7 @@ enum ContractorVolumeUnit {
   }
 }
 
-/// A Makon3D-derived quantity included in the contractor brief.
+/// A Makonix-derived quantity included in the contractor brief.
 class ContractorWorkVolume {
   const ContractorWorkVolume({
     required this.type,

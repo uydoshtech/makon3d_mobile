@@ -1,7 +1,7 @@
-# Makon3D App Clip — RoomPlan scanning for the Makon3D Telegram Mini App
+# Makonix App Clip — RoomPlan scanning for the Makonix Telegram Mini App
 
 The `Makon3DAppClip` target lets a user scan a room with Apple RoomPlan
-**without installing the full Makon3D app**. The Makon3D Mini App
+**without installing the full Makonix app**. The Makonix Mini App
 (`uydoshtech.github.io/makon3d/`, `@makon3d_bot`) creates a scan session on
 the uydosh backend, shows the invocation URL as a link/QR, the clip scans +
 uploads, and the user returns to Telegram where the finished scan opens in
@@ -13,7 +13,7 @@ flow, backend contract, testing setup, and release process are identical, so
 covers only what differs.
 
 ```
-Makon3D Mini App                 Backend                        App Clip
+Makonix Mini App                 Backend                        App Clip
 ────────────────                 ───────                        ────────
 create scan session ─────────▶  POST /makon3d/scan-sessions
                     ◀─────────  { scanSessionId, invocationUrl, expiresAt }
@@ -31,7 +31,7 @@ read start_param=scan_{id} ◀────────────────�
 
 ## Identity (vs the UyDosh clip)
 
-| | UyDosh clip | Makon3D clip |
+| | UyDosh clip | Makonix clip |
 |---|---|---|
 | Target / sources | `UyDoshAppClip` (uydosh_mobile) | `Makon3DAppClip` (this repo) |
 | Bundle ID | `com.uydosh.app.Clip` | `com.makon3d.app.Clip` (parent `com.makon3d.app`) |

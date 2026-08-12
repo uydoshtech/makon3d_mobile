@@ -493,7 +493,7 @@ class MakonProjectStore extends ChangeNotifier {
     if (sourceFile != null) {
       try {
         final support = await getApplicationSupportDirectory();
-        final directory = Directory('${support.path}/Makon3DScanCopies');
+        final directory = Directory('${support.path}/MakonixScanCopies');
         await directory.create(recursive: true);
         final copy = await sourceFile.copy('${directory.path}/$localId.usdz');
         copiedLocalPath = copy.path;

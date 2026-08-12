@@ -8,7 +8,7 @@ import "package:makon3d_mobile/services/auth/telegram_native_login_config.dart";
 ///
 /// On success returns a JWT `id_token` to POST to `/users/telegram-auth`.
 /// Returns `null` when the user cancels. Throws [TelegramLoginError] on
-/// failure. Unavailable ([isSupported] false) until the Makon3D BotFather
+/// failure. Unavailable ([isSupported] false) until the Makonix BotFather
 /// registration is configured — see [TelegramNativeLoginConfig].
 class TelegramNativeLoginService {
   TelegramNativeLoginService._();

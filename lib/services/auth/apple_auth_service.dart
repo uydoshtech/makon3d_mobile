@@ -38,7 +38,7 @@ class AppleSignInResult {
 class AppleAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  /// SIWA is native-only (iOS/macOS). Makon3D ships iOS-only anyway.
+  /// SIWA is native-only (iOS/macOS). Makonix ships iOS-only anyway.
   static bool get isAvailable {
     if (kIsWeb) return false;
     return defaultTargetPlatform == TargetPlatform.iOS ||

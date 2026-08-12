@@ -14,7 +14,7 @@ void main() {
       "selected_language": "en",
     });
     await LanguageState.initialize();
-    await tester.pumpWidget(const Makon3DApp());
+    await tester.pumpWidget(const MakonixApp());
     await tester.pump();
 
     expect(find.byType(SplashScreen), findsOneWidget);

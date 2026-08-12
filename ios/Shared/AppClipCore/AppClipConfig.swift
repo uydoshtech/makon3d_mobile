@@ -15,10 +15,10 @@ public enum AppClipConfig {
     /// serves both products; makon3d endpoints live under /makon3d).
     public static let apiBaseURL = URL(string: "https://api.uydosh.com")!
 
-    /// Telegram bot that hosts the Makon3D Mini App.
+    /// Telegram bot that hosts the Makonix Mini App.
     public static let telegramBotUsername = "makon3d_bot"
 
-    /// Short name of the Makon3D Mini App registered in BotFather (/newapp).
+    /// Short name of the Makonix Mini App registered in BotFather (/newapp).
     public static let telegramMiniAppShortName = "app"
 
     /// Builds the invocation URL for a scan session:
@@ -34,7 +34,7 @@ public enum AppClipConfig {
         URL(string: "https://t.me/\(telegramBotUsername)/\(telegramMiniAppShortName)")!
     }
 
-    /// Deep link that returns the user to the Makon3D Telegram Mini App after
+    /// Deep link that returns the user to the Makonix Telegram Mini App after
     /// a scan: `https://t.me/makon3d_bot/app?startapp=scan_{scanSessionId}`.
     ///
     /// Fallback only — the backend's session state carries a `returnUrl`

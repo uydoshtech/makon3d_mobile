@@ -1,6 +1,6 @@
 # Social login setup (Apple / Google / Telegram)
 
-Makon3D reuses UyDosh's login flows against the **shared backend**
+Makonix reuses UyDosh's login flows against the **shared backend**
 (`api.uydosh.com`): Apple and Google go through Firebase and
 `POST /users/firebase-auth`; Telegram uses the native Login SDK and
 `POST /users/telegram-auth`. Identity is **shared** with UyDosh — signing in
@@ -53,13 +53,13 @@ the corresponding sign-in buttons are simply hidden.
    --dart-define=TELEGRAM_NATIVE_REDIRECT_URI_IOS=https://app1229616832-login.tg.dev
    ```
 
-   Makon3D defaults to its `@makon3d_bot` client id (`8923824061`). Pass
+   Makonix defaults to its `@makon3d_bot` client id (`8923824061`). Pass
    `TELEGRAM_OIDC_CLIENT_ID` only if BotFather issues a replacement client id.
 
 The Telegram button appears automatically once
 `TelegramNativeLoginConfig.isConfigured` is true. The browser OAuth
 fallback used by UyDosh is **not** wired — the backend redirects to
-`uydosh://` and would need a Makon3D variant; native login does not need it.
+`uydosh://` and would need a Makonix variant; native login does not need it.
 
 ## Notes
 

@@ -1,7 +1,7 @@
 import Foundation
 
 /// A temporary scan session created by a Telegram Mini App (UyDosh or
-/// Makon3D) and consumed by the App Clip. Mirrors
+/// Makonix) and consumed by the App Clip. Mirrors
 /// `GET /scan-sessions/{scanSessionId}`.
 public struct ScanSession: Codable, Equatable {
     public enum Status: String, Codable, Equatable {
@@ -16,7 +16,7 @@ public struct ScanSession: Codable, Equatable {
 
     public let scanSessionId: String
     /// Listing the scan belongs to — `listing` sessions only (absent for
-    /// Makon3D gallery sessions). The backend uses integer listing ids, but
+    /// Makonix gallery sessions). The backend uses integer listing ids, but
     /// the wire format is a string; decoding accepts both.
     public let listingId: String?
     public let status: Status

@@ -7,19 +7,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Makon3D Scan"
+            "value" : "Makonix Scan"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Makon3D Сканер"
+            "value" : "Makonix Сканер"
           }
         },
         "uz" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Makon3D Skaner"
+            "value" : "Makonix Skaner"
           }
         }
       }
@@ -31,7 +31,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Makon3DAppClip"
+            "value" : "MakonixAppClip"
           }
         }
       }
@@ -42,19 +42,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Makon3D uses the camera to scan your room and create a 3D model with dimensions."
+            "value" : "Makonix uses the camera to scan your room and create a 3D model with dimensions."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Makon3D использует камеру, чтобы отсканировать комнату и создать 3D-модель с размерами."
+            "value" : "Makonix использует камеру, чтобы отсканировать комнату и создать 3D-модель с размерами."
           }
         },
         "uz" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Makon3D xonangizni skanerlash va o‘lchamlari bilan 3D model yaratish uchun kameradan foydalanadi."
+            "value" : "Makonix xonangizni skanerlash va o‘lchamlari bilan 3D model yaratish uchun kameradan foydalanadi."
           }
         }
       }

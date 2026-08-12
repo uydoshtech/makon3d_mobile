@@ -6,7 +6,7 @@ import 'package:makon3d_mobile/models/housing_scan.dart';
 import 'package:makon3d_mobile/models/project_room.dart';
 import 'package:makon3d_mobile/models/wallpaper_prefs.dart';
 
-/// Makon3D project. [scanMode] is immutable after creation (v1).
+/// Makonix project. [scanMode] is immutable after creation (v1).
 class MakonProject {
   const MakonProject({
     required this.id,

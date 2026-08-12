@@ -12,7 +12,7 @@ import room_scan_kit
     // (i.e. before Flutter / RoomPlan / ARKit load):
     // - applies the in-app language to `AppleLanguages` so RoomPlan's coaching
     //   overlay follows the in-app language, and
-    // - adopts the iOS per-app language (Settings › Apps › Makon 3D › Language)
+    // - adopts the iOS per-app language (Settings › Apps › Makonix › Language)
     //   into `flutter.selected_language` when the user changed it there.
     // shared_preferences on iOS stores Dart keys in NSUserDefaults under the
     // "flutter." prefix, so the helper reads/writes the same value Dart uses

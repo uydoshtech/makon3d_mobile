@@ -12,11 +12,11 @@ Future<void> main() async {
   await LanguageState.initialize();
   await FirebaseBootstrap.initialize();
   await AuthState.initialize();
-  runApp(const Makon3DApp());
+  runApp(const MakonixApp());
 }
 
-class Makon3DApp extends StatelessWidget {
-  const Makon3DApp({super.key});
+class MakonixApp extends StatelessWidget {
+  const MakonixApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class Makon3DApp extends StatelessWidget {
       listenable: LanguageState(),
       builder: (context, _) {
         return MaterialApp(
-          title: "Makon 3D",
+          title: "Makonix",
           debugShowCheckedModeBanner: false,
           locale: Locale(LanguageState().currentLanguage),
           supportedLocales: supportedLocales,

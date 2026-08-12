@@ -14,7 +14,7 @@ import 'package:makon3d_mobile/theme/makon_colors.dart';
 import 'package:makon3d_mobile/widgets/keyboard_dismiss_scope.dart';
 import 'package:makon3d_mobile/widgets/toasts.dart';
 
-/// Five-step customer flow that turns a Makon3D project into a contractor brief.
+/// Five-step customer flow that turns a Makonix project into a contractor brief.
 class ContractorListingFlowScreen extends StatefulWidget {
   const ContractorListingFlowScreen({required this.projectId, super.key});
 

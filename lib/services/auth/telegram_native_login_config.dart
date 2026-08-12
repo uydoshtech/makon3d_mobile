@@ -1,8 +1,8 @@
-/// Telegram Login **native SDK** configuration for Makon3D.
+/// Telegram Login **native SDK** configuration for Makonix.
 ///
 /// The BotFather registration is **per app**: register `com.makon3d.app` in
 /// @BotFather → Bot Settings → Login Widget → Native Login, which assigns a
-/// Makon3D-specific App URL (`https://app1229616832-login.tg.dev`). The
+/// Makonix-specific App URL (`https://app1229616832-login.tg.dev`). The
 /// UyDosh values cannot be reused — they are bound to `com.uydosh.app`.
 ///
 /// Until that registration exists the iOS redirect URI remains empty,

@@ -13,7 +13,7 @@
 		<string>uz</string>
 	</array>
 	<key>CFBundleDisplayName</key>
-	<string>Makon 3D</string>
+	<string>Makonix</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -57,11 +57,11 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSCameraUsageDescription</key>
-	<string>Makon 3D uses the camera to scan rooms in 3D on supported devices.</string>
+	<string>Makonix uses the camera to scan rooms in 3D on supported devices.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Makon 3D uses your location to orient the floor plan compass toward true north.</string>
+	<string>Makonix uses your location to orient the floor plan compass toward true north.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Makon 3D uses your location to orient the floor plan compass toward true north.</string>
+	<string>Makonix uses your location to orient the floor plan compass toward true north.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

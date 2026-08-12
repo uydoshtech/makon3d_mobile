@@ -1,4 +1,4 @@
-# Makon 3D — TestFlight CI
+# Makonix — TestFlight CI
 
 CI builds an App Store IPA and uploads it to TestFlight when you push an
 `ios-*` tag (or run the **Release iOS (TestFlight)** workflow).
@@ -30,20 +30,20 @@ Repo: `uydoshtech/makon3d_mobile` → Settings → Secrets and variables → Act
 | `ASC_KEY_P8_BASE64` | Base64 of the API key `.p8` file |
 
 The distribution cert and ASC API key can be the **same values** already used on
-`uydosh_mobile`. The provisioning profile must be **new** for Makon 3D.
+`uydosh_mobile`. The provisioning profile must be **new** for Makonix.
 
-### Create the Makon 3D App Store profile
+### Create the Makonix App Store profile
 
 1. [developer.apple.com](https://developer.apple.com/account/resources/profiles/list) → **Profiles** → **+**
 2. **App Store Connect** (distribution) → Continue
 3. App ID: **`com.makon3d.app`** (Real estate 3D scanning)
 4. Certificate: your **Apple Distribution** cert (team D5THR62Q33)
-5. Name it e.g. `Makon3D AppStore` → Generate → Download
+5. Name it e.g. `Makonix AppStore` → Generate → Download
 
 Encode and set the secret:
 
 ```bash
-base64 -i ~/Downloads/Makon3D_AppStore.mobileprovision | pbcopy
+base64 -i ~/Downloads/Makonix_AppStore.mobileprovision | pbcopy
 gh secret set IOS_PROVISION_PROFILE_BASE64 -R uydoshtech/makon3d_mobile
 # paste when prompted
 ```
@@ -68,7 +68,7 @@ base64 -i /path/to/AuthKey_XXXXX.p8 | gh secret set ASC_KEY_P8_BASE64 -R "$REPO"
 
 ## App Store Connect checklist
 
-- App record exists for bundle id `com.makon3d.app` (Makon 3D)
+- App record exists for bundle id `com.makon3d.app` (Makonix)
 - After the first upload: TestFlight → assign build to a tester group
 - Testers need a **LiDAR** device on **iOS 17+**
 

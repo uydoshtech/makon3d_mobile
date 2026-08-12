@@ -31,9 +31,9 @@
     },
     "error.invalid_message" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Return to Telegram and start the scan again from the Makon3D app." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Вернитесь в Telegram и запустите сканирование заново из приложения Makon3D." } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Telegram’ga qaytib, Makon3D ilovasidan skanerlashni qaytadan boshlang." } }
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Return to Telegram and start the scan again from the Makonix app." } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Вернитесь в Telegram и запустите сканирование заново из приложения Makonix." } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Telegram’ga qaytib, Makonix ilovasidan skanerlashni qaytadan boshlang." } }
       }
     },
     "error.invalid_title" : {
@@ -45,9 +45,9 @@
     },
     "error.publish_note" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "You can create a new scan link anytime in the Makon3D app." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Вы можете создать новую ссылку для сканирования в приложении Makon3D." } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Makon3D ilovasida istalgan vaqtda yangi skanerlash havolasini yaratishingiz mumkin." } }
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "You can create a new scan link anytime in the Makonix app." } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Вы можете создать новую ссылку для сканирования в приложении Makonix." } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "Makonix ilovasida istalgan vaqtda yangi skanerlash havolasini yaratishingiz mumkin." } }
       }
     },
     "error.retry_button" : {
@@ -199,16 +199,16 @@
     },
     "success.fallback" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your 3D model is already saved. If Telegram doesn’t open, you can find it in the Makon3D gallery." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Ваша 3D-модель уже сохранена. Если Telegram не открывается, вы найдёте её в галерее Makon3D." } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "3D modelingiz allaqachon saqlangan. Agar Telegram ochilmasa, uni Makon3D galereyasida topasiz." } }
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Your 3D model is already saved. If Telegram doesn’t open, you can find it in the Makonix gallery." } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Ваша 3D-модель уже сохранена. Если Telegram не открывается, вы найдёте её в галерее Makonix." } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "3D modelingiz allaqachon saqlangan. Agar Telegram ochilmasa, uni Makonix galereyasida topasiz." } }
       }
     },
     "success.message" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Return to Makon3D to view your 3D model." } },
-        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Вернитесь в Makon3D, чтобы посмотреть 3D-модель." } },
-        "uz" : { "stringUnit" : { "state" : "translated", "value" : "3D modelni ko‘rish uchun Makon3D’ga qayting." } }
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Return to Makonix to view your 3D model." } },
+        "ru" : { "stringUnit" : { "state" : "translated", "value" : "Вернитесь в Makonix, чтобы посмотреть 3D-модель." } },
+        "uz" : { "stringUnit" : { "state" : "translated", "value" : "3D modelni ko‘rish uchun Makonix’ga qayting." } }
       }
     },
     "success.return_button" : {

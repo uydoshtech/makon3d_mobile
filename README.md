@@ -1,4 +1,4 @@
-# Makon 3D
+# Makonix
 
 ## Project persistence
 
@@ -19,7 +19,7 @@ One screen: scan a room with Apple RoomPlan, upload the USDZ to the UyDosh
 backend (which also converts it to GLB), then explore the result in the native
 SceneKit viewer (3D view, 2D floor plan, dimensions, compass, sun simulation).
 
-- Bundle ID: `com.makon3d.app` (App Store Connect app "Makon 3D")
+- Bundle ID: `com.makon3d.app` (App Store Connect app "Makonix")
 - iOS 17+, LiDAR-capable iPhone/iPad only
 - Languages: Uzbek, Russian, English
 

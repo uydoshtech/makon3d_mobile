@@ -1,4 +1,4 @@
-# Makon 3D — iOS Podfile.
+# Makonix — iOS Podfile.
 #
 # The post_install section patches the flutter_roomplan pod the same way the
 # UyDosh app does (markers kept as "uydosh:" so the patches stay byte-identical
@@ -751,7 +751,7 @@ post_install do |installer|
     end
   end
 
-  # Makon 3D: disable CLLocation heading entirely during RoomPlan.
+  # Makonix: disable CLLocation heading entirely during RoomPlan.
   # Even with early stop(), CoreMotion.MotionThread EXC_BAD_ACCESS still
   # fires on some devices when heading overlaps ARKit teardown. True-north
   # on the floor plan is optional for v1 — scan-relative north is enough.

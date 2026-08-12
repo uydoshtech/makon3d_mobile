@@ -8,7 +8,7 @@
 # settings directly into the project.
 #
 # Usage:
-#   APPCLIP_PROFILE_NAME="Makon3D AppClip AppStore" bundle exec ruby ios/scripts/ci_appclip_signing.rb
+#   APPCLIP_PROFILE_NAME="Makonix AppClip AppStore" bundle exec ruby ios/scripts/ci_appclip_signing.rb
 
 require 'xcodeproj'
 

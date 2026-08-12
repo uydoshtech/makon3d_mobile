@@ -1,5 +1,5 @@
 name: makon3d_mobile
-description: "Makon 3D — LiDAR 3D room scanning app."
+description: "Makonix — LiDAR 3D room scanning app."
 publish_to: 'none'
 
 version: 1.0.0+75
@@ -55,4 +55,5 @@ flutter:
     - assets/branding/makon3d_logo.svg
     - assets/branding/makon3d_mark.svg
     - assets/branding/makon_splash_logo.png
+    - assets/branding/makonix_logo.png
     - assets/branding/google_g_logo.svg
