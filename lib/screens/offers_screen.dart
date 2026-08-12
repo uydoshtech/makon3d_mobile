@@ -68,12 +68,14 @@ class _OffersScreenState extends State<OffersScreen> {
       _failed = false;
     });
     try {
-      final jobs = widget.isContractor
+      final loadedJobs = widget.isContractor
           ? await ContractorMarketplaceService.listMyOffers()
           : await ContractorMarketplaceService.listMine();
+      final jobs = List<ContractorJob>.of(loadedJobs)
+        ..sort(compareContractorJobsByFreshness);
       if (!mounted) return;
       setState(() {
-        _jobs = jobs;
+        _jobs = List<ContractorJob>.unmodifiable(jobs);
         _loading = false;
         _loadedOnce = true;
       });
@@ -225,6 +227,13 @@ class _OfferJobCard extends StatelessWidget {
         : L10n.get(
             'contractor_offers_count',
           ).replaceAll('{count}', '${job.offerCount}');
+    final publishedAt = job.publishedAt?.toLocal();
+    final publishedLabel = publishedAt == null
+        ? null
+        : L10n.get('offers_published_on').replaceAll(
+            '{date}',
+            MaterialLocalizations.of(context).formatMediumDate(publishedAt),
+          );
     final statusColor = switch (job.status) {
       ContractorListingStatus.open => const Color(0xFF2E7D32),
       ContractorListingStatus.assigned => const Color(0xFF9A6B00),
@@ -290,6 +299,29 @@ class _OfferJobCard extends StatelessWidget {
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.colorScheme.onSurfaceVariant,
                                 height: 1.25,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                    if (publishedLabel != null) ...[
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.calendar_today_outlined,
+                            size: 15,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              publishedLabel,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
                               ),
                             ),
                           ),

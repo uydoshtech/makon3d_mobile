@@ -23,6 +23,7 @@ void main() {
       'area_m2': '87.7',
       'room_count': 3,
       'offer_count': 4,
+      'published_at': '2026-08-12T14:30:00.000Z',
       'contact_revealed': false,
       'my_offer': <String, dynamic>{
         'id': 8,
@@ -41,6 +42,7 @@ void main() {
     expect(job.budgetMaxMillion, 30.5);
     expect(job.myOffer?.amountMillion, 24.5);
     expect(job.offerCount, 4);
+    expect(job.publishedAt, DateTime.utc(2026, 8, 12, 14, 30));
   });
 
   test('selected contractor receives private access fields', () {
@@ -68,4 +70,26 @@ void main() {
     expect(job.privateAccess?.exactAddress, 'ул. Авлиё-Ата, дом 37');
     expect(job.privateAccess?.customerPhone, '+998901234567');
   });
+
+  test(
+    'contractor jobs sort by publication freshness with stable fallback',
+    () {
+      ContractorJob job(int id, String? publishedAt) =>
+          ContractorJob.fromJson(<String, dynamic>{
+            'id': id,
+            'status': 'open',
+            'start_date': '2026-09-01',
+            if (publishedAt != null) 'published_at': publishedAt,
+          });
+
+      final jobs = <ContractorJob>[
+        job(30, null),
+        job(10, '2026-08-10T09:00:00.000Z'),
+        job(12, '2026-08-12T09:00:00.000Z'),
+        job(11, '2026-08-12T09:00:00.000Z'),
+      ]..sort(compareContractorJobsByFreshness);
+
+      expect(jobs.map((item) => item.id), <int>[12, 11, 10, 30]);
+    },
+  );
 }

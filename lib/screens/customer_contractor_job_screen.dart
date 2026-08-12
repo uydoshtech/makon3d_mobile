@@ -264,19 +264,22 @@ class _CustomerContractorJobScreenState
                           : () => unawaited(_reveal()),
                     ),
                   ],
-                  const SizedBox(height: 24),
-                  Text(
-                    L10n.get(
-                      'contractor_offers_count',
-                    ).replaceAll('{count}', '${job.offerCount}'),
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
                   if (job.offers.isEmpty)
-                    _EmptyOffers()
-                  else
+                    const Padding(
+                      padding: EdgeInsets.only(top: 16),
+                      child: _EmptyOffers(),
+                    )
+                  else ...[
+                    const SizedBox(height: 24),
+                    Text(
+                      L10n.get(
+                        'contractor_offers_count',
+                      ).replaceAll('{count}', '${job.offerCount}'),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     for (final offer in job.offers) ...[
                       _OwnerOfferCard(
                         offer: offer,
@@ -285,6 +288,7 @@ class _CustomerContractorJobScreenState
                       ),
                       const SizedBox(height: 12),
                     ],
+                  ],
                 ],
               ),
             ),
@@ -308,6 +312,13 @@ class _PublicationSummary extends StatelessWidget {
       ContractorListingStatus.closed => L10n.get('contractor_status_closed'),
       ContractorListingStatus.cancelled => L10n.get('contractor_status_closed'),
     };
+    final publishedAt = job.publishedAt?.toLocal();
+    final publishedLabel = publishedAt == null
+        ? null
+        : L10n.get('offers_published_on').replaceAll(
+            '{date}',
+            MaterialLocalizations.of(context).formatMediumDate(publishedAt),
+          );
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -321,12 +332,38 @@ class _PublicationSummary extends StatelessWidget {
             children: [
               const Icon(Icons.campaign_outlined),
               const SizedBox(width: 9),
-              Text(
-                statusText,
-                style: const TextStyle(fontWeight: FontWeight.w900),
+              Expanded(
+                child: Text(
+                  statusText,
+                  style: const TextStyle(fontWeight: FontWeight.w900),
+                ),
               ),
             ],
           ),
+          if (publishedLabel != null) ...[
+            const SizedBox(height: 9),
+            Row(
+              children: [
+                Icon(
+                  Icons.calendar_today_outlined,
+                  size: 16,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 7),
+                Expanded(
+                  child: Text(
+                    publishedLabel,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 14),
           Text(
             job.projectName ?? L10n.get('contractor_preview_order_title'),
@@ -502,6 +539,8 @@ class _OfferMetric extends StatelessWidget {
 }
 
 class _EmptyOffers extends StatelessWidget {
+  const _EmptyOffers();
+
   @override
   Widget build(BuildContext context) {
     return Container(

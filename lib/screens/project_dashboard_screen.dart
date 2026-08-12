@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:room_scan_kit/scan_flow/scan_flow.dart';
 
 import 'package:makon3d_mobile/l10n/l10n.dart';
@@ -226,6 +227,112 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
     }
   }
 
+  String _duplicateRoomName(ProjectRoom room, MakonProject project) {
+    final sourceName = room.name?.trim().isNotEmpty == true
+        ? room.name!.trim()
+        : L10n.get(room.roomType.titleKey);
+    final firstCopy = L10n.get(
+      'project_room_duplicate_name',
+    ).replaceAll('{name}', sourceName);
+    final usedNames = project.rooms
+        .map(
+          (candidate) => candidate.name?.trim().isNotEmpty == true
+              ? candidate.name!.trim().toLowerCase()
+              : L10n.get(candidate.roomType.titleKey).toLowerCase(),
+        )
+        .toSet();
+    if (!usedNames.contains(firstCopy.toLowerCase())) return firstCopy;
+    var number = 2;
+    while (usedNames.contains('$firstCopy $number'.toLowerCase())) {
+      number += 1;
+    }
+    return '$firstCopy $number';
+  }
+
+  Future<void> _duplicateRoom(ProjectRoom room) async {
+    final project = _project;
+    if (project == null || !room.isScanned) return;
+    final title = room.name?.trim().isNotEmpty == true
+        ? room.name!.trim()
+        : L10n.get(room.roomType.titleKey);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        icon: const Icon(Icons.copy_all_outlined),
+        title: Text(L10n.get('project_room_duplicate_confirm_title')),
+        content: Text(
+          L10n.get(
+            'project_room_duplicate_confirm_message',
+          ).replaceAll('{name}', title),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(L10n.get('project_delete_cancel')),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            icon: const Icon(Icons.copy_outlined),
+            label: Text(L10n.get('project_room_duplicate_confirm')),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    BuildContext? progressContext;
+    final progressClosed = showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        progressContext = dialogContext;
+        return PopScope(
+          canPop: false,
+          child: AlertDialog(
+            content: Row(
+              children: [
+                const SizedBox.square(
+                  dimension: 26,
+                  child: CircularProgressIndicator(strokeWidth: 3),
+                ),
+                const SizedBox(width: 18),
+                Expanded(
+                  child: Text(L10n.get('project_room_duplicate_progress')),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+    await WidgetsBinding.instance.endOfFrame;
+
+    ProjectRoom? duplicate;
+    Object? duplicateError;
+    try {
+      duplicate = await MakonProjectStore.instance.duplicateRoomScan(
+        projectId: widget.projectId,
+        roomId: room.id,
+        duplicateName: _duplicateRoomName(room, project),
+      );
+    } catch (error) {
+      duplicateError = error;
+    } finally {
+      final dialogContext = progressContext;
+      if (dialogContext != null && dialogContext.mounted) {
+        Navigator.of(dialogContext).pop();
+      }
+      await progressClosed;
+    }
+    if (!mounted) return;
+    if (duplicate != null) {
+      Toasts.showSuccess(context, L10n.get('project_room_duplicate_success'));
+    } else {
+      debugPrint('Room scan duplication failed: $duplicateError');
+      Toasts.showError(context, L10n.get('project_room_duplicate_failed'));
+    }
+  }
+
   Future<void> _editProject(MakonProject project) async {
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
@@ -339,6 +446,7 @@ class _ProjectDashboardScreenState extends State<ProjectDashboardScreen> {
               onRescanRoom: _rescanRoom,
               onConfirmDeleteRoom: _confirmDeleteRoom,
               onDeleteRoom: _deleteRoom,
+              onDuplicateRoom: (room) => unawaited(_duplicateRoom(room)),
               onOpenContractors: () => unawaited(_openContractorListing()),
             ),
     );
@@ -517,6 +625,7 @@ class _RoomByRoomBody extends StatelessWidget {
     required this.onRescanRoom,
     required this.onConfirmDeleteRoom,
     required this.onDeleteRoom,
+    required this.onDuplicateRoom,
     required this.onOpenContractors,
   });
 
@@ -526,6 +635,7 @@ class _RoomByRoomBody extends StatelessWidget {
   final ValueChanged<ProjectRoom> onRescanRoom;
   final Future<bool> Function(ProjectRoom room) onConfirmDeleteRoom;
   final ValueChanged<ProjectRoom> onDeleteRoom;
+  final ValueChanged<ProjectRoom> onDuplicateRoom;
   final VoidCallback onOpenContractors;
 
   @override
@@ -608,6 +718,12 @@ class _RoomByRoomBody extends StatelessWidget {
                         onTap: room.isScanned
                             ? () => onOpenRoom(room)
                             : () => onRescanRoom(room),
+                        onLongPress: room.isScanned
+                            ? () {
+                                unawaited(HapticFeedback.mediumImpact());
+                                onDuplicateRoom(room);
+                              }
+                            : null,
                       ),
                     );
                   }),

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:makon3d_mobile/models/housing_scan.dart';
@@ -427,6 +429,153 @@ class MakonProjectStore extends ChangeNotifier {
     if (scan != null) {
       unawaited(_cleanupDeletedScan(scan));
     }
+  }
+
+  /// Creates a room whose scan, server media, and local USDZ are independent
+  /// from [roomId]. This prevents deleting or editing one copy from affecting
+  /// the other.
+  Future<ProjectRoom?> duplicateRoomScan({
+    required String projectId,
+    required String roomId,
+    required String duplicateName,
+  }) async {
+    await ensureLoaded();
+    if (!AuthState().isSignedIn) return null;
+    final project = getById(projectId);
+    if (project == null) return null;
+    final sourceIndex = project.rooms.indexWhere((room) => room.id == roomId);
+    if (sourceIndex < 0) return null;
+    final sourceRoom = project.rooms[sourceIndex];
+    final sourceScan = sourceRoom.scan;
+    if (sourceScan == null || !sourceRoom.isScanned) return null;
+
+    final localId = _newLocalId();
+    File? sourceFile;
+    try {
+      sourceFile = await RoomUsdzViewerService.resolveLocalUsdz(
+        sourceScan.localUsdzPath,
+        fallbackPathOrUrl: sourceScan.usdzUrl,
+      );
+    } catch (_) {
+      // A server-side duplicate does not require a local source file.
+    }
+
+    ScanUploadResult? upload;
+    final remoteId = sourceScan.remoteScanId;
+    if (remoteId != null && remoteId > 0) {
+      try {
+        upload = await ScanUploadService.duplicateScan(remoteId);
+      } on DioException catch (error) {
+        // Compatibility fallback while older API instances are still rolling
+        // out: re-upload the on-device USDZ when it is available.
+        final status = error.response?.statusCode;
+        if (sourceFile == null ||
+            (status != 404 && status != 405 && status != 409)) {
+          rethrow;
+        }
+        upload = await ScanUploadService.uploadScan(
+          usdzFilePath: sourceFile.path,
+        );
+      }
+    } else if (sourceFile != null) {
+      upload = await ScanUploadService.uploadScan(
+        usdzFilePath: sourceFile.path,
+      );
+    }
+    if (upload != null && upload.id <= 0) {
+      throw StateError('Duplicate scan upload did not return an id.');
+    }
+    if (sourceScan.hasModel && upload == null && sourceFile == null) {
+      throw StateError('The source scan model is unavailable.');
+    }
+
+    String? copiedLocalPath;
+    if (sourceFile != null) {
+      try {
+        final support = await getApplicationSupportDirectory();
+        final directory = Directory('${support.path}/Makon3DScanCopies');
+        await directory.create(recursive: true);
+        final copy = await sourceFile.copy('${directory.path}/$localId.usdz');
+        copiedLocalPath = copy.path;
+      } catch (error) {
+        debugPrint('MakonProjectStore local scan copy failed: $error');
+      }
+    }
+
+    final now = DateTime.now();
+    final duplicateScan = HousingScan(
+      id: localId,
+      localUsdzPath: copiedLocalPath,
+      remoteScanId: upload?.id,
+      usdzUrl: upload?.usdzUrl,
+      glbUrl: upload?.glbUrl,
+      floorLongM: sourceScan.floorLongM,
+      floorShortM: sourceScan.floorShortM,
+      heightM: sourceScan.heightM,
+      floorAreaM2: sourceScan.floorAreaM2,
+      wallPerimeterM: upload?.wallPerimeterM ?? sourceScan.wallPerimeterM,
+      doorwayWidthM: upload?.doorwayWidthM ?? sourceScan.doorwayWidthM,
+      doorwayAreaM2: upload?.doorwayAreaM2 ?? sourceScan.doorwayAreaM2,
+      windowAreaM2: upload?.windowAreaM2 ?? sourceScan.windowAreaM2,
+      roomTypes: upload?.roomTypes.isNotEmpty == true
+          ? upload!.roomTypes
+          : sourceScan.roomTypes,
+      objectCounts: upload?.objectCounts.isNotEmpty == true
+          ? upload!.objectCounts
+          : sourceScan.objectCounts,
+      worldPlusXBearingDeg: sourceScan.worldPlusXBearingDeg,
+      capturedAt: now,
+    );
+    final duplicateRoom = ProjectRoom(
+      id: _newLocalId(),
+      roomType: sourceRoom.roomType,
+      createdAt: now,
+      name: duplicateName,
+      scan: duplicateScan,
+      floorTilePrefs: sourceRoom.floorTilePrefs,
+      wallpaperPrefs: sourceRoom.wallpaperPrefs,
+    );
+
+    final latestProject = getById(projectId);
+    final latestSourceIndex = latestProject?.rooms.indexWhere(
+      (room) => room.id == roomId,
+    );
+    if (latestProject == null ||
+        latestSourceIndex == null ||
+        latestSourceIndex < 0) {
+      await _discardDuplicateMedia(upload?.id, copiedLocalPath);
+      return null;
+    }
+    final rooms = [...latestProject.rooms]
+      ..insert(latestSourceIndex + 1, duplicateRoom);
+    try {
+      await upsert(latestProject.copyWith(rooms: rooms));
+      return duplicateRoom;
+    } catch (_) {
+      await _discardDuplicateMedia(upload?.id, copiedLocalPath);
+      rethrow;
+    }
+  }
+
+  Future<void> _discardDuplicateMedia(int? remoteId, String? localPath) async {
+    if (remoteId != null && remoteId > 0) {
+      await ProjectSyncService.deleteRemoteScan(remoteId);
+    }
+    if (localPath == null || localPath.isEmpty) return;
+    try {
+      final file = File(localPath);
+      if (file.existsSync()) await file.delete();
+    } catch (_) {}
+  }
+
+  static String _newLocalId() {
+    final random = Random.secure();
+    final timestamp = DateTime.now().microsecondsSinceEpoch.toRadixString(16);
+    final suffix = List.generate(
+      6,
+      (_) => random.nextInt(16).toRadixString(16),
+    ).join();
+    return '$timestamp-$suffix';
   }
 
   /// Best-effort teardown after a delete: removes the project's uploaded

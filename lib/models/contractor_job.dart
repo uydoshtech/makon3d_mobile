@@ -88,6 +88,7 @@ class ContractorJob {
     this.roomCount,
     this.previewScanId,
     this.selectedOfferId,
+    this.publishedAt,
     this.myOffer,
     this.privateAccess,
   });
@@ -112,6 +113,7 @@ class ContractorJob {
   final int? previewScanId;
   final int offerCount;
   final int? selectedOfferId;
+  final DateTime? publishedAt;
   final bool contactRevealed;
   final List<ContractorOffer> offers;
   final ContractorOffer? myOffer;
@@ -122,6 +124,7 @@ class ContractorJob {
 
   factory ContractorJob.fromJson(Map<String, dynamic> json) {
     final rawDate = _asText(json['start_date']);
+    final rawPublishedAt = _asText(json['published_at']);
     final rawOffers = json['offers'];
     final rawMyOffer = json['my_offer'];
     final rawPrivateAccess = json['private_access'];
@@ -154,6 +157,7 @@ class ContractorJob {
       previewScanId: _asInt(json['preview_scan_id']),
       offerCount: _asInt(json['offer_count']) ?? 0,
       selectedOfferId: _asInt(json['selected_offer_id']),
+      publishedAt: DateTime.tryParse(rawPublishedAt ?? ''),
       contactRevealed: json['contact_revealed'] == true,
       offers: rawOffers is List
           ? rawOffers
@@ -174,6 +178,22 @@ class ContractorJob {
           : null,
     );
   }
+}
+
+/// Newest publication first. A stable ID fallback keeps legacy payloads that
+/// predate `published_at` deterministic and below dated jobs.
+int compareContractorJobsByFreshness(ContractorJob left, ContractorJob right) {
+  final leftDate = left.publishedAt;
+  final rightDate = right.publishedAt;
+  if (leftDate != null && rightDate != null) {
+    final dateOrder = rightDate.compareTo(leftDate);
+    if (dateOrder != 0) return dateOrder;
+  } else if (leftDate != null) {
+    return -1;
+  } else if (rightDate != null) {
+    return 1;
+  }
+  return right.id.compareTo(left.id);
 }
 
 int? _asInt(Object? value) {

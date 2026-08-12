@@ -81,7 +81,21 @@ class ScanUploadService {
         if (metrics != null) "room_scan_metrics": metrics.toJson(),
       },
     );
-    final data = response.data ?? const <String, dynamic>{};
+    return _parseUploadResult(response.data);
+  }
+
+  /// Creates a fully independent server-side copy of an existing scan.
+  static Future<ScanUploadResult> duplicateScan(int scanId) async {
+    final deviceId = await DeviceIdentity.get();
+    final response = await _dio.post<Map<String, dynamic>>(
+      "/makon3d/scans/$scanId/duplicate",
+      data: <String, dynamic>{"device_id": deviceId},
+    );
+    return _parseUploadResult(response.data);
+  }
+
+  static ScanUploadResult _parseUploadResult(Map<String, dynamic>? response) {
+    final data = response ?? const <String, dynamic>{};
     return ScanUploadResult(
       id: (data["id"] as num?)?.toInt() ?? 0,
       usdzUrl: data["usdzUrl"] as String?,

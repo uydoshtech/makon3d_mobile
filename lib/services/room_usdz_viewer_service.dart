@@ -569,6 +569,14 @@ class RoomUsdzViewerService {
       "floorPlanAddFurnitureUpdated": l(
         "room_3d_floor_plan_add_furniture_updated",
       ),
+      "floorPlanInstallWindow": l("room_3d_floor_plan_install_window"),
+      "floorPlanInstallWindowTitle": l(
+        "room_3d_floor_plan_install_window_title",
+      ),
+      "floorPlanInstallWindowMessage": l(
+        "room_3d_floor_plan_install_window_message",
+      ),
+      "floorPlanWindowAdded": l("room_3d_floor_plan_window_added"),
       "floorPlanChangeWalls": l("room_3d_floor_plan_change_walls"),
       "floorPlanChangeFloor": l("room_3d_floor_plan_change_floor"),
       "floorPlanChangeWallsTitle": l("room_3d_floor_plan_change_walls_title"),
