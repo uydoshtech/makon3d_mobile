@@ -23,9 +23,8 @@
                         <constraints>
                             <constraint firstItem="YRO-k0-Ey4" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="1a2-6s-vTC"/>
                             <constraint firstItem="YRO-k0-Ey4" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="4X2-HB-R7a"/>
-                            <constraint firstItem="YRO-k0-Ey4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Ze5-6b-2t3" secondAttribute="leading" constant="40" id="launch-leading"/>
-                            <constraint firstItem="Ze5-6b-2t3" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="YRO-k0-Ey4" secondAttribute="trailing" constant="40" id="launch-trailing"/>
-                            <constraint firstItem="YRO-k0-Ey4" firstAttribute="width" relation="lessThanOrEqual" constant="220" id="launch-max-width"/>
+                            <constraint firstItem="YRO-k0-Ey4" firstAttribute="width" constant="660" id="launch-width"/>
+                            <constraint firstItem="YRO-k0-Ey4" firstAttribute="height" constant="660" id="launch-height"/>
                         </constraints>
                     </view>
                 </viewController>

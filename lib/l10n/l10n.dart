@@ -608,7 +608,7 @@ class L10n {
       "room_3d_floor_plan_object_unknown": "Object",
       "room_3d_floor_plan_rotate_furniture_title": "Adjust furniture",
       "room_3d_floor_plan_rotate_furniture_message":
-          "Slider rotates; arrows move on the floor; raise/lower adjust height (10 cm).",
+          "Slider rotates; arrows move on the floor; raise/lower adjust height (5 cm).",
       "room_3d_floor_plan_rotate_furniture_updated": "Furniture updated",
       "room_3d_floor_plan_rotate_furniture_degrees_format": "%+.0f°",
       "room_3d_floor_plan_move_furniture_up": "Move up",
@@ -1242,7 +1242,7 @@ class L10n {
       "room_3d_floor_plan_object_unknown": "Объект",
       "room_3d_floor_plan_rotate_furniture_title": "Настройка мебели",
       "room_3d_floor_plan_rotate_furniture_message":
-          "Слайдер поворачивает; стрелки — по полу; поднять/опустить — высота (10 см).",
+          "Слайдер поворачивает; стрелки — по полу; поднять/опустить — высота (5 см).",
       "room_3d_floor_plan_rotate_furniture_updated": "Мебель обновлена",
       "room_3d_floor_plan_rotate_furniture_degrees_format": "%+.0f°",
       "room_3d_floor_plan_move_furniture_up": "Вверх",
@@ -1880,7 +1880,7 @@ class L10n {
       "room_3d_floor_plan_object_unknown": "Buyum",
       "room_3d_floor_plan_rotate_furniture_title": "Mebelni sozlash",
       "room_3d_floor_plan_rotate_furniture_message":
-          "Slayder buradi; strelkalar pol bo'ylab; ko'tarish/tushirish — balandlik (10 sm).",
+          "Slayder buradi; strelkalar pol bo'ylab; ko'tarish/tushirish — balandlik (5 sm).",
       "room_3d_floor_plan_rotate_furniture_updated": "Mebel yangilandi",
       "room_3d_floor_plan_rotate_furniture_degrees_format": "%+.0f°",
       "room_3d_floor_plan_move_furniture_up": "Yuqoriga",

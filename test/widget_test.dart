@@ -19,6 +19,10 @@ void main() {
 
     expect(find.byType(SplashScreen), findsOneWidget);
     expect(find.byType(Image), findsOneWidget);
+    final logoTransform = tester.widget<Transform>(
+      find.ancestor(of: find.byType(Image), matching: find.byType(Transform)),
+    );
+    expect(logoTransform.transform.getMaxScaleOnAxis(), 3);
     expect(
       find.descendant(
         of: find.byType(SplashScreen),

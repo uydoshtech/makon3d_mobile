@@ -65,13 +65,16 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: MakonColors.yellow,
       body: Center(
-        child: Image.asset(
-          "assets/branding/makon_splash_logo.png",
-          fit: BoxFit.contain,
-          // Native LaunchScreen.storyboard renders this same artwork at
-          // 220pt wide. Keeping those bounds identical prevents a visual
-          // jump when Flutter draws its first frame.
-          width: 220,
+        child: Transform.scale(
+          scale: 3,
+          child: Image.asset(
+            "assets/branding/makon_splash_logo.png",
+            fit: BoxFit.contain,
+            // Native LaunchScreen.storyboard renders the same 220pt artwork
+            // at 3x. Matching that scale prevents a visual jump when Flutter
+            // draws its first frame.
+            width: 220,
+          ),
         ),
       ),
     );
