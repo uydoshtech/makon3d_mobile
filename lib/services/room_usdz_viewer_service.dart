@@ -577,6 +577,19 @@ class RoomUsdzViewerService {
         "room_3d_floor_plan_install_window_message",
       ),
       "floorPlanWindowAdded": l("room_3d_floor_plan_window_added"),
+      "floorPlanAddWallOpeningTitle": l(
+        "room_3d_floor_plan_add_wall_opening_title",
+      ),
+      "floorPlanAddDoor": l("room_3d_floor_plan_add_door"),
+      "floorPlanAddDoorway": l("room_3d_floor_plan_add_doorway"),
+      "floorPlanAddWindow": l("room_3d_floor_plan_add_window"),
+      "floorPlanWallOpeningPlacementMessage": l(
+        "room_3d_floor_plan_wall_opening_placement_message",
+      ),
+      "floorPlanWallOpeningAdded": l("room_3d_floor_plan_wall_opening_added"),
+      "floorPlanWallOpeningUnavailable": l(
+        "room_3d_floor_plan_wall_opening_unavailable",
+      ),
       "floorPlanChangeWalls": l("room_3d_floor_plan_change_walls"),
       "floorPlanChangeFloor": l("room_3d_floor_plan_change_floor"),
       "floorPlanChangeWallsTitle": l("room_3d_floor_plan_change_walls_title"),

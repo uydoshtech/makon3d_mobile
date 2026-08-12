@@ -662,6 +662,15 @@ class L10n {
       "room_3d_floor_plan_install_window_message":
           "A window and matching wall opening will be created at this anchor.",
       "room_3d_floor_plan_window_added": "Window installed",
+      "room_3d_floor_plan_add_wall_opening_title": "Add to this wall",
+      "room_3d_floor_plan_add_door": "Door",
+      "room_3d_floor_plan_add_doorway": "Doorway",
+      "room_3d_floor_plan_add_window": "Window",
+      "room_3d_floor_plan_wall_opening_placement_message":
+          "Drag it along the wall, then tap the green checkmark.",
+      "room_3d_floor_plan_wall_opening_added": "Wall opening created",
+      "room_3d_floor_plan_wall_opening_unavailable":
+          "This opening overlaps another opening or does not fit here.",
       "room_3d_floor_plan_change_walls": "Change walls",
       "room_3d_floor_plan_change_floor": "Change floor",
       "room_3d_floor_plan_change_walls_title": "Wall material",
@@ -1288,6 +1297,15 @@ class L10n {
       "room_3d_floor_plan_install_window_message":
           "В выбранной точке появится окно, а в стене автоматически создастся проём.",
       "room_3d_floor_plan_window_added": "Окно установлено",
+      "room_3d_floor_plan_add_wall_opening_title": "Добавить на эту стену",
+      "room_3d_floor_plan_add_door": "Дверь",
+      "room_3d_floor_plan_add_doorway": "Дверной проём",
+      "room_3d_floor_plan_add_window": "Окно",
+      "room_3d_floor_plan_wall_opening_placement_message":
+          "Переместите объект вдоль стены и нажмите зелёную галочку.",
+      "room_3d_floor_plan_wall_opening_added": "Проём в стене создан",
+      "room_3d_floor_plan_wall_opening_unavailable":
+          "Проём пересекается с другим проёмом или не помещается здесь.",
       "room_3d_floor_plan_change_walls": "Стены",
       "room_3d_floor_plan_change_floor": "Пол",
       "room_3d_floor_plan_change_walls_title": "Материал стен",
@@ -1921,6 +1939,15 @@ class L10n {
       "room_3d_floor_plan_install_window_message":
           "Tanlangan joyga deraza o'rnatiladi va devorda avtomatik ravishda teshik yaratiladi.",
       "room_3d_floor_plan_window_added": "Deraza o'rnatildi",
+      "room_3d_floor_plan_add_wall_opening_title": "Bu devorga qo'shish",
+      "room_3d_floor_plan_add_door": "Eshik",
+      "room_3d_floor_plan_add_doorway": "Eshik o'rni",
+      "room_3d_floor_plan_add_window": "Deraza",
+      "room_3d_floor_plan_wall_opening_placement_message":
+          "Obyektni devor bo'ylab suring, so'ng yashil tasdiq belgisini bosing.",
+      "room_3d_floor_plan_wall_opening_added": "Devorda o'rin yaratildi",
+      "room_3d_floor_plan_wall_opening_unavailable":
+          "Bu o'rin boshqa o'rin bilan kesishadi yoki bu yerga sig'maydi.",
       "room_3d_floor_plan_change_walls": "Devorlar",
       "room_3d_floor_plan_change_floor": "Pol",
       "room_3d_floor_plan_change_walls_title": "Devor materiali",
