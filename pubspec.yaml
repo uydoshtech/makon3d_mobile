@@ -2,7 +2,7 @@ name: makon3d_mobile
 description: "Makonix — LiDAR 3D room scanning app."
 publish_to: 'none'
 
-version: 1.0.0+75
+version: 1.0.0+76
 
 environment:
   sdk: ^3.12.2
@@ -31,7 +31,7 @@ dependencies:
   room_scan_kit:
     git:
       url: https://github.com/uydoshtech/room_scan_kit.git
-      ref: v0.6.42
+      ref: 79f930694b11f15c6262a7994a432d8fb2fda226
   shared_preferences: ^2.5.3
   sign_in_with_apple: ^8.1.0
   sqflite: ^2.4.2

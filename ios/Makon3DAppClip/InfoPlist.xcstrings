@@ -7,19 +7,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Makonix Scan"
+            "value" : "Makonix"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Makonix Сканер"
+            "value" : "Makonix"
           }
         },
         "uz" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Makonix Skaner"
+            "value" : "Makonix"
           }
         }
       }
@@ -30,8 +30,8 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "MakonixAppClip"
+            "state" : "translated",
+            "value" : "Makonix"
           }
         }
       }
