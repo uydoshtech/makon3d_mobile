@@ -83,6 +83,7 @@ class _MainShellState extends State<MainShell> {
           OffersScreen(
             isActive: _index == _offersTab,
             isContractor: isContractor,
+            onOpenAccount: () => _goToTab(_settingsTab),
           ),
           const SettingsScreen(),
         ],

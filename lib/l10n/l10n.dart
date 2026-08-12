@@ -623,6 +623,23 @@ class L10n {
       "room_3d_floor_plan_delete_furniture_confirm_message":
           "This item will be hidden from the 3D view and floor plan.",
       "room_3d_floor_plan_delete_furniture_updated": "Furniture removed",
+      "room_3d_floor_plan_delete_window": "Remove window",
+      "room_3d_floor_plan_delete_window_confirm_title": "Remove window?",
+      "room_3d_floor_plan_delete_window_confirm_message":
+          "The window opening will be filled to make this a solid wall.",
+      "room_3d_floor_plan_delete_window_updated":
+          "Window removed; wall made solid",
+      "room_3d_floor_plan_delete_door": "Remove door",
+      "room_3d_floor_plan_delete_door_confirm_title": "Remove door?",
+      "room_3d_floor_plan_delete_door_confirm_message":
+          "The door and its opening will be removed to make this a solid wall.",
+      "room_3d_floor_plan_delete_door_updated": "Door removed; wall made solid",
+      "room_3d_floor_plan_delete_opening": "Fill doorway",
+      "room_3d_floor_plan_delete_opening_confirm_title": "Fill doorway?",
+      "room_3d_floor_plan_delete_opening_confirm_message":
+          "This doorway will be filled to make this a solid wall.",
+      "room_3d_floor_plan_delete_opening_updated":
+          "Doorway filled; wall made solid",
       "room_3d_floor_plan_furniture_size_title": "Size",
       "room_3d_floor_plan_furniture_size_width": "Width",
       "room_3d_floor_plan_furniture_size_length": "Length",
@@ -1217,6 +1234,24 @@ class L10n {
       "room_3d_floor_plan_delete_furniture_confirm_message":
           "Этот предмет будет скрыт в 3D-виде и на плане этажа.",
       "room_3d_floor_plan_delete_furniture_updated": "Мебель удалена",
+      "room_3d_floor_plan_delete_window": "Убрать окно",
+      "room_3d_floor_plan_delete_window_confirm_title": "Убрать окно?",
+      "room_3d_floor_plan_delete_window_confirm_message":
+          "Оконный проём будет заполнен, и стена станет сплошной.",
+      "room_3d_floor_plan_delete_window_updated":
+          "Окно убрано, стена стала сплошной",
+      "room_3d_floor_plan_delete_door": "Убрать дверь",
+      "room_3d_floor_plan_delete_door_confirm_title": "Убрать дверь?",
+      "room_3d_floor_plan_delete_door_confirm_message":
+          "Дверь и дверной проём будут убраны, и стена станет сплошной.",
+      "room_3d_floor_plan_delete_door_updated":
+          "Дверь убрана, стена стала сплошной",
+      "room_3d_floor_plan_delete_opening": "Заложить проём",
+      "room_3d_floor_plan_delete_opening_confirm_title": "Заложить проём?",
+      "room_3d_floor_plan_delete_opening_confirm_message":
+          "Этот дверной проём будет заполнен, и стена станет сплошной.",
+      "room_3d_floor_plan_delete_opening_updated":
+          "Проём заложен, стена стала сплошной",
       "room_3d_floor_plan_furniture_size_title": "Размер",
       "room_3d_floor_plan_furniture_size_width": "Ширина",
       "room_3d_floor_plan_furniture_size_length": "Длина",
@@ -1815,6 +1850,26 @@ class L10n {
       "room_3d_floor_plan_delete_furniture_confirm_message":
           "Bu buyum 3D ko'rinish va qavat rejasidan yashiriladi.",
       "room_3d_floor_plan_delete_furniture_updated": "Mebel olib tashlandi",
+      "room_3d_floor_plan_delete_window": "Derazani olib tashlash",
+      "room_3d_floor_plan_delete_window_confirm_title":
+          "Derazani olib tashlash?",
+      "room_3d_floor_plan_delete_window_confirm_message":
+          "Deraza o'rni to'ldirilib, devor yaxlit qilinadi.",
+      "room_3d_floor_plan_delete_window_updated":
+          "Deraza olib tashlandi, devor yaxlit qilindi",
+      "room_3d_floor_plan_delete_door": "Eshikni olib tashlash",
+      "room_3d_floor_plan_delete_door_confirm_title": "Eshikni olib tashlash?",
+      "room_3d_floor_plan_delete_door_confirm_message":
+          "Eshik va uning o'rni olib tashlanib, devor yaxlit qilinadi.",
+      "room_3d_floor_plan_delete_door_updated":
+          "Eshik olib tashlandi, devor yaxlit qilindi",
+      "room_3d_floor_plan_delete_opening": "Eshik o'rnini yopish",
+      "room_3d_floor_plan_delete_opening_confirm_title":
+          "Eshik o'rnini yopish?",
+      "room_3d_floor_plan_delete_opening_confirm_message":
+          "Bu eshik o'rni to'ldirilib, devor yaxlit qilinadi.",
+      "room_3d_floor_plan_delete_opening_updated":
+          "Eshik o'rni yopildi, devor yaxlit qilindi",
       "room_3d_floor_plan_furniture_size_title": "O'lcham",
       "room_3d_floor_plan_furniture_size_width": "Kenglik",
       "room_3d_floor_plan_furniture_size_length": "Uzunlik",

@@ -10,6 +10,7 @@ import 'package:makon3d_mobile/screens/customer_contractor_job_screen.dart';
 import 'package:makon3d_mobile/services/auth/auth_state.dart';
 import 'package:makon3d_mobile/services/contractor_marketplace_service.dart';
 import 'package:makon3d_mobile/theme/makon_colors.dart';
+import 'package:makon3d_mobile/widgets/app_bar_account_avatar.dart';
 import 'package:makon3d_mobile/widgets/makonix_loader.dart';
 
 /// Customer-facing contractor responses and contractor-facing submitted bids.
@@ -18,11 +19,13 @@ class OffersScreen extends StatefulWidget {
   const OffersScreen({
     required this.isActive,
     required this.isContractor,
+    this.onOpenAccount,
     super.key,
   });
 
   final bool isActive;
   final bool isContractor;
+  final VoidCallback? onOpenAccount;
 
   @override
   State<OffersScreen> createState() => _OffersScreenState();
@@ -109,8 +112,20 @@ class _OffersScreenState extends State<OffersScreen> {
     final titleKey = widget.isContractor
         ? 'offers_submitted_title'
         : 'offers_list_title';
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(L10n.get(titleKey))),
+      appBar: AppBar(
+        title: Text(
+          L10n.get(titleKey),
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        actions: [
+          if (widget.onOpenAccount case final onOpenAccount?)
+            AppBarAccountAvatar(onTap: onOpenAccount),
+        ],
+      ),
       body: !AuthState().isSignedIn
           ? _Message(
               icon: Icons.lock_outline,
@@ -131,12 +146,22 @@ class _OffersScreenState extends State<OffersScreen> {
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.fromLTRB(32, 120, 32, 120),
                       children: [
-                        Icon(
-                          Icons.handshake_outlined,
-                          size: 58,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        Center(
+                          child: Container(
+                            width: 76,
+                            height: 76,
+                            decoration: const BoxDecoration(
+                              color: MakonColors.yellowSoft,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.handshake_outlined,
+                              size: 36,
+                              color: MakonColors.ink,
+                            ),
+                          ),
                         ),
-                        const SizedBox(height: 18),
+                        const SizedBox(height: 20),
                         Text(
                           L10n.get(
                             widget.isContractor
@@ -144,7 +169,10 @@ class _OffersScreenState extends State<OffersScreen> {
                                 : 'offers_empty',
                           ),
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyLarge,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                            height: 1.45,
+                          ),
                         ),
                       ],
                     )
@@ -152,7 +180,7 @@ class _OffersScreenState extends State<OffersScreen> {
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
                       itemCount: _jobs.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 12),
+                      separatorBuilder: (_, _) => const SizedBox(height: 10),
                       itemBuilder: (context, index) {
                         final job = _jobs[index];
                         return _OfferJobCard(
@@ -197,66 +225,139 @@ class _OfferJobCard extends StatelessWidget {
         : L10n.get(
             'contractor_offers_count',
           ).replaceAll('{count}', '${job.offerCount}');
+    final statusColor = switch (job.status) {
+      ContractorListingStatus.open => const Color(0xFF2E7D32),
+      ContractorListingStatus.assigned => const Color(0xFF9A6B00),
+      ContractorListingStatus.closed ||
+      ContractorListingStatus.cancelled => theme.colorScheme.onSurfaceVariant,
+    };
     return Material(
-      color: theme.colorScheme.surface,
-      borderRadius: BorderRadius.circular(20),
+      color: theme.colorScheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(18),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                width: 48,
-                height: 48,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: MakonColors.yellowSoft,
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(13),
+                  color: theme.colorScheme.secondary,
                 ),
                 child: const Icon(
                   Icons.handshake_outlined,
-                  color: MakonColors.black,
+                  size: 23,
+                  color: MakonColors.ink,
                 ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    if (job.publicLocation.isNotEmpty) ...[
-                      const SizedBox(height: 3),
-                      Text(
-                        job.publicLocation,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 8),
-                    Text(
-                      subtitle,
-                      style: theme.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 3),
-                    Text(
-                      status,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                    if (job.publicLocation.isNotEmpty) ...[
+                      const SizedBox(height: 5),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 1),
+                            child: Icon(
+                              Icons.location_on_outlined,
+                              size: 16,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          Expanded(
+                            child: Text(
+                              job.publicLocation,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                                height: 1.25,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+                    ],
+                    const SizedBox(height: 9),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          subtitle,
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: statusColor.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: statusColor,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                status,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: statusColor,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded),
+              const SizedBox(width: 8),
+              Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface.withValues(alpha: 0.72),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.chevron_right_rounded,
+                  size: 22,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
             ],
           ),
         ),
@@ -283,24 +384,37 @@ class _Message extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 52,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            Container(
+              width: 72,
+              height: 72,
+              decoration: const BoxDecoration(
+                color: MakonColors.yellowSoft,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 34, color: MakonColors.ink),
             ),
-            const SizedBox(height: 16),
-            Text(text, textAlign: TextAlign.center),
+            const SizedBox(height: 18),
+            Text(
+              text,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+                height: 1.45,
+              ),
+            ),
             if (action != null) ...[
-              const SizedBox(height: 16),
-              OutlinedButton(
+              const SizedBox(height: 18),
+              OutlinedButton.icon(
                 onPressed: action,
-                child: Text(L10n.get('contractor_retry')),
+                icon: const Icon(Icons.refresh_rounded),
+                label: Text(L10n.get('contractor_retry')),
               ),
             ],
           ],

@@ -521,6 +521,34 @@ class RoomUsdzViewerService {
       "floorPlanDeleteFurnitureUpdated": l(
         "room_3d_floor_plan_delete_furniture_updated",
       ),
+      "floorPlanDeleteWindow": l("room_3d_floor_plan_delete_window"),
+      "floorPlanDeleteWindowConfirmTitle": l(
+        "room_3d_floor_plan_delete_window_confirm_title",
+      ),
+      "floorPlanDeleteWindowConfirmMessage": l(
+        "room_3d_floor_plan_delete_window_confirm_message",
+      ),
+      "floorPlanDeleteWindowUpdated": l(
+        "room_3d_floor_plan_delete_window_updated",
+      ),
+      "floorPlanDeleteDoor": l("room_3d_floor_plan_delete_door"),
+      "floorPlanDeleteDoorConfirmTitle": l(
+        "room_3d_floor_plan_delete_door_confirm_title",
+      ),
+      "floorPlanDeleteDoorConfirmMessage": l(
+        "room_3d_floor_plan_delete_door_confirm_message",
+      ),
+      "floorPlanDeleteDoorUpdated": l("room_3d_floor_plan_delete_door_updated"),
+      "floorPlanDeleteOpening": l("room_3d_floor_plan_delete_opening"),
+      "floorPlanDeleteOpeningConfirmTitle": l(
+        "room_3d_floor_plan_delete_opening_confirm_title",
+      ),
+      "floorPlanDeleteOpeningConfirmMessage": l(
+        "room_3d_floor_plan_delete_opening_confirm_message",
+      ),
+      "floorPlanDeleteOpeningUpdated": l(
+        "room_3d_floor_plan_delete_opening_updated",
+      ),
       "floorPlanFurnitureSizeTitle": l(
         "room_3d_floor_plan_furniture_size_title",
       ),
