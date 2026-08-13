@@ -11,6 +11,7 @@ import 'package:makon3d_mobile/services/makon_project_store.dart';
 import 'package:makon3d_mobile/widgets/app_bar_account_avatar.dart';
 import 'package:makon3d_mobile/widgets/makonix_loader.dart';
 import 'package:makon3d_mobile/widgets/project_delete_dialog.dart';
+import 'package:makon3d_mobile/widgets/project_duplicate_dialog.dart';
 import 'package:makon3d_mobile/widgets/sign_in_sheet.dart';
 
 /// Device-local Makon projects. Opening a project never re-asks for scan mode.
@@ -196,7 +197,7 @@ class _ProjectsListScreenState extends State<ProjectsListScreen>
                             project: project,
                             onTap: () => unawaited(_openProject(project)),
                             onLongPress: () => unawaited(
-                              confirmAndDeleteProject(context, project),
+                              confirmAndDuplicateProject(context, project),
                             ),
                           ),
                         );

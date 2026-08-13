@@ -449,6 +449,123 @@ class MakonProjectStore extends ChangeNotifier {
     final sourceScan = sourceRoom.scan;
     if (sourceScan == null || !sourceRoom.isScanned) return null;
 
+    final copied = await _duplicateHousingScan(sourceScan);
+    final now = DateTime.now();
+    final duplicateRoom = ProjectRoom(
+      id: _newLocalId(),
+      roomType: sourceRoom.roomType,
+      createdAt: now,
+      name: duplicateName,
+      scan: copied.scan,
+      layoutOffsetXM: sourceRoom.layoutOffsetXM,
+      layoutOffsetZM: sourceRoom.layoutOffsetZM,
+      layoutYawDeg: sourceRoom.layoutYawDeg,
+      floorTilePrefs: sourceRoom.floorTilePrefs,
+      wallpaperPrefs: sourceRoom.wallpaperPrefs,
+    );
+
+    final latestProject = getById(projectId);
+    final latestSourceIndex = latestProject?.rooms.indexWhere(
+      (room) => room.id == roomId,
+    );
+    if (latestProject == null ||
+        latestSourceIndex == null ||
+        latestSourceIndex < 0) {
+      await copied.discard();
+      return null;
+    }
+    final rooms = [...latestProject.rooms]
+      ..insert(latestSourceIndex + 1, duplicateRoom);
+    try {
+      await upsert(latestProject.copyWith(rooms: rooms));
+      return duplicateRoom;
+    } catch (_) {
+      await copied.discard();
+      rethrow;
+    }
+  }
+
+  /// Creates an independent copy of [projectId], including every room scan.
+  /// The duplicate is inserted immediately after the source project. Contractor
+  /// listings are not copied — the new project starts unpublished.
+  Future<MakonProject?> duplicateProject({
+    required String projectId,
+    required String duplicateName,
+  }) async {
+    await ensureLoaded();
+    if (!AuthState().isSignedIn) return null;
+    final source = getById(projectId);
+    if (source == null) return null;
+
+    final copiedScans = <_DuplicatedScan>[];
+    try {
+      HousingScan? entireHousingScan;
+      if (source.entireHousingScan case final entire?) {
+        final copied = await _duplicateHousingScan(entire);
+        copiedScans.add(copied);
+        entireHousingScan = copied.scan;
+      }
+
+      final rooms = <ProjectRoom>[];
+      for (final room in source.rooms) {
+        final scan = room.scan;
+        HousingScan? duplicatedScan;
+        if (scan != null && room.isScanned) {
+          final copied = await _duplicateHousingScan(scan);
+          copiedScans.add(copied);
+          duplicatedScan = copied.scan;
+        }
+        rooms.add(
+          ProjectRoom(
+            id: _newLocalId(),
+            roomType: room.roomType,
+            createdAt: DateTime.now(),
+            name: room.name,
+            scan: duplicatedScan,
+            layoutOffsetXM: room.layoutOffsetXM,
+            layoutOffsetZM: room.layoutOffsetZM,
+            layoutYawDeg: room.layoutYawDeg,
+            floorTilePrefs: room.floorTilePrefs,
+            wallpaperPrefs: room.wallpaperPrefs,
+          ),
+        );
+      }
+
+      final now = DateTime.now();
+      final duplicate = MakonProject(
+        id: _newProjectId(),
+        name: duplicateName,
+        scanMode: source.scanMode,
+        createdAt: now,
+        updatedAt: now.toUtc(),
+        address: source.address,
+        notes: source.notes,
+        entireHousingScan: entireHousingScan,
+        rooms: rooms,
+        entireHousingFloorTilePrefs: source.entireHousingFloorTilePrefs,
+        entireHousingWallpaperPrefs: source.entireHousingWallpaperPrefs,
+      );
+
+      final latestIndex = _projects.indexWhere(
+        (project) => project.id == projectId,
+      );
+      if (latestIndex < 0) {
+        await _discardDuplicatedScans(copiedScans);
+        return null;
+      }
+      final next = [..._projects]..insert(latestIndex + 1, duplicate);
+      _projects = next;
+      await _persist();
+      notifyListeners();
+      unawaited(ProjectSyncService.pushProject(duplicate));
+      return duplicate;
+    } catch (_) {
+      await _discardDuplicatedScans(copiedScans);
+      rethrow;
+    }
+  }
+
+  Future<_DuplicatedScan> _duplicateHousingScan(HousingScan sourceScan) async {
     final localId = _newLocalId();
     File? sourceFile;
     try {
@@ -502,58 +619,38 @@ class MakonProjectStore extends ChangeNotifier {
       }
     }
 
-    final now = DateTime.now();
-    final duplicateScan = HousingScan(
-      id: localId,
-      localUsdzPath: copiedLocalPath,
-      remoteScanId: upload?.id,
-      usdzUrl: upload?.usdzUrl,
-      glbUrl: upload?.glbUrl,
-      floorLongM: sourceScan.floorLongM,
-      floorShortM: sourceScan.floorShortM,
-      heightM: sourceScan.heightM,
-      floorAreaM2: sourceScan.floorAreaM2,
-      wallPerimeterM: upload?.wallPerimeterM ?? sourceScan.wallPerimeterM,
-      doorwayWidthM: upload?.doorwayWidthM ?? sourceScan.doorwayWidthM,
-      doorwayAreaM2: upload?.doorwayAreaM2 ?? sourceScan.doorwayAreaM2,
-      windowAreaM2: upload?.windowAreaM2 ?? sourceScan.windowAreaM2,
-      roomTypes: upload?.roomTypes.isNotEmpty == true
-          ? upload!.roomTypes
-          : sourceScan.roomTypes,
-      objectCounts: upload?.objectCounts.isNotEmpty == true
-          ? upload!.objectCounts
-          : sourceScan.objectCounts,
-      worldPlusXBearingDeg: sourceScan.worldPlusXBearingDeg,
-      capturedAt: now,
+    return _DuplicatedScan(
+      scan: HousingScan(
+        id: localId,
+        localUsdzPath: copiedLocalPath,
+        remoteScanId: upload?.id,
+        usdzUrl: upload?.usdzUrl,
+        glbUrl: upload?.glbUrl,
+        floorLongM: sourceScan.floorLongM,
+        floorShortM: sourceScan.floorShortM,
+        heightM: sourceScan.heightM,
+        floorAreaM2: sourceScan.floorAreaM2,
+        wallPerimeterM: upload?.wallPerimeterM ?? sourceScan.wallPerimeterM,
+        doorwayWidthM: upload?.doorwayWidthM ?? sourceScan.doorwayWidthM,
+        doorwayAreaM2: upload?.doorwayAreaM2 ?? sourceScan.doorwayAreaM2,
+        windowAreaM2: upload?.windowAreaM2 ?? sourceScan.windowAreaM2,
+        roomTypes: upload?.roomTypes.isNotEmpty == true
+            ? upload!.roomTypes
+            : sourceScan.roomTypes,
+        objectCounts: upload?.objectCounts.isNotEmpty == true
+            ? upload!.objectCounts
+            : sourceScan.objectCounts,
+        worldPlusXBearingDeg: sourceScan.worldPlusXBearingDeg,
+        capturedAt: DateTime.now(),
+      ),
+      remoteId: upload?.id,
+      localPath: copiedLocalPath,
     );
-    final duplicateRoom = ProjectRoom(
-      id: _newLocalId(),
-      roomType: sourceRoom.roomType,
-      createdAt: now,
-      name: duplicateName,
-      scan: duplicateScan,
-      floorTilePrefs: sourceRoom.floorTilePrefs,
-      wallpaperPrefs: sourceRoom.wallpaperPrefs,
-    );
+  }
 
-    final latestProject = getById(projectId);
-    final latestSourceIndex = latestProject?.rooms.indexWhere(
-      (room) => room.id == roomId,
-    );
-    if (latestProject == null ||
-        latestSourceIndex == null ||
-        latestSourceIndex < 0) {
-      await _discardDuplicateMedia(upload?.id, copiedLocalPath);
-      return null;
-    }
-    final rooms = [...latestProject.rooms]
-      ..insert(latestSourceIndex + 1, duplicateRoom);
-    try {
-      await upsert(latestProject.copyWith(rooms: rooms));
-      return duplicateRoom;
-    } catch (_) {
-      await _discardDuplicateMedia(upload?.id, copiedLocalPath);
-      rethrow;
+  Future<void> _discardDuplicatedScans(List<_DuplicatedScan> scans) async {
+    for (final scan in scans) {
+      await scan.discard();
     }
   }
 
@@ -573,6 +670,16 @@ class MakonProjectStore extends ChangeNotifier {
     final timestamp = DateTime.now().microsecondsSinceEpoch.toRadixString(16);
     final suffix = List.generate(
       6,
+      (_) => random.nextInt(16).toRadixString(16),
+    ).join();
+    return '$timestamp-$suffix';
+  }
+
+  static String _newProjectId() {
+    final random = Random.secure();
+    final timestamp = DateTime.now().microsecondsSinceEpoch.toRadixString(16);
+    final suffix = List.generate(
+      8,
       (_) => random.nextInt(16).toRadixString(16),
     ).join();
     return '$timestamp-$suffix';
@@ -828,5 +935,20 @@ class MakonProjectStore extends ChangeNotifier {
     _loaded = true;
     _backendSyncStarted = false;
     if (didChange) notifyListeners();
+  }
+}
+
+class _DuplicatedScan {
+  const _DuplicatedScan({required this.scan, this.remoteId, this.localPath});
+
+  final HousingScan scan;
+  final int? remoteId;
+  final String? localPath;
+
+  Future<void> discard() {
+    return MakonProjectStore.instance._discardDuplicateMedia(
+      remoteId,
+      localPath,
+    );
   }
 }

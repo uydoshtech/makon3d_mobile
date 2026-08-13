@@ -101,7 +101,7 @@ PODS:
   - PromisesSwift (2.4.1):
     - PromisesObjC (= 2.4.1)
   - RecaptchaInterop (101.0.0)
-  - room_scan_kit (0.6.44):
+  - room_scan_kit (0.6.46):
     - Flutter
   - share_plus (0.0.1):
     - Flutter
@@ -222,7 +222,7 @@ SPEC CHECKSUMS:
   PromisesObjC: 752c3227f599e3467650e47ea36f433eeb10c273
   PromisesSwift: 217dea0fd5d2ad65222a109c48698add13cc1c5b
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
-  room_scan_kit: 32375bf3e3ec76d0547da38ceea431bc5faf1247
+  room_scan_kit: fc54733234688c55e56c15842fe62e7d07c692f5
   share_plus: 8b6f8b3447e494cca5317c8c3073de39b3600d1f
   shared_preferences_foundation: 5086985c1d43c5ba4d5e69a4e8083a389e2909e6
   sign_in_with_apple: fb98447f3dfb81e2926945ea43a8c9c7205eaca9

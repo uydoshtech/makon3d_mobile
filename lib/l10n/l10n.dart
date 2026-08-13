@@ -142,6 +142,14 @@ class L10n {
       "project_delete_cancel": "Cancel",
       "project_delete_confirm": "Delete",
       "project_deleted": "Project deleted",
+      "project_duplicate_confirm_title": "Duplicate this project?",
+      "project_duplicate_confirm_message":
+          "An independent copy of \"{name}\" will be created, including its scans. You can edit or delete either project separately.",
+      "project_duplicate_confirm": "Create duplicate",
+      "project_duplicate_progress": "Creating an independent copy…",
+      "project_duplicate_success": "Project duplicate created",
+      "project_duplicate_failed": "Could not duplicate the project",
+      "project_duplicate_name": "{name} — copy",
       "use_current_location": "Use current location",
       "location_services_disabled":
           "Location services are off. Turn them on to use current location.",
@@ -768,6 +776,14 @@ class L10n {
       "project_delete_cancel": "Отмена",
       "project_delete_confirm": "Удалить",
       "project_deleted": "Проект удалён",
+      "project_duplicate_confirm_title": "Создать дубликат проекта?",
+      "project_duplicate_confirm_message":
+          "Будет создана независимая копия «{name}», включая сканы. Каждый проект можно изменять или удалять отдельно.",
+      "project_duplicate_confirm": "Создать дубликат",
+      "project_duplicate_progress": "Создаём независимую копию…",
+      "project_duplicate_success": "Дубликат проекта создан",
+      "project_duplicate_failed": "Не удалось создать дубликат проекта",
+      "project_duplicate_name": "{name} — копия",
       "use_current_location": "Моя геолокация",
       "location_services_disabled":
           "Геолокация выключена. Включите её, чтобы использовать текущее местоположение.",
@@ -1403,6 +1419,14 @@ class L10n {
       "project_delete_cancel": "Bekor qilish",
       "project_delete_confirm": "O'chirish",
       "project_deleted": "Loyiha o'chirildi",
+      "project_duplicate_confirm_title": "Loyiha nusxasi yaratilsinmi?",
+      "project_duplicate_confirm_message":
+          "\"{name}\" loyihasining mustaqil nusxasi, jumladan skanlari, yaratiladi. Har bir loyihani alohida o'zgartirish yoki o'chirish mumkin.",
+      "project_duplicate_confirm": "Nusxa yaratish",
+      "project_duplicate_progress": "Mustaqil nusxa yaratilmoqda…",
+      "project_duplicate_success": "Loyiha nusxasi yaratildi",
+      "project_duplicate_failed": "Loyiha nusxasini yaratib bo'lmadi",
+      "project_duplicate_name": "{name} — nusxa",
       "use_current_location": "Joriy joylashuv",
       "location_services_disabled":
           "Joylashuv xizmatlari o'chiq. Joriy joylashuvdan foydalanish uchun ularni yoqing.",
