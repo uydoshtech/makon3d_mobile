@@ -483,18 +483,6 @@ class _EntireHousingBody extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
       children: [
-        Text(
-          L10n.get('project_scan_mode_label'),
-          style: theme.textTheme.labelLarge,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          L10n.get(ScanMode.entireHousing.titleKey),
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        const SizedBox(height: 20),
         _ContractorSearchCard(project: project, onTap: onOpenContractors),
         const SizedBox(height: 24),
         if (hasModel && scan != null) ...[
@@ -652,13 +640,6 @@ class _RoomByRoomBody extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
               children: [
-                _DashboardInfoCard(
-                  icon: Icons.view_in_ar,
-                  label: L10n.get('project_scan_mode_label'),
-                  title: L10n.get(ScanMode.roomByRoom.titleKey),
-                  description: L10n.get(ScanMode.roomByRoom.subtitleKey),
-                ),
-                const SizedBox(height: 16),
                 _ContractorSearchCard(
                   project: project,
                   onTap: onOpenContractors,
@@ -742,76 +723,6 @@ class _RoomByRoomBody extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _DashboardInfoCard extends StatelessWidget {
-  const _DashboardInfoCard({
-    required this.icon,
-    required this.label,
-    required this.title,
-    required this.description,
-  });
-
-  final IconData icon;
-  final String label;
-  final String title;
-  final String description;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
-
-    return Material(
-      color: scheme.surfaceContainerHighest,
-      borderRadius: BorderRadius.circular(18),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: scheme.primaryContainer,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(icon, color: scheme.onPrimaryContainer),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    title,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    description,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: scheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
